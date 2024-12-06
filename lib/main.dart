@@ -21,9 +21,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: signUp.id,
+      initialRoute: SignUp.id,
       routes: {
-        signUp.id: (BuildContext context) => signUp(),
+        SignUp.id: (BuildContext context) => SignUp(),
 
 
       },
