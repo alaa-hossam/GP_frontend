@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: logIn.id,
       routes: {
-        signUp.id: (BuildContext context) => signUp(),
+        SignUp.id: (BuildContext context) => SignUp(),
         logIn.id: (BuildContext context) => logIn(),
         forgetPassword.id: (BuildContext context) => forgetPassword(),
       },

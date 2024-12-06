@@ -39,7 +39,7 @@ class _logInState extends State<logIn> {
                   Center(
                     child: Column(
                       children: [
-                        myTextFormField(
+                        MyTextFormField(
                             controller: email,
                             hintName: "Email",
                             icon: Icons.email_outlined
@@ -47,7 +47,7 @@ class _logInState extends State<logIn> {
                         SizedBox(
                           height: SizeConfig.verticalBlock *10,
                         ),
-                        myTextFormField(
+                        MyTextFormField(
                           controller: password,
                           hintName: "Password",
                           icon: Icons.lock,
@@ -92,7 +92,7 @@ class _logInState extends State<logIn> {
                             const SizedBox(width: 5,),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, signUp.id);
+                                Navigator.pushNamed(context, SignUp.id);
                               },
                               child: const Text(
                                 'Sign up',

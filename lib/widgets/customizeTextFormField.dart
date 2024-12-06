@@ -7,18 +7,7 @@ class MyTextFormField extends StatelessWidget {
   final IconData icon;
   final Widget? suffixIcon;
   final bool isObscureText , enable;
-  RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
-  myTextFormField(
-      {required this.controller,
-        required this.hintName,
-        required this.icon,
-        this.isObscureText = false,
-        this.enable=true,
-        this.suffixIcon,
-      });
-  final bool isObscureText, enable;
   final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
-
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
 
   MyTextFormField({
@@ -28,6 +17,7 @@ class MyTextFormField extends StatelessWidget {
     this.isObscureText = false,
     this.enable = true,
     this.onClickFunction,
+    this.suffixIcon,
   });
   @override
   Widget build(BuildContext context) {

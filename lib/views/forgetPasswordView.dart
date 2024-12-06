@@ -72,7 +72,7 @@ class _forgetPasswordState extends State<forgetPassword> {
                           SizedBox(
                             height: SizeConfig.verticalBlock *10,
                           ),
-                          myTextFormField(
+                          MyTextFormField(
                               controller: email,
                               hintName: "Email",
                               icon: Icons.email_outlined
