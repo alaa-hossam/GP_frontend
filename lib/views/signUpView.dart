@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 
 class signUp extends StatelessWidget {
+  static String id = "SignUpScreen";
   const signUp({super.key});
 
   @override
