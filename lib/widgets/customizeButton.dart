@@ -4,9 +4,17 @@ import 'Dimensions.dart';
 
 class customizeButton extends StatelessWidget {
   final String buttonName;
+  final Color buttonColor;
+  final IconData? buttonIcon;
+  final Color fontColor;
+  final Border? buttonBorder;
   customizeButton(
       {
         required this.buttonName,
+        required this.buttonColor,
+        this.buttonIcon,
+        required this.fontColor,
+        this.buttonBorder
       });
 
   @override
@@ -18,18 +26,26 @@ class customizeButton extends StatelessWidget {
         width: SizeConfig.horizontalBlock * 363,
         height:SizeConfig.verticalBlock * 55,
         decoration: BoxDecoration(
-          color: Color(0xFF5095B0),
+          color: buttonColor,
           borderRadius: BorderRadius.circular(5),
+          border: buttonBorder
         ),
-        child:  Center(
-          child: Text(buttonName,
-            style: TextStyle(
-              color: Color(0xFFF5F5F5),
-              fontFamily: 'button-bold',
-              fontSize: SizeConfig.textRatio * 20,
+        child:  Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(buttonIcon ,color: SizeConfig.iconColor,),
+            SizedBox(width: 10,),
+            Text(buttonName,
+              style: TextStyle(
+                color: fontColor,
+                fontFamily: 'button-bold',
+                fontSize: SizeConfig.textRatio * 20,
+              ),
             ),
-          ),
+          ],
         ),
+
+
       ),
     );
   }
