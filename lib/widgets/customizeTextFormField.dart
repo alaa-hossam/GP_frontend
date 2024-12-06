@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Dimensions.dart';
 
-class myTextFormField extends StatelessWidget {
+class MyTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String hintName;
   final IconData icon;
@@ -16,48 +16,68 @@ class myTextFormField extends StatelessWidget {
         this.enable=true,
         this.suffixIcon,
       });
+  final bool isObscureText, enable;
+  final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
 
+  RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
+
+  MyTextFormField({
+    required this.controller,
+    required this.hintName,
+    required this.icon,
+    this.isObscureText = false,
+    this.enable = true,
+    this.onClickFunction,
+  });
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
     return Container(
       width: SizeConfig.horizontalBlock * 363,
-      height:SizeConfig.verticalBlock * 55,
+      height: SizeConfig.verticalBlock * 55,
       child: TextFormField(
         controller: controller,
         obscureText: isObscureText,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter $hintName';
-          } else if(hintName == 'password' && value.length<8){
+          } else if (hintName == 'password' && value.length < 8) {
             return 'Password should be at least 8 characters';
-          }else if (!_emailRegex.hasMatch(value) && hintName == 'Email'){
-            return 'Email address is not valid\n It should be Email structure';
+          } else if (!_emailRegex.hasMatch(value) && hintName == 'Email') {
+            return 'Email address is not valid\n It should be an Email structure';
           }
           return null;
         },
         enabled: enable,
         decoration: InputDecoration(
-          enabledBorder:const OutlineInputBorder(
+          enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.transparent),
           ),
-          focusedBorder:const OutlineInputBorder(
+          focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: Colors.blue),
           ),
-          prefixIcon: Icon(icon, size: SizeConfig.textRatio * 25, color: Color(0xFF5095B0),),
+          prefixIcon: Icon(
+            icon,
+            size: SizeConfig.textRatio * 25,
+            color: const Color(0xFF5095B0),
+          ),
           hintText: hintName,
           hintStyle: TextStyle(
-
-              color: Color(0x803C3C3C),
-              fontSize:SizeConfig.textRatio * 20,
-              fontFamily: 'Roboto'
+            color: SizeConfig.fontColor,
+            fontSize: SizeConfig.textRatio * 20,
+            fontFamily: 'Roboto',
           ),
-          fillColor: Color(0xFFF5F5F5),
+          fillColor: const Color(0xFFF5F5F5),
           filled: true,
           suffixIcon: suffixIcon,
         ),
+        onTap: () async {
+          if (onClickFunction != null) {
+            await onClickFunction!(context); // Pass the context to the callback
+          }
+        },
       ),
     );
   }
