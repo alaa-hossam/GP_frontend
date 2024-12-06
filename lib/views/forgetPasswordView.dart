@@ -80,7 +80,7 @@ class _forgetPasswordState extends State<forgetPassword> {
                           SizedBox(
                             height: SizeConfig.verticalBlock *10,
                           ),
-                          customizeButton(buttonName: 'Send Code'),
+                          customizeButton(buttonName: 'Send Code',buttonColor: SizeConfig.iconColor, ),
                           SizedBox(
                             height: SizeConfig.verticalBlock *10,
                           ),

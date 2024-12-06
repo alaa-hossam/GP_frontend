@@ -4,6 +4,8 @@ import 'package:gp_frontend/widgets/customizeDropDownMenu.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 
+import '../widgets/customizeButton.dart';
+
 class SignUp extends StatefulWidget {
   static String id = "SignUpScreen";
 
@@ -64,6 +66,9 @@ class _SignUpState extends State<SignUp> {
           children: [
             Column(
               children: [
+                Text("Logo"),
+                SizedBox(height: SizeConfig.verticalBlock * 80),
+
                 // Full Name Field
                 MyTextFormField(
                   controller: _fullName,
@@ -102,9 +107,47 @@ class _SignUpState extends State<SignUp> {
                 MyTextFormField(
                   controller: _email,
                   hintName: "Email",
-                  icon: Icons.mail_outline,
+                  icon: Icons.mail,
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
+
+                customizeButton(buttonName: 'Sign Up',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),),
+                SizedBox(height: SizeConfig.verticalBlock * 150),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: SizeConfig.horizontalBlock * 123,
+                      height: SizeConfig.verticalBlock * 2,
+                      // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 40,
+                      //     right: SizeConfig.horizontalBlock * 10),
+                      decoration:const BoxDecoration(
+                        color: Color(0xFFD8DADC)
+                      ),),
+                    Text("Or With", style: TextStyle(fontSize: SizeConfig.textRatio * 14),),
+                    Container(
+                      width: SizeConfig.horizontalBlock * 123,
+                      height: SizeConfig.verticalBlock * 2,
+                      // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 10),
+                      decoration:const BoxDecoration(
+                          color: Color(0xFFD8DADC)
+                      ),)
+                  ],
+                ),
+                SizedBox(height: SizeConfig.verticalBlock * 10),
+
+                customizeButton(buttonName: 'Google',buttonColor: Colors.white, buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
+                SizedBox(height: SizeConfig.verticalBlock * 10),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Already have an account?", style:TextStyle(fontSize: SizeConfig.textRatio * 14 )),
+
+                    Text("Log in", style:TextStyle(fontSize: SizeConfig.textRatio * 14,  color: Color(0xFF5095B0)) ,)
+                  ],
+                )
               ],
             ),
           ],
