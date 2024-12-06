@@ -1,5 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/forgetPasswordView.dart';
+import 'package:gp_frontend/views/logInView.dart';
 import 'views/signUpView.dart';
 
 void main() {
@@ -21,11 +23,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: signUp.id,
+      initialRoute: logIn.id,
       routes: {
         signUp.id: (BuildContext context) => signUp(),
-
-
+        logIn.id: (BuildContext context) => logIn(),
+        forgetPassword.id: (BuildContext context) => forgetPassword(),
       },
     );
   }

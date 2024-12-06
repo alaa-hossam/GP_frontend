@@ -5,6 +5,7 @@ class myTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String hintName;
   final IconData icon;
+  final Widget? suffixIcon;
   final bool isObscureText , enable;
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
   myTextFormField(
@@ -13,6 +14,7 @@ class myTextFormField extends StatelessWidget {
         required this.icon,
         this.isObscureText = false,
         this.enable=true,
+        this.suffixIcon,
       });
 
   @override
@@ -54,6 +56,7 @@ class myTextFormField extends StatelessWidget {
           ),
           fillColor: Color(0xFFF5F5F5),
           filled: true,
+          suffixIcon: suffixIcon,
         ),
       ),
     );
