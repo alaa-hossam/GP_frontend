@@ -49,11 +49,11 @@ class myTextFormField extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: Colors.blue),
           ),
-          prefixIcon: Icon(icon, size: SizeConfig.textRatio * 16, color: Color(0xFF3C2A7A),),
+          prefixIcon: Icon(icon, size: SizeConfig.textRatio * 20, color: Color(0xFF5095B0),),
           hintText: hintName,
           hintStyle: TextStyle(
               color: Color(0xFF3C3C3C),
-              fontSize:SizeConfig.textRatio * 16,
+              fontSize:SizeConfig.textRatio * 20,
               fontFamily: 'Roboto'
           ),
           labelText: hintName,
