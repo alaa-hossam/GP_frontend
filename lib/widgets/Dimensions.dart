@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flutter/widgets.dart';
 class SizeConfig {
-  static const double designWidth = 430;
-  static const double designHeight = 932;
+  static const double designWidth = 393;
+  static const double designHeight = 852;
   static late MediaQueryData _mediaQueryData;
   static late double screenWidth;
   static late double screenHeight;
@@ -19,4 +19,5 @@ class SizeConfig {
     verticalBlock = (screenHeight - statusBarHeight) / (designHeight);
     textRatio = min(verticalBlock, horizontalBlock);
   }
+
 }

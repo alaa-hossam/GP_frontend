@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'Dimensions.dart';
 
 class myTextFormField extends StatelessWidget {
-  TextEditingController controller;
-  String hintName;
-  IconData icon;
-  bool isObscureText , enable;
+  final TextEditingController controller;
+  final String hintName;
+  final IconData icon;
+  final bool isObscureText , enable;
   RegExp get _emailRegex => RegExp(r'^\S+@stud.fci-cu.edu.eg');
   myTextFormField(
       {required this.controller,
@@ -13,11 +14,16 @@ class myTextFormField extends StatelessWidget {
         this.isObscureText = false,
         this.enable=true,
       });
+
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    // print(SizeConfig.horizontalBlock * 363);
 
     return Container(
       padding:const EdgeInsets.symmetric(horizontal: 20.0),
+      width: SizeConfig.horizontalBlock * 363,
+      height:SizeConfig.verticalBlock * 55,
       child: TextFormField(
         controller: controller,
         obscureText: isObscureText,
@@ -37,17 +43,21 @@ class myTextFormField extends StatelessWidget {
         enabled: enable,
         decoration: InputDecoration(
           enabledBorder:const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: Colors.transparent),
           ),
           focusedBorder:const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: Colors.blue),
           ),
-          prefixIcon: Icon(icon),
+          prefixIcon: Icon(icon, size: SizeConfig.textRatio * 16, color: Color(0xFF3C2A7A),),
           hintText: hintName,
+          hintStyle: TextStyle(
+              color: Color(0xFF3C3C3C),
+              fontSize:SizeConfig.textRatio * 16,
+              fontFamily: 'Roboto'
+          ),
           labelText: hintName,
-          fillColor: Colors.grey[200],
+          fillColor: Color(0xFFF5F5F5),
           filled: true,
         ),
       ),

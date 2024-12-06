@@ -13,7 +13,8 @@ class signUp extends StatelessWidget {
     final _password = TextEditingController();
 
     return MaterialApp(
-      home: Scaffold(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
         body: ListView(
           children: [
             Column(
