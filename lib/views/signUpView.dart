@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 
+
 class signUp extends StatelessWidget {
   static String id = "SignUpScreen";
   const signUp({super.key});
@@ -20,7 +21,7 @@ class signUp extends StatelessWidget {
           children: [
             Column(
               children: [
-                myTextFormField(controller: _FullName, hintName: "Full Name", icon: Icons.account_circle)
+                myTextFormField(controller: _FullName, hintName: "Full Name", icon: Icons.person)
               ],
             )
           ],
