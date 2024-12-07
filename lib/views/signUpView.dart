@@ -97,7 +97,6 @@ class _SignUpState extends State<SignUp> {
                   onClickFunction: _selectDate, // Passing the function reference
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
-                // Phone Number Field
                 MyTextFormField(
                   controller: _phoneNumber,
                   hintName: "Phone Number",
