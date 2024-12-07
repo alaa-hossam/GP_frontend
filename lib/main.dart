@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'views/signUpView.dart';
+import 'views/GetOTP.dart';
 
 void main() {
   runApp(
@@ -11,6 +12,7 @@ void main() {
     ),
   );
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
         SignUp.id: (BuildContext context) => SignUp(),
         logIn.id: (BuildContext context) => logIn(),
         forgetPassword.id: (BuildContext context) => forgetPassword(),
+        Getotp.id:(BuildContext context) => Getotp()
       },
     );
   }
