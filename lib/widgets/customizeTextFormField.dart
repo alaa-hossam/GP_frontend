@@ -46,7 +46,7 @@ class MyTextFormField extends StatelessWidget {
           ),
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
-            borderSide: BorderSide(color: Colors.blue),
+            borderSide: BorderSide(color: Color(0xFF5095B0)),
           ),
           prefixIcon: Icon(
             icon,

@@ -34,6 +34,8 @@ class _logInState extends State<logIn> {
               child: Center(
                 child: Column(
                   children: [
+                    Text("Logo"),
+                    SizedBox(height: SizeConfig.verticalBlock * 80),
                     MyTextFormField(
                         controller: email,
                         hintName: "Email",
@@ -51,7 +53,7 @@ class _logInState extends State<logIn> {
                         icon: Icon(
                           obscureText ? Icons.visibility_off : Icons.visibility,
                         ),
-                        onPressed: togglePasswordVisibility(),
+                        onPressed: togglePasswordVisibility,
                       ),
                     ),
                     SizedBox(
@@ -80,6 +82,30 @@ class _logInState extends State<logIn> {
                       height: SizeConfig.verticalBlock *10,
                     ),
                     customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),),
+                    SizedBox(height: SizeConfig.verticalBlock * 150),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: SizeConfig.horizontalBlock * 140,
+                          height: SizeConfig.verticalBlock * 2,
+                          decoration:const BoxDecoration(
+                              color: Color(0xFFD8DADC)
+                          ),),
+                        SizedBox(width: SizeConfig.horizontalBlock * 5),
+                        Text("Or With", style: TextStyle(fontSize: SizeConfig.textRatio * 14),),
+                        SizedBox(width: SizeConfig.horizontalBlock * 5),
+                        Container(
+                          width: SizeConfig.horizontalBlock * 140,
+                          height: SizeConfig.verticalBlock * 2,
+                          decoration:const BoxDecoration(
+                              color: Color(0xFFD8DADC)
+                          ),)
+                      ],
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 10),
+                    customizeButton(buttonName: 'Google',buttonColor: Colors.white, buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
+                    SizedBox(height: SizeConfig.verticalBlock * 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
