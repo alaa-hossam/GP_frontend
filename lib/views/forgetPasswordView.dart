@@ -33,7 +33,9 @@ class _ForgetPasswordState extends State<forgetPassword> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: SizeConfig.verticalBlock * 200),
+          padding: EdgeInsets.only(top: SizeConfig.verticalBlock * 200 ,
+              right: SizeConfig.horizontalBlock * 10 ,
+              left: SizeConfig.horizontalBlock * 10),
           child: Form(
             key: _globalKey,
             child: Column(
