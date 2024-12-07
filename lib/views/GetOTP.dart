@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../widgets/customizeOTPField.dart';
+import '../widgets/customizeButton.dart';
 import '../widgets/Dimensions.dart';
 
 class Getotp extends StatefulWidget {
@@ -39,7 +40,7 @@ class _GetotpState extends State<Getotp> {
                       ),
                       SizedBox(height: SizeConfig.verticalBlock * 10),
                       Text(
-                        'Please enter the 5 digit code sent to your email.',
+                        'Please enter the 6 digit code sent to your email.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0x803C3C3C),
@@ -47,6 +48,46 @@ class _GetotpState extends State<Getotp> {
                           fontFamily: 'caption-regular',
                         ),
                       ),
+                      SizedBox(height: SizeConfig.verticalBlock * 30),
+                      Row(
+                        children: [
+                          Customizeotpfield(),
+                          SizedBox(width: SizeConfig.horizontalBlock * 10),
+                          Customizeotpfield(),
+                          SizedBox(width: SizeConfig.horizontalBlock * 10),
+                          Customizeotpfield(),
+                          SizedBox(width: SizeConfig.horizontalBlock * 23),
+                          Customizeotpfield(),
+                          SizedBox(width: SizeConfig.horizontalBlock * 10),
+                          Customizeotpfield(),
+                          SizedBox(width: SizeConfig.horizontalBlock * 10),
+                          Customizeotpfield(),
+                        ],
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 10,),
+
+                      Text(
+                        '00:60',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFFB36995),
+                          fontSize: SizeConfig.textRatio * 15,
+                          fontFamily: 'Roboto-regular',
+                        ),
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 10,),
+                      Text(
+                        'Resend Code',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF5095B0),
+                          fontSize: SizeConfig.textRatio * 16,
+                          fontFamily: 'Roboto-medium',
+                        ),
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 16,),
+
+                      customizeButton(buttonName: "Verify", buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5))
                     ],
 
                   ),
