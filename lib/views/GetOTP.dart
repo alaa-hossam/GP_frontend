@@ -20,6 +20,19 @@ class _GetotpState extends State<Getotp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: Color(0xFF292929),
+              size: SizeConfig.textRatio * 15,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
         body: ListView(
           children: [
             Column(
