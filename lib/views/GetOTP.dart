@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/Dimensions.dart';
 
 class Getotp extends StatefulWidget {
-  static String id = "SignUpScreen";
+  static String id = "GetOtpScreen";
   const Getotp({super.key});
 
   @override
@@ -22,27 +22,36 @@ class _GetotpState extends State<Getotp> {
         body: ListView(
           children: [
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Forget Password?',
-                  style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontSize: SizeConfig.textRatio * 24,
-                    fontFamily: 'title-bold',
+                SizedBox(height:SizeConfig.horizontalBlock * 50,),
+                Container(
+                  width: SizeConfig.horizontalBlock * 363,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Enter code',
+                        style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: SizeConfig.textRatio * 24,
+                          fontFamily: 'title-bold',
+                        ),
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 10),
+                      Text(
+                        'Please enter the 5 digit code sent to your email.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0x803C3C3C),
+                          fontSize: SizeConfig.textRatio * 16,
+                          fontFamily: 'caption-regular',
+                        ),
+                      ),
+                    ],
+
                   ),
                 ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-                Text(
-                  'Enter your email address associated with your account.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0x803C3C3C),
-                    fontSize: SizeConfig.textRatio * 16,
-                    fontFamily: 'caption-regular',
-                  ),
-                ),
+
               ],
             )
           ],

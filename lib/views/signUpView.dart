@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/GetOTP.dart';
+import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customizeDropDownMenu.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
@@ -22,6 +24,12 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _phoneNumber = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  bool obscureText = true;
+  togglePasswordVisibility() {
+    setState(() {
+      obscureText = !obscureText;
+    });
+  }
 
   final List<String> dropDownItems = ["Male", "Female"];
 
@@ -44,6 +52,8 @@ class _SignUpState extends State<SignUp> {
       });
     }
   }
+
+
 
   @override
   void dispose() {
@@ -109,9 +119,31 @@ class _SignUpState extends State<SignUp> {
                   icon: Icons.mail,
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
+                MyTextFormField(
+                  controller: _password,
+                  hintName: "Password",
+                  icon: Icons.lock,
+                  isObscureText: obscureText,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: togglePasswordVisibility(),
+                  ),
+                ),
+                SizedBox(height: SizeConfig.verticalBlock * 10),
 
-                customizeButton(buttonName: 'Sign Up',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),),
-                SizedBox(height: SizeConfig.verticalBlock * 150),
+
+                customizeButton(buttonName: 'Sign Up',buttonColor: SizeConfig.iconColor,
+                  fontColor: Color(0xFFF5F5F5),onClickButton: () {
+    Navigator.pushNamed(
+    context,
+    Getotp.id);
+    }
+                      ),
+
+
+                SizedBox(height: SizeConfig.verticalBlock * 60),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +168,8 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
 
-                customizeButton(buttonName: 'Google',buttonColor: Colors.white, buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
+                customizeButton(buttonName: 'Google',buttonColor: Colors.white,
+                  buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
 
                 Row(
@@ -144,7 +177,19 @@ class _SignUpState extends State<SignUp> {
                   children: [
                     Text("Already have an account?", style:TextStyle(fontSize: SizeConfig.textRatio * 14 )),
 
-                    Text("Log in", style:TextStyle(fontSize: SizeConfig.textRatio * 14,  color: Color(0xFF5095B0)) ,)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, logIn.id);
+                      },
+                      child: Text(
+                        'Log In',
+                        style: TextStyle(
+                          color: Color(0xFF5095B0),
+                          fontFamily: 'roboto-medium',
+                          fontSize: SizeConfig.textRatio * 16,
+                        ),
+                      ),
+                    ),
                   ],
                 )
               ],

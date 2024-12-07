@@ -8,20 +8,22 @@ class customizeButton extends StatelessWidget {
   final IconData? buttonIcon;
   final Color fontColor;
   final Border? buttonBorder;
+  final Function? onClickButton;
   customizeButton(
       {
         required this.buttonName,
         required this.buttonColor,
         this.buttonIcon,
         required this.fontColor,
-        this.buttonBorder
+        this.buttonBorder,
+        this.onClickButton
       });
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return GestureDetector(
-      onTap: (){},
+      onTap: (){onClickButton;},
       child: Container(
         width: SizeConfig.horizontalBlock * 363,
         height:SizeConfig.verticalBlock * 55,
