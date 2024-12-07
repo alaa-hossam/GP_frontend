@@ -23,7 +23,9 @@ class customizeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return GestureDetector(
-      onTap: (){onClickButton;},
+      onTap: (){if (onClickButton != null) {
+        onClickButton!();
+      }},
       child: Container(
         width: SizeConfig.horizontalBlock * 363,
         height:SizeConfig.verticalBlock * 55,

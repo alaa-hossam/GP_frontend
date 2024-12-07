@@ -128,7 +128,7 @@ class _SignUpState extends State<SignUp> {
                     icon: Icon(
                       obscureText ? Icons.visibility_off : Icons.visibility,
                     ),
-                    onPressed: togglePasswordVisibility(),
+                    onPressed: togglePasswordVisibility,
                   ),
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
