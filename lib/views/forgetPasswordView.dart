@@ -5,7 +5,6 @@ import '../widgets/customizeTextFormField.dart';
 
 class forgetPassword extends StatefulWidget {
   static String id = "ForgetPasswordScreen";
-
   @override
   State<forgetPassword> createState() => _ForgetPasswordState();
 }
@@ -66,7 +65,7 @@ class _ForgetPasswordState extends State<forgetPassword> {
                   icon: Icons.email_outlined,
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
-                customizeButton(buttonName: 'Send Code'),
+                customizeButton(buttonName: 'Send Code',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
