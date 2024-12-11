@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/views/Home.dart';
+import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/resetPassword.dart';
@@ -36,7 +37,9 @@ class MyApp extends StatelessWidget {
         forgetPassword.id: (BuildContext context) => forgetPassword(),
         resetPassword.id: (BuildContext context) => resetPassword(),
         Getotp.id:(BuildContext context) => Getotp(),
-        Home.id:(BuildContext context) => Home()
+        Home.id:(BuildContext context) => Home(),
+        Profile.id:(BuildContext context) => Profile()
+
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/ProfileView.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 
@@ -33,8 +34,10 @@ class _HomeState extends State<Home> {
                   SizedBox(
                     width: 10 * SizeConfig.horizontalBlock,
                   ),
-                  Icon(
-                    Icons.account_circle_outlined,
+                  IconButton(onPressed: (){
+                    Navigator.pushNamed(context, Profile.id);
+                  },
+                    icon: Icon(Icons.account_circle_outlined),
                   ),
                 ],
               ),
