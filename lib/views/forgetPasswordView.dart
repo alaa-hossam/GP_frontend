@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
+import 'GetOTP.dart';
 
 class forgetPassword extends StatefulWidget {
   static String id = "ForgetPasswordScreen";
@@ -67,7 +68,11 @@ class _ForgetPasswordState extends State<forgetPassword> {
                   icon: Icons.email_outlined,
                 ),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
-                customizeButton(buttonName: 'Send Code',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),),
+                customizeButton(buttonName: 'Send Code',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),onClickButton: () {
+                  Navigator.pushNamed(
+                      context,
+                      Getotp.id);
+                }),
                 SizedBox(height: SizeConfig.verticalBlock * 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

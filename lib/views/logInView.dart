@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/signUpView.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
@@ -81,7 +82,9 @@ class _logInState extends State<logIn> {
                     SizedBox(
                       height: SizeConfig.verticalBlock *10,
                     ),
-                    customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),),
+                    customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),onClickButton: (){
+                      Navigator.pushNamed(context, Home.id);
+                    },),
                     SizedBox(height: SizeConfig.verticalBlock * 150),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

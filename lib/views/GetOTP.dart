@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/resetPassword.dart';
 import '../widgets/customizeOTPField.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/Dimensions.dart';
@@ -98,7 +99,11 @@ class _GetotpState extends State<Getotp> {
                       ),
                       SizedBox(height: SizeConfig.verticalBlock * 16,),
 
-                      customizeButton(buttonName: "Verify", buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5))
+                      customizeButton(buttonName: "Verify", buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),onClickButton: () {
+                        Navigator.pushNamed(
+                            context,
+                            resetPassword.id);
+                      })
                     ],
 
                   ),
