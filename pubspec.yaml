@@ -29,7 +29,9 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   device_preview: ^1.2.0
-
+  uuid: ^3.0.7
+  device_info_plus: ^11.1.1
+  crypto: ^3.0.6
   flutter:
     sdk: flutter
   provider: ^6.0.0

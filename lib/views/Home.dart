@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -15,6 +18,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   TextEditingController filter = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -64,14 +68,14 @@ class _HomeState extends State<Home> {
                       ),
                       onPressed: () {},
                     ),
-                    width: 300,
+                    width: 300 - (40 * SizeConfig.horizontalBlock),
                     height: 45,
                   ),
                   SizedBox(width: 20 * SizeConfig.horizontalBlock),
                   MyTextFormField(
                     controller: filter,
                     icon: Icons.tune,
-                    width: 48 - (20 * SizeConfig.horizontalBlock),
+                    width: 48 - (40 * SizeConfig.horizontalBlock),
                     height: 45,
                   )
                 ],
@@ -83,4 +87,30 @@ class _HomeState extends State<Home> {
         ),
     );
   }
+}
+
+
+class imageProvider extends ChangeNotifier{
+  AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
+  int _currentIndex = 0;
+  Timer? _timer;
+  String get currentImage => AdsVM.fetchProducts();
+  imageProvider(){
+    _startImageRotation();
+  }
+
+  void _startImageRotation(){
+    _timer = Timer.periodic(Duration(seconds:3), (timer){
+      _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose(){
+    _timer?.cancel();
+    super.dispose();
+  }
+
+
 }
