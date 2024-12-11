@@ -3,29 +3,34 @@ import 'Dimensions.dart';
 
 class MyTextFormField extends StatelessWidget {
   final TextEditingController controller;
-  final String hintName;
+  final String? hintName;
   final IconData icon;
   final Widget? suffixIcon;
   final bool isObscureText , enable;
+  double?  width , height;
   final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
 
   MyTextFormField({
     required this.controller,
-    required this.hintName,
+    this.hintName,
     required this.icon,
     this.isObscureText = false,
     this.enable = true,
     this.onClickFunction,
     this.suffixIcon,
+    this.width,
+    this.height,
   });
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-
+    width ??= SizeConfig.horizontalBlock * 363;
+    height ??= SizeConfig.verticalBlock * 55;
     return Container(
-      width: SizeConfig.horizontalBlock * 363,
-      height: SizeConfig.verticalBlock * 55,
+
+      width: width,
+      height: height,
       child: TextFormField(
         controller: controller,
         obscureText: isObscureText,

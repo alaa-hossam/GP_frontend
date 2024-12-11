@@ -17,9 +17,7 @@ class _GetotpState extends State<Getotp> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           leading: IconButton(
@@ -110,7 +108,6 @@ class _GetotpState extends State<Getotp> {
             )
           ],
         ),
-      ),
     );
   }
 }

@@ -69,9 +69,7 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
         body: ListView(
           children: [
             Column(
@@ -196,7 +194,6 @@ class _SignUpState extends State<SignUp> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
