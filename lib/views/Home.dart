@@ -8,10 +8,11 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
+import '../widgets/customizeCategory.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
-  const Home({super.key});
+  Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -20,6 +21,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   TextEditingController filter = TextEditingController();
+  int selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -56,35 +58,31 @@ class _HomeState extends State<Home> {
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: 20 * SizeConfig.horizontalBlock,
-            ),
-            child: Row(
-              children: [
-                MyTextFormField(
-                  controller: search,
-                  hintName: "Search",
-                  icon: Icons.search,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.qr_code_scanner_outlined,
-                      color: SizeConfig.iconColor,
-                    ),
-                    onPressed: () {},
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MyTextFormField(
+                controller: search,
+                hintName: "Search",
+                icon: Icons.search,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.qr_code_scanner_outlined,
+                    color: SizeConfig.iconColor,
                   ),
-                  width: 300 - (10 * SizeConfig.horizontalBlock),
-                  height: 45,
+                  onPressed: () {},
                 ),
-                SizedBox(width: 20 * SizeConfig.horizontalBlock),
-                MyTextFormField(
-                  controller: filter,
-                  icon: Icons.tune,
-                  width: 48 - (10 * SizeConfig.horizontalBlock),
-                  height: 45,
-                )
-              ],
-            ),
+                width: 300 - (10 * SizeConfig.horizontalBlock),
+                height: 45,
+              ),
+              SizedBox(width: 20 * SizeConfig.horizontalBlock),
+              MyTextFormField(
+                controller: filter,
+                icon: Icons.tune,
+                width: 48 - (10 * SizeConfig.horizontalBlock),
+                height: 45,
+              )
+            ],
           ),
           SizedBox(
             height: 10 * SizeConfig.verticalBlock,
@@ -134,23 +132,45 @@ class _HomeState extends State<Home> {
               if (categoryProvider._categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
-          // return Text('${categoryProvider.categories.length}');
-              return
-                Container(
+              // return Text('${categoryProvider.categories.length}');
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+
                   width: SizeConfig.horizontalBlock,
                   height: 43 * SizeConfig.verticalBlock,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: categoryProvider.categories.length, // Number of items
                     itemBuilder: (context, index) {
+                      bool isSelected = index == selectedIndex;
                       var category = categoryProvider.categories[index];
-                      return Container(
-                        child: Text(category),
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index; // Update the selected index
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Customizecategory("${category}", isSelected)
+                          ],
+                        )
                       );
+                      // if (index == 0) {
+                      //   return Row(
+                      //     children: [
+                      //       Customizecategory("All"),
+                      //       Customizecategory("${category}")
+                      //     ],
+                      //   );
+                      // } else {
+                      //   return Customizecategory("${category}");
+                      // }
                     },
                   ),
-                );
-
+                ),
+              );
             },
           ),
         ],
