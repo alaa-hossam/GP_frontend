@@ -1,9 +1,10 @@
 import 'dart:async';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
+import 'package:provider/provider.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 
@@ -23,94 +24,149 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-        appBar: AppBar(
-          leading: Icon(Icons.menu),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 20 * SizeConfig.verticalBlock),
-
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
-                  ),
-                  SizedBox(
-                    width: 10 * SizeConfig.horizontalBlock,
-                  ),
-                  IconButton(onPressed: (){
+      appBar: AppBar(
+        leading: Icon(Icons.menu),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 20 * SizeConfig.verticalBlock),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.shopping_cart_outlined,
+                ),
+                SizedBox(
+                  width: 10 * SizeConfig.horizontalBlock,
+                ),
+                IconButton(
+                  onPressed: () {
                     Navigator.pushNamed(context, Profile.id);
                   },
-                    icon: Icon(Icons.account_circle_outlined),
-                  ),
-                ],
-              ),
-            )
-          ],
-          title: Text("Logo"),
-        ),
-        body: ListView(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 20 * SizeConfig.horizontalBlock,
-                  right: 20 * SizeConfig.horizontalBlock),
-              child: Row(
-                children: [
-                  MyTextFormField(
-                    controller: search,
-                    hintName: "Search",
-                    icon: Icons.search,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.qr_code_scanner_outlined,
-                        color: SizeConfig.iconColor,
-                      ),
-                      onPressed: () {},
-                    ),
-                    width: 300 - (40 * SizeConfig.horizontalBlock),
-                    height: 45,
-                  ),
-                  SizedBox(width: 20 * SizeConfig.horizontalBlock),
-                  MyTextFormField(
-                    controller: filter,
-                    icon: Icons.tune,
-                    width: 48 - (40 * SizeConfig.horizontalBlock),
-                    height: 45,
-                  )
-                ],
-              ),
+                  icon: Icon(Icons.account_circle_outlined),
+                ),
+              ],
             ),
-            SizedBox(height: 10* SizeConfig.verticalBlock,)
-
-          ],
-        ),
+          )
+        ],
+        title: Text("Logo"),
+      ),
+      body: ListView(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: 20 * SizeConfig.horizontalBlock,
+            ),
+            child: Row(
+              children: [
+                MyTextFormField(
+                  controller: search,
+                  hintName: "Search",
+                  icon: Icons.search,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.qr_code_scanner_outlined,
+                      color: SizeConfig.iconColor,
+                    ),
+                    onPressed: () {},
+                  ),
+                  width: 300 - (10 * SizeConfig.horizontalBlock),
+                  height: 45,
+                ),
+                SizedBox(width: 20 * SizeConfig.horizontalBlock),
+                MyTextFormField(
+                  controller: filter,
+                  icon: Icons.tune,
+                  width: 48 - (10 * SizeConfig.horizontalBlock),
+                  height: 45,
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 10 * SizeConfig.verticalBlock,
+          ),
+          Consumer<imageProvider>(
+            builder: (context, imageProvider, child) {
+              return Column(
+                children: [
+                  GestureDetector(
+                      onTap: () async {
+                        final Uri url = Uri.parse(imageProvider.currentLink);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.inAppWebView);
+                        } else {
+                          throw 'Could not launch ${imageProvider.currentLink}';
+                        }
+                      },
+                      child: Image.asset(
+                        imageProvider.currentImage,
+                        width: 363,
+                        height: 160,
+                        fit: BoxFit.fill,
+                      )),
+                  SizedBox(height: 10 * SizeConfig.verticalBlock),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                          imageProvider.AdsVM.ads.length,
+                          (index) => Container(
+                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: index == imageProvider._currentIndex
+                                      ? Color(0xFFB36995) // Highlighted color
+                                      : Colors.grey, // Default color
+                                ),
+                              )))
+                ],
+              );
+            },
+          )
+        ],
+      ),
     );
   }
 }
 
-
-class imageProvider extends ChangeNotifier{
+class imageProvider extends ChangeNotifier {
   AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
+
   int _currentIndex = 0;
   Timer? _timer;
-  String get currentImage => AdsVM.fetchProducts();
-  imageProvider(){
+
+  String get currentImage {
+    return AdsVM.ads.isNotEmpty
+        ? AdsVM.ads[_currentIndex % AdsVM.ads.length]
+            .image // Access the File's path
+        : 'assets/images/BPM.png'; // Default image
+  }
+
+  String get currentLink {
+    return AdsVM.ads.isNotEmpty
+        ? AdsVM.ads[_currentIndex % AdsVM.ads.length]
+            .link // Access the File's path
+        : 'https://google.com'; // Default image
+  }
+
+  imageProvider() {
+    AdsVM.fetchAds();
     _startImageRotation();
   }
 
-  void _startImageRotation(){
-    _timer = Timer.periodic(Duration(seconds:3), (timer){
+  void _startImageRotation() {
+    AdsVM.fetchAds();
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
       _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
+
       notifyListeners();
     });
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _timer?.cancel();
     super.dispose();
   }
-
-
 }

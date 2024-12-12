@@ -2,17 +2,15 @@ import 'package:flutter/cupertino.dart';
 
 import '../Models/AdvertisementModel.dart';
 
-class AdvertisementsViewModel extends ChangeNotifier{
-  List<AdvertisementsModel> _Advertisements = [];
-
-  List<AdvertisementsModel> get Advertisements => _Advertisements;
-  final AdvertisementApiServices apiServices= AdvertisementApiServices();
+class AdvertisementsViewModel extends ChangeNotifier {
+  final AdvertisementApiServices apiServices = AdvertisementApiServices();
   List<AdvertisementsModel> _ads = [];
 
   List<AdvertisementsModel> get ads => _ads;
 
-  fetchProducts(){
-    _Advertisements = apiServices.getAds();
+  void fetchAds() {
+    _ads = apiServices.getAds();
+    notifyListeners(); // Notify the UI about changes
   }
 }
 

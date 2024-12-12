@@ -5,16 +5,22 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/resetPassword.dart';
+import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
 import 'views/GetOTP.dart';
 import 'views/Home.dart';
 
 void main() {
   runApp(
-    DevicePreview(
-      builder: (context) => MyApp(),
-    ),
-  );
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => imageProvider()),
+        ],
+        child: DevicePreview(
+          builder: (context) => MyApp(),
+        ),
+
+  ));
 }
 
 

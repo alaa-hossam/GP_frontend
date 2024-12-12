@@ -1,23 +1,25 @@
 import 'dart:io';
 
 class AdvertisementsModel {
-  File _image;
+  String _image;
   String _link;
-  List<AdvertisementsModel> _ads = [
-    AdvertisementsModel(File("D:BPM.png"), "https://chat.openai.com/chat"),
-    AdvertisementsModel(File("D:BPM.png"), "https://chat.openai.com/chat"),
-    AdvertisementsModel(File("D:BPM.png"), "https://chat.openai.com/chat")
-  ];
+
+
+  String get image => _image;
 
   AdvertisementsModel(this._image, this._link);
 
-  List<AdvertisementsModel> get ads => _ads;
+
+  String get link => _link;
 }
 
-class AdvertisementApiServices{
-  AdvertisementsModel? ads;
-  getAds(){
-    return ads?.ads;
+class AdvertisementApiServices {
+  List<AdvertisementsModel> getAds() {
+    return [
+      AdvertisementsModel("assets/images/BPM.png", "https://google.com"),
+      AdvertisementsModel("assets/images/Screenshot 2024-05-17 110110.png", "https://chatgpt.com"),
+      AdvertisementsModel("assets/images/BPM.png", "https://google.com"),
+    ];
+  }
 }
 
-}
