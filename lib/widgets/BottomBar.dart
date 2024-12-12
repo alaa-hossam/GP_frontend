@@ -59,6 +59,7 @@ class BottomBarState extends State<BottomBar> {
 
 class buttonProvider extends ChangeNotifier {
   int _selectedIndex = 0;
+  int? _oldselected;
   static List<Widget> _widgetOptions = <Widget>[
     Home(),
     Profile(),
@@ -66,11 +67,14 @@ class buttonProvider extends ChangeNotifier {
   int get selectedIndex => _selectedIndex;
 
   void updateIndex(BuildContext context,int index) {
+    _oldselected = _selectedIndex;
     _selectedIndex = index;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => _widgetOptions[index]),
-    );
+    if(_oldselected != _selectedIndex) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => _widgetOptions[index]),
+      );
+    }
     notifyListeners();
   }
 }

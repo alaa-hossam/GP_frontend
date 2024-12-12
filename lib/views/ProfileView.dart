@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/widgets/customizeNavigatorProfile.dart';
 import 'package:gp_frontend/widgets/customizeProfileOptions.dart';
-
+import 'package:image_picker/image_picker.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 
@@ -15,6 +16,17 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  File? _image;
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: source);
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -52,7 +64,9 @@ class _ProfileState extends State<Profile> {
                       backgroundColor: SizeConfig.iconColor,
                       radius: SizeConfig.horizontalBlock * 20,
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _pickImage(ImageSource.gallery);
+                        },
                         icon: Icon(
                           Icons.edit_outlined,
                           color: Colors.white,
