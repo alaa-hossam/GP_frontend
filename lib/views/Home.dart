@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,11 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+      ),
       appBar: AppBar(
-        leading: Icon(Icons.menu),
+        // leading: Icon(Icons.menu),
         centerTitle: true,
         actions: [
           Padding(
@@ -123,7 +127,32 @@ class _HomeState extends State<Home> {
                 ],
               );
             },
-          )
+          ),
+          SizedBox(height: 10 * SizeConfig.verticalBlock),
+          Consumer<CategoryProvider>(
+            builder: (context, categoryProvider, child) {
+              if (categoryProvider._categories.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+          // return Text('${categoryProvider.categories.length}');
+              return
+                Container(
+                  width: SizeConfig.horizontalBlock,
+                  height: 43 * SizeConfig.verticalBlock,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categoryProvider.categories.length, // Number of items
+                    itemBuilder: (context, index) {
+                      var category = categoryProvider.categories[index];
+                      return Container(
+                        child: Text(category),
+                      );
+                    },
+                  ),
+                );
+
+            },
+          ),
         ],
       ),
     );
@@ -168,5 +197,27 @@ class imageProvider extends ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+}
+
+class CategoryProvider extends ChangeNotifier {
+  CategoryViewModel CatVM = CategoryViewModel();
+  List<String> _categories = [];
+
+  List<String> get categories => _categories;
+
+  CategoryProvider() {
+    fetchCategories();
+  }
+
+  void fetchCategories() {
+    print("Fetching categories...");
+    CatVM.fetchCats();
+    print("Fetched categories: ${CatVM.categories}");
+
+    _categories = CatVM.categories.map((cat) => cat.name).toList();
+    print("Processed categories: $categories");
+
+    notifyListeners();
   }
 }

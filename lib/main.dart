@@ -15,6 +15,7 @@ void main() {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => imageProvider()),
+          ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ],
         child: DevicePreview(
           builder: (context) => MyApp(),
