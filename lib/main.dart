@@ -5,6 +5,7 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/resetPassword.dart';
+import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
 import 'views/GetOTP.dart';
@@ -16,6 +17,7 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => imageProvider()),
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
+          ChangeNotifierProvider(create: (_) => buttonProvider()),
         ],
         child: DevicePreview(
           builder: (context) => MyApp(),

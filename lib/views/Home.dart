@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
+import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/customizeCategory.dart';
@@ -175,6 +176,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+      bottomNavigationBar: BottomBar(selectedIndex: 0),
     );
   }
 }

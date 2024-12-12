@@ -41,7 +41,7 @@ class _ProfileState extends State<Profile> {
               Stack(
                 children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage('images/lll.jpg'),
+                    backgroundImage: AssetImage('assets/images/BPM.png'),
                     backgroundColor: SizeConfig.iconColor,
                     radius: SizeConfig.horizontalBlock * 70,
                   ),

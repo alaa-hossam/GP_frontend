@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+import 'package:provider/provider.dart';
 import '../views/Home.dart';
 import '../views/ProfileView.dart';
 
@@ -14,7 +15,6 @@ class BottomBar extends StatefulWidget {
 
 class BottomBarState extends State<BottomBar> {
   late int selectedIndex;
-   int? oldselectedIndex;
 
   @override
   void initState() {
@@ -22,40 +22,55 @@ class BottomBarState extends State<BottomBar> {
     selectedIndex = widget.selectedIndex;
   }
 
-  static List<Widget> _widgetOptions = <Widget>[
-    Home(),
-    Profile(),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return BottomNavigationBar(
-      currentIndex: selectedIndex,
-      selectedItemColor: SizeConfig.iconColor,
-      unselectedItemColor: SizeConfig.fontColor,
-      iconSize: SizeConfig.textRatio * 24,
-      onTap: (index){
-        setState(() {
-          oldselectedIndex = selectedIndex;
-          selectedIndex = index;
-        });
-        if(selectedIndex != oldselectedIndex){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => _widgetOptions[selectedIndex]));
-        }
-        },
-      showSelectedLabels: false,
-      showUnselectedLabels: false,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_circle_outlined),
-          label: '',
-        ),
-      ],
+
+    return Consumer<buttonProvider>(
+      builder: (context, buttonProvider, child) {
+        return BottomNavigationBar(
+          currentIndex: buttonProvider.selectedIndex,
+          selectedItemColor: SizeConfig.iconColor,
+          unselectedItemColor: SizeConfig.fontColor,
+          iconSize: SizeConfig.textRatio * 24,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          onTap: (index) {
+            buttonProvider.updateIndex(context,index);
+          },
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined),
+              label: '',
+            ),
+          ],
+        );
+      },
     );
+  }
+}
+
+
+class buttonProvider extends ChangeNotifier {
+  int _selectedIndex = 0;
+  static List<Widget> _widgetOptions = <Widget>[
+    Home(),
+    Profile(),
+  ];
+  int get selectedIndex => _selectedIndex;
+
+  void updateIndex(BuildContext context,int index) {
+    _selectedIndex = index;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => _widgetOptions[index]),
+    );
+    notifyListeners();
   }
 }
