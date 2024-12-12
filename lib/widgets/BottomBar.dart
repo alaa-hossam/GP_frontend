@@ -70,7 +70,7 @@ class buttonProvider extends ChangeNotifier {
     _oldselected = _selectedIndex;
     _selectedIndex = index;
     if(_oldselected != _selectedIndex) {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => _widgetOptions[index]),
       );
