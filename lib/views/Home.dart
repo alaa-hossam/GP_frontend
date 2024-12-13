@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
+import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   TextEditingController filter = TextEditingController();
-  int selectedIndex = -1;
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -158,22 +159,32 @@ class _HomeState extends State<Home> {
                           ],
                         )
                       );
-                      // if (index == 0) {
-                      //   return Row(
-                      //     children: [
-                      //       Customizecategory("All"),
-                      //       Customizecategory("${category}")
-                      //     ],
-                      //   );
-                      // } else {
-                      //   return Customizecategory("${category}");
-                      // }
                     },
                   ),
                 ),
               );
             },
           ),
+          SizedBox(height: 10 * SizeConfig.verticalBlock,),
+          Padding(
+            padding: EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock),
+            child: Text("Best Seller" , style: TextStyle(fontSize: 20 * SizeConfig.textRatio, fontWeight: FontWeight.bold),),
+          ),
+          SizedBox(height: 10 * SizeConfig.verticalBlock,),
+          Container(
+            height: 255 * SizeConfig.verticalBlock,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6),
+                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6),
+                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6)
+
+              ],
+            ),
+          )
+
+
         ],
       ),
       bottomNavigationBar: BottomBar(selectedIndex: 0),

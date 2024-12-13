@@ -11,10 +11,9 @@ class CategoryModel {
 
 
 class CategoryService{
-  List <CategoryModel> Categories = [];
-  // Categories.add({})
+  List<CategoryModel> myCategories = [CategoryModel("0", "All")];
   List<CategoryModel> getCategories() {
-    return [
+    return myCategories + [
       CategoryModel("1" , "Text Tiles"),
       CategoryModel("2" , "Wood"),
       CategoryModel("3" , "Glass"),

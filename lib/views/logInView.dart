@@ -83,7 +83,7 @@ class _logInState extends State<logIn> {
                       height: SizeConfig.verticalBlock *10,
                     ),
                     customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),onClickButton: (){
-                      Navigator.pushNamed(context, Home.id);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(),));
                     },),
                     SizedBox(height: SizeConfig.verticalBlock * 150),
                     Row(
