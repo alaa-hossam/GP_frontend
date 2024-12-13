@@ -14,11 +14,11 @@ class Customizecategory extends StatelessWidget {
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
           color: Selected ?  SizeConfig.iconColor : Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
+        borderRadius: BorderRadius.all(Radius.circular(13 * SizeConfig.textRatio)),
             border: Border.all(width: 2, color: SizeConfig.iconColor)
       ),
 
-      child: Text("${title}" ,style: TextStyle(fontSize: 20),),
+      child: Text("${title}" ,style: TextStyle(fontSize: 20 * SizeConfig.textRatio),),
     );
   }
 }

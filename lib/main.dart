@@ -9,7 +9,6 @@ import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
 import 'views/GetOTP.dart';
-import 'views/Home.dart';
 
 void main() {
   runApp(
@@ -18,6 +17,7 @@ void main() {
           ChangeNotifierProvider(create: (_) => imageProvider()),
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
           ChangeNotifierProvider(create: (_) => buttonProvider()),
+          ChangeNotifierProvider(create: (_) => productProvider()),
         ],
         child: DevicePreview(
           builder: (context) => MyApp(),

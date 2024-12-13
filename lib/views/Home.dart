@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
+import '../ViewModels/productViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -31,6 +33,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: Drawer(
         backgroundColor: Colors.white,
+
       ),
       appBar: AppBar(
         // leading: Icon(Icons.menu),
@@ -42,6 +45,7 @@ class _HomeState extends State<Home> {
               children: [
                 Icon(
                   Icons.shopping_cart_outlined,
+                  size:24 * SizeConfig.textRatio,
                 ),
                 SizedBox(
                   width: 10 * SizeConfig.horizontalBlock,
@@ -50,7 +54,7 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     Navigator.pushNamed(context, Profile.id);
                   },
-                  icon: Icon(Icons.account_circle_outlined),
+                  icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
                 ),
               ],
             ),
@@ -71,6 +75,7 @@ class _HomeState extends State<Home> {
                   icon: Icon(
                     Icons.qr_code_scanner_outlined,
                     color: SizeConfig.iconColor,
+                    size: 24 * SizeConfig.textRatio,
                   ),
                   onPressed: () {},
                 ),
@@ -78,12 +83,21 @@ class _HomeState extends State<Home> {
                 height: 45 * SizeConfig.verticalBlock,
               ),
               SizedBox(width: 20 * SizeConfig.horizontalBlock),
-              MyTextFormField(
-                controller: filter,
-                icon: Icons.tune,
-                width: 48 * SizeConfig.horizontalBlock,
+              Container(
+                width:48 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
-              )
+                decoration: BoxDecoration(
+                  color: Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Icon(Icons.tune , size: 24 * SizeConfig.textRatio,),
+              ),
+              // MyTextFormField(
+              //   controller: filter,
+              //   icon: Icons.tune,
+              //   width: 48 * SizeConfig.horizontalBlock,
+              //   height: 45 * SizeConfig.verticalBlock,
+              // )
             ],
           ),
           SizedBox(
@@ -93,41 +107,57 @@ class _HomeState extends State<Home> {
             builder: (context, imageProvider, child) {
               return Column(
                 children: [
-                  GestureDetector(
-                      onTap: () async {
-                        final Uri url = Uri.parse(imageProvider.currentLink);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url, mode: LaunchMode.inAppWebView);
-                        } else {
-                          throw 'Could not launch ${imageProvider.currentLink}';
-                        }
+                  SizedBox(
+                    height: 160 * SizeConfig.verticalBlock,
+                    child: PageView.builder(
+                      controller: imageProvider.pageController,
+                      itemCount: imageProvider.AdsVM.ads.length,
+                      onPageChanged: (index) {
+                        imageProvider.updateCurrentIndex(index); // Sync current index
                       },
-                      child: Image.asset(
-                        imageProvider.currentImage,
-                        width: 363 * SizeConfig.horizontalBlock,
-                        height: 160 * SizeConfig.verticalBlock,
-                        fit: BoxFit.fill,
-                      )),
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () async {
+                            final Uri url = Uri.parse(imageProvider.AdsVM.ads[index].link);
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.inAppWebView);
+                            } else {
+                              throw 'Could not launch ${imageProvider.AdsVM.ads[index].link}';
+                            }
+                          },
+                          child: Image.asset(
+                            imageProvider.AdsVM.ads[index].image,
+                            width: 363 * SizeConfig.horizontalBlock,
+                            height: 160 * SizeConfig.verticalBlock,
+                            fit: BoxFit.fill,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   SizedBox(height: 10 * SizeConfig.verticalBlock),
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                          imageProvider.AdsVM.ads.length,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      imageProvider.AdsVM.ads.length,
                           (index) => Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: index == imageProvider._currentIndex
-                                      ? Color(0xFFB36995) // Highlighted color
-                                      : Colors.grey, // Default color
-                                ),
-                              )))
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == imageProvider._currentIndex
+                              ? Color(0xFFB36995)
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               );
             },
           ),
+
           SizedBox(height: 10 * SizeConfig.verticalBlock),
           Consumer<CategoryProvider>(
             builder: (context, categoryProvider, child) {
@@ -138,26 +168,70 @@ class _HomeState extends State<Home> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-
                   width: SizeConfig.horizontalBlock,
                   height: 43 * SizeConfig.verticalBlock,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: categoryProvider.categories.length, // Number of items
+                    itemCount:
+                        categoryProvider.categories.length, // Number of items
                     itemBuilder: (context, index) {
                       bool isSelected = index == selectedIndex;
                       var category = categoryProvider.categories[index];
                       return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index; // Update the selected index
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Customizecategory("${category}", isSelected)
-                          ],
-                        )
+                          onTap: () {
+                            setState(() {
+                              selectedIndex =
+                                  index; // Update the selected index
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Customizecategory("${category}", isSelected)
+                            ],
+                          ));
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(
+            height: 10 * SizeConfig.verticalBlock,
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock),
+            child: Text(
+              "Best Seller",
+              style: TextStyle(
+                  fontSize: 20 * SizeConfig.textRatio,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+
+
+          Consumer<productProvider>(
+            builder: (context, productProvider, child) {
+              if (productProvider.products.isEmpty) {
+                // print(productProvider.products.length);
+                return Center(child: CircularProgressIndicator());
+              }
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: SizeConfig.horizontalBlock,
+                  height: 250 * SizeConfig.verticalBlock,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount:
+                        productProvider.products.length, // Number of items
+                    itemBuilder: (context, index) {
+                      var product = productProvider.products[index];
+                      return Row(
+                        children: [
+                          customProduct(product.imageURL, product.name,
+                              product.category, product.price, product.rate),
+                          SizedBox(width: 10 * SizeConfig.horizontalBlock)
+                        ],
                       );
                     },
                   ),
@@ -165,26 +239,47 @@ class _HomeState extends State<Home> {
               );
             },
           ),
-          SizedBox(height: 10 * SizeConfig.verticalBlock,),
           Padding(
             padding: EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock),
-            child: Text("Best Seller" , style: TextStyle(fontSize: 20 * SizeConfig.textRatio, fontWeight: FontWeight.bold),),
-          ),
-          SizedBox(height: 10 * SizeConfig.verticalBlock,),
-          Container(
-            height: 255 * SizeConfig.verticalBlock,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6),
-                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6),
-                customProduct("assets/images/p1.jpg", "Rose embroidery", "Textiles", 150.0, 4.6)
-
-              ],
+            child: Text(
+              "Recommended For you",
+              style: TextStyle(
+                  fontSize: 20 * SizeConfig.textRatio,
+                  fontWeight: FontWeight.bold),
             ),
-          )
+          ),
 
 
+          Consumer<productProvider>(
+            builder: (context, productProvider, child) {
+              if (productProvider.products.isEmpty) {
+                // print(productProvider.products.length);
+                return Center(child: CircularProgressIndicator());
+              }
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: SizeConfig.horizontalBlock,
+                  height: 250 * SizeConfig.verticalBlock,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount:
+                    productProvider.products.length, // Number of items
+                    itemBuilder: (context, index) {
+                      var product = productProvider.products[index];
+                      return Row(
+                        children: [
+                          customProduct(product.imageURL, product.name,
+                              product.category, product.price, product.rate),
+                          SizedBox(width: 10 * SizeConfig.horizontalBlock)
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
       bottomNavigationBar: BottomBar(selectedIndex: 0),
@@ -197,19 +292,18 @@ class imageProvider extends ChangeNotifier {
 
   int _currentIndex = 0;
   Timer? _timer;
+  PageController pageController = PageController();
 
   String get currentImage {
     return AdsVM.ads.isNotEmpty
-        ? AdsVM.ads[_currentIndex % AdsVM.ads.length]
-            .image // Access the File's path
+        ? AdsVM.ads[_currentIndex % AdsVM.ads.length].image
         : 'assets/images/BPM.png'; // Default image
   }
 
   String get currentLink {
     return AdsVM.ads.isNotEmpty
-        ? AdsVM.ads[_currentIndex % AdsVM.ads.length]
-            .link // Access the File's path
-        : 'https://google.com'; // Default image
+        ? AdsVM.ads[_currentIndex % AdsVM.ads.length].link
+        : 'https://google.com'; // Default link
   }
 
   imageProvider() {
@@ -218,17 +312,27 @@ class imageProvider extends ChangeNotifier {
   }
 
   void _startImageRotation() {
-    AdsVM.fetchAds();
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
 
+      _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
+      pageController.animateToPage(
+        _currentIndex,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
       notifyListeners();
     });
+  }
+
+  void updateCurrentIndex(int index) {
+    _currentIndex = index;
+    notifyListeners();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    pageController.dispose();
     super.dispose();
   }
 }
@@ -244,13 +348,25 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   void fetchCategories() {
-    print("Fetching categories...");
     CatVM.fetchCats();
-    print("Fetched categories: ${CatVM.categories}");
-
     _categories = CatVM.categories.map((cat) => cat.name).toList();
-    print("Processed categories: $categories");
+    notifyListeners();
+  }
+}
 
+class productProvider extends ChangeNotifier {
+  productViewModel productVM = productViewModel();
+  List<productModel> _products = [];
+
+  List<productModel> get products => _products;
+
+  productProvider() {
+    fetchProducts();
+  }
+
+  void fetchProducts() {
+    productVM.fetchProducts();
+    _products = productVM.products.map((product) => product).toList();
     notifyListeners();
   }
 }
