@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/signUpView.dart';
@@ -17,11 +18,16 @@ class _logInState extends State<logIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool obscureText = true;
+  customerViewModel cmv= customerViewModel();
+
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
     });
   }
+//   getUser()async{
+//     return await cmv.fetchUser("1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e");
+// }
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -120,6 +126,7 @@ class _logInState extends State<logIn> {
                             fontSize: SizeConfig.textRatio * 16,
                           ),
                         ),
+                        
                         SizedBox(width: SizeConfig.horizontalBlock * 5),
                         GestureDetector(
                           onTap: () {
@@ -133,9 +140,45 @@ class _logInState extends State<logIn> {
                               fontSize: SizeConfig.textRatio * 16,
                             ),
                           ),
+                          
                         ),
+
                       ],
                     ),
+                    // FutureBuilder(
+                    //   future: getUser(),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState == ConnectionState.waiting) {
+                    //       return Padding(
+                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
+                    //         child: Text("Loading..."),
+                    //       );
+                    //     } else if (snapshot.hasError) {
+                    //       print(snapshot.error);
+                    //       return Padding(
+                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
+                    //         child: Text("Error: ${snapshot.error}"),
+                    //       );
+                    //     } else if (snapshot.hasData) {
+                    //       return Padding(
+                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
+                    //         child: Text(
+                    //           "${snapshot.data}",
+                    //           style: TextStyle(
+                    //             color: Colors.green,
+                    //             fontFamily: 'roboto-regular',
+                    //             fontSize: SizeConfig.textRatio * 16,
+                    //           ),
+                    //         ),
+                    //       );
+                    //     } else {
+                    //       return Padding(
+                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
+                    //         child: Text("No Data"),
+                    //       );
+                    //     }
+                    //   },
+                    // ),
                   ],
                 ),
               ),

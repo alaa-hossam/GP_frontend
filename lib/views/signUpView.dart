@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/GetOTP.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customizeDropDownMenu.dart';
@@ -24,6 +25,8 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _phoneNumber = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  String? _gender;
+  customerViewModel cvm = customerViewModel();
   bool obscureText = true;
   togglePasswordVisibility() {
     setState(() {
@@ -31,8 +34,26 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
-  final List<String> dropDownItems = ["Male", "Female"];
+  Future<String> addCustomer() async {
+    try {
+      return await cvm.addUser(
+        birthDate: _date.text,
+        email: _email.text,
+        gender: _gender ?? "",
+        name: _fullName.text,
+        password: _password.text,
+        phone: _phoneNumber.text,
+        username: _email.text,
+      );
 
+
+    } catch (e) {
+
+      return e.toString();
+    }
+  }
+
+  final List<String> dropDownItems = ["Male", "Female", "Not Prefer To Say"];
   // The updated _selectDate function to set the selected date to the text field
   Future<void> _selectDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
@@ -53,8 +74,6 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-
-
   @override
   void dispose() {
     _fullName.dispose();
@@ -70,130 +89,161 @@ class _SignUpState extends State<SignUp> {
     SizeConfig().init(context);
 
     return Scaffold(
-        body: ListView(
-          children: [
-            Column(
-              children: [
-                Text("Logo"),
-                SizedBox(height: SizeConfig.verticalBlock * 80),
+      body: ListView(
+        children: [
+          Column(
+            children: [
+              Text("Logo"),
+              SizedBox(height: SizeConfig.verticalBlock * 80),
 
-                // Full Name Field
-                MyTextFormField(
-                  controller: _fullName,
-                  hintName: "Full Name",
-                  icon: Icons.person_outline,
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
+              // Full Name Field
+              MyTextFormField(
+                controller: _fullName,
+                hintName: "Full Name",
+                icon: Icons.person_outline,
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
 
-                // Gender Dropdown
-                MyDropDownMenu(dropDownItems: dropDownItems, prefixIcon: Icons.female, hintText: "Gender"),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
+              // Gender Dropdown
+              MyDropDownMenu(
+                dropDownItems: dropDownItems,
+                prefixIcon: Icons.female,
+                hintText: "Gender",
+                onChanged: (String? value) {
+                  setState(() {
+                    _gender = value; // Store the selected gender
+                  });
+                },
+              ),
 
-                // Address Field
-                MyTextFormField(
-                  controller: _address,
-                  hintName: "Address",
-                  icon: Icons.location_on_outlined,
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
 
-                // Birth Date Field with Date Picker
-                MyTextFormField(
-                  controller: _date,
-                  hintName: "Birth Date",
-                  icon: Icons.date_range,
-                  onClickFunction: _selectDate, // Passing the function reference
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-                MyTextFormField(
-                  controller: _phoneNumber,
-                  hintName: "Phone Number",
-                  icon: Icons.phone_outlined,
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-                MyTextFormField(
-                  controller: _email,
-                  hintName: "Email",
-                  icon: Icons.mail,
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-                MyTextFormField(
-                  controller: _password,
-                  hintName: "Password",
-                  icon: Icons.lock,
-                  isObscureText: obscureText,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      obscureText ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: togglePasswordVisibility,
+              // Address Field
+              MyTextFormField(
+                controller: _address,
+                hintName: "Address",
+                icon: Icons.location_on_outlined,
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+
+              // Birth Date Field with Date Picker
+              MyTextFormField(
+                controller: _date,
+                hintName: "Birth Date",
+                icon: Icons.date_range,
+                onClickFunction: _selectDate, // Passing the function reference
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+              MyTextFormField(
+                controller: _phoneNumber,
+                hintName: "Phone Number",
+                icon: Icons.phone_outlined,
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+              MyTextFormField(
+                controller: _email,
+                hintName: "Email",
+                icon: Icons.mail,
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+              MyTextFormField(
+                controller: _password,
+                hintName: "Password",
+                icon: Icons.lock,
+                isObscureText: obscureText,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    obscureText ? Icons.visibility_off : Icons.visibility,
                   ),
+                  onPressed: togglePasswordVisibility,
                 ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
 
-
-                customizeButton(buttonName: 'Sign Up',buttonColor: SizeConfig.iconColor,
-                  fontColor: Color(0xFFF5F5F5),onClickButton: () {
-    Navigator.pushNamed(
-    context,
-    Getotp.id);
-    }
-                      ),
-
-
-                SizedBox(height: SizeConfig.verticalBlock * 60),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: SizeConfig.horizontalBlock * 123,
-                      height: SizeConfig.verticalBlock * 2,
-                      // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 40,
-                      //     right: SizeConfig.horizontalBlock * 10),
-                      decoration:const BoxDecoration(
-                        color: Color(0xFFD8DADC)
-                      ),),
-                    Text("Or With", style: TextStyle(fontSize: SizeConfig.textRatio * 14),),
-                    Container(
-                      width: SizeConfig.horizontalBlock * 123,
-                      height: SizeConfig.verticalBlock * 2,
-                      // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 10),
-                      decoration:const BoxDecoration(
-                          color: Color(0xFFD8DADC)
-                      ),)
-                  ],
-                ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-
-                customizeButton(buttonName: 'Google',buttonColor: Colors.white,
-                  buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Already have an account?", style:TextStyle(fontSize: SizeConfig.textRatio * 14 )),
-
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Log In',
-                        style: TextStyle(
-                          color: Color(0xFF5095B0),
-                          fontFamily: 'roboto-medium',
-                          fontSize: SizeConfig.textRatio * 16,
+              customizeButton(
+                  buttonName: 'Sign Up',
+                  buttonColor: SizeConfig.iconColor,
+                  fontColor: Color(0xFFF5F5F5),
+                  onClickButton: () async {
+                    String response = await addCustomer();
+                    if(response == "User added successfully"){
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Sign-Up Successful!")),
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Getotp(_email.text), // Instantiate Getotp
                         ),
+                      );
+                    }else{
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("${response}")),
+                      );
+                    }
+
+
+                  }),
+
+              SizedBox(height: SizeConfig.verticalBlock * 60),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: SizeConfig.horizontalBlock * 123,
+                    height: SizeConfig.verticalBlock * 2,
+                    // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 40,
+                    //     right: SizeConfig.horizontalBlock * 10),
+                    decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                  ),
+                  Text(
+                    "Or With",
+                    style: TextStyle(fontSize: SizeConfig.textRatio * 14),
+                  ),
+                  Container(
+                    width: SizeConfig.horizontalBlock * 123,
+                    height: SizeConfig.verticalBlock * 2,
+                    // margin: EdgeInsets.only(left: SizeConfig.horizontalBlock * 10),
+                    decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                  )
+                ],
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+
+              customizeButton(
+                buttonName: 'Google',
+                buttonColor: Colors.white,
+                buttonIcon: Icons.mail,
+                fontColor: Colors.black,
+                buttonBorder: Border.all(color: SizeConfig.iconColor),
+              ),
+              SizedBox(height: SizeConfig.verticalBlock * 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Already have an account?",
+                      style: TextStyle(fontSize: SizeConfig.textRatio * 14)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Log In',
+                      style: TextStyle(
+                        color: Color(0xFF5095B0),
+                        fontFamily: 'roboto-medium',
+                        fontSize: SizeConfig.textRatio * 16,
                       ),
                     ),
-                  ],
-                )
-              ],
-            ),
-          ],
-        ),
-      );
+                  ),
+                ],
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

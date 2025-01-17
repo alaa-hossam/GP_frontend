@@ -10,7 +10,9 @@ import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
 import 'views/GetOTP.dart';
 
-void main() {
+
+void main() async{
+
   runApp(
       MultiProvider(
         providers: [
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
         logIn.id: (BuildContext context) => logIn(),
         forgetPassword.id: (BuildContext context) => forgetPassword(),
         resetPassword.id: (BuildContext context) => resetPassword(),
-        Getotp.id:(BuildContext context) => Getotp(),
+        // Getotp.id:(BuildContext context) => Getotp(),
         Home.id:(BuildContext context) => Home(),
         Profile.id:(BuildContext context) => Profile()
 

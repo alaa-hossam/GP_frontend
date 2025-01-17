@@ -6,7 +6,14 @@ class MyDropDownMenu extends StatefulWidget {
   final List<String> dropDownItems;
   final IconData prefixIcon;
   final String hintText;
-  MyDropDownMenu({required this.dropDownItems, required this.prefixIcon ,required this.hintText});
+  final ValueChanged<String?>? onChanged; // Add this parameter
+
+  MyDropDownMenu({
+    required this.dropDownItems,
+    required this.prefixIcon,
+    required this.hintText,
+    this.onChanged, // Initialize it
+  });
 
   @override
   _MyDropDownMenuState createState() => _MyDropDownMenuState();
@@ -20,41 +27,27 @@ class _MyDropDownMenuState extends State<MyDropDownMenu> {
     return Container(
       width: SizeConfig.horizontalBlock * 363,
       height: SizeConfig.verticalBlock * 55,
-      decoration: BoxDecoration(
-        color: Color(0xFFF5F5F5),
-      ),
-      child: Row(
-        children: [
-          // Prefix Icon
-          Icon(widget.prefixIcon, color: SizeConfig.iconColor), // Dynamically using the passed prefixIcon
-          SizedBox(width: 10), // Spacing between the icon and the dropdown
-          Expanded(  // To make the dropdown take the remaining space
-            child: DropdownButton<String>(
-              underline: Container(),
-              value: selectedValue,
-              hint: Text(
-                widget.hintText,
-                style: TextStyle(
-                  color: SizeConfig.fontColor,
-                  fontSize: 20 * SizeConfig.textRatio,
-                ),
-              ),
-              icon: const Icon(Icons.arrow_drop_down), // Dropdown icon
-              isExpanded: true,  // Ensures dropdown takes the full width
-              items: widget.dropDownItems.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedValue = newValue; // Update the selected value
-                });
-              },
-            ),
-          ),
-        ],
+      color: const Color(0xFFF5F5F5),      // Existing implementation
+      child: DropdownButton<String>(
+        underline: Container(),
+        value: selectedValue,
+        hint: Text(widget.hintText),
+        icon: const Icon(Icons.arrow_drop_down),
+        isExpanded: true,
+        items: widget.dropDownItems.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(item),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedValue = newValue;
+          });
+          if (widget.onChanged != null) {
+            widget.onChanged!(newValue); // Trigger the callback
+          }
+        },
       ),
     );
   }

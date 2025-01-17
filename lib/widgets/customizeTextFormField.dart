@@ -4,7 +4,7 @@ import 'Dimensions.dart';
 class MyTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String? hintName;
-  final IconData icon;
+  final IconData? icon;
   final Widget? suffixIcon;
   final bool isObscureText , enable;
   double?  width , height;
@@ -14,7 +14,7 @@ class MyTextFormField extends StatelessWidget {
   MyTextFormField({
     required this.controller,
     this.hintName,
-    required this.icon,
+     this.icon,
     this.isObscureText = false,
     this.enable = true,
     this.onClickFunction,
