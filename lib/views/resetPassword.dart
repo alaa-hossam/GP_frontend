@@ -53,8 +53,8 @@ class _resetPasswordState extends State<resetPassword> {
             key: _globalKey,
             child: Center(
               child: Column(
+                spacing:SizeConfig.verticalBlock * 10 ,
                 children: [
-                  SizedBox(height: SizeConfig.verticalBlock * 10),
                   Text(
                     'Enter new password',
                     style: TextStyle(
@@ -63,7 +63,6 @@ class _resetPasswordState extends State<resetPassword> {
                       fontFamily: 'title-bold',
                     ),
                   ),
-                  SizedBox(height: SizeConfig.verticalBlock * 10),
                   Text(
                     'Your new password must be different from previous used passwords.',
                     textAlign: TextAlign.center,
@@ -73,7 +72,6 @@ class _resetPasswordState extends State<resetPassword> {
                       fontFamily: 'caption-regular',
                     ),
                   ),
-                  SizedBox(height: SizeConfig.verticalBlock * 10),
                   MyTextFormField(
                       controller: passwordController,
                       hintName: "Password",
@@ -85,9 +83,6 @@ class _resetPasswordState extends State<resetPassword> {
                       ),
                       onPressed: togglePasswordVisibility,
                     ),
-                  ),
-                  SizedBox(
-                    height: SizeConfig.verticalBlock *10,
                   ),
                   MyTextFormField(
                     controller: confirmPasswordController,
@@ -101,31 +96,33 @@ class _resetPasswordState extends State<resetPassword> {
                       onPressed: toggleConfirmPasswordVisibility,
                     ),
                   ),
-                  SizedBox(
-                    height: SizeConfig.verticalBlock *10,
-                  ),
-                  customizeButton(buttonName: 'Reset Password', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),),
-                  SizedBox(height: SizeConfig.verticalBlock * 10),
+                  customizeButton(buttonName: 'Reset Password', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),onClickButton: (){
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => logIn()),
+                    );
+                  },),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    spacing:SizeConfig.horizontalBlock * 5 ,
                     children: [
                       Text(
                         "Remember Password?",
                         style: TextStyle(
-                          color: Color(0xFF000000),
                           fontFamily: 'roboto-regular',
                           fontSize: SizeConfig.textRatio * 16,
                         ),
                       ),
-                      SizedBox(width: SizeConfig.horizontalBlock * 5),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pop(context);
-                        },
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => logIn()),
+                          );                        },
                         child: Text(
                           'Log In',
                           style: TextStyle(
-                            color: Color(0xFF5095B0),
+                            color: SizeConfig.iconColor,
                             fontFamily: 'roboto-medium',
                             fontSize: SizeConfig.textRatio * 16,
                           ),

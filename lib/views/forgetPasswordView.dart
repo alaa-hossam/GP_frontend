@@ -41,8 +41,8 @@ class _ForgetPasswordState extends State<forgetPassword> {
             key: _globalKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing:SizeConfig.verticalBlock * 10 ,
               children: [
-                SizedBox(height: SizeConfig.verticalBlock * 10),
                 Text(
                   'Forget Password?',
                   style: TextStyle(
@@ -51,7 +51,6 @@ class _ForgetPasswordState extends State<forgetPassword> {
                     fontFamily: 'title-bold',
                   ),
                 ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
                 Text(
                   'Enter your email address associated with your account.',
                   textAlign: TextAlign.center,
@@ -61,31 +60,27 @@ class _ForgetPasswordState extends State<forgetPassword> {
                     fontFamily: 'caption-regular',
                   ),
                 ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
                 MyTextFormField(
                   controller: emailController,
                   hintName: "Email",
                   icon: Icons.email_outlined,
                 ),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
                 customizeButton(buttonName: 'Send Code',buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),onClickButton: () {
                   Navigator.pushNamed(
                       context,
                       Getotp.id);
                 }),
-                SizedBox(height: SizeConfig.verticalBlock * 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing:SizeConfig.horizontalBlock * 5 ,
                   children: [
                     Text(
                       "Remember Password?",
                       style: TextStyle(
-                        color: Color(0xFF000000),
                         fontFamily: 'roboto-regular',
                         fontSize: SizeConfig.textRatio * 16,
                       ),
                     ),
-                    SizedBox(width: SizeConfig.horizontalBlock * 5),
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -93,7 +88,7 @@ class _ForgetPasswordState extends State<forgetPassword> {
                       child: Text(
                         'Log In',
                         style: TextStyle(
-                          color: Color(0xFF5095B0),
+                          color: SizeConfig.iconColor,
                           fontFamily: 'roboto-medium',
                           fontSize: SizeConfig.textRatio * 16,
                         ),

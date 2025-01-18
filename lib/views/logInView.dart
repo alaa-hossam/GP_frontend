@@ -40,16 +40,14 @@ class _logInState extends State<logIn> {
               key: _globalKey,
               child: Center(
                 child: Column(
+                  spacing:SizeConfig.verticalBlock * 10 ,
                   children: [
                     Text("Logo"),
-                    SizedBox(height: SizeConfig.verticalBlock * 80),
+                    SizedBox(height: SizeConfig.verticalBlock * 70),
                     MyTextFormField(
                         controller: email,
                         hintName: "Email",
                         icon: Icons.email_outlined
-                    ),
-                    SizedBox(
-                      height: SizeConfig.verticalBlock *10,
                     ),
                     MyTextFormField(
                       controller: password,
@@ -62,9 +60,6 @@ class _logInState extends State<logIn> {
                         ),
                         onPressed: togglePasswordVisibility,
                       ),
-                    ),
-                    SizedBox(
-                      height: SizeConfig.verticalBlock *10,
                     ),
                     Container(
                       width: SizeConfig.horizontalBlock *363 ,
@@ -85,15 +80,13 @@ class _logInState extends State<logIn> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: SizeConfig.verticalBlock *10,
-                    ),
                     customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),onClickButton: (){
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(),));
                     },),
-                    SizedBox(height: SizeConfig.verticalBlock * 150),
+                    SizedBox(height: SizeConfig.verticalBlock * 100),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing:SizeConfig.horizontalBlock * 5 ,
                       children: [
                         Container(
                           width: SizeConfig.horizontalBlock * 140,
@@ -101,9 +94,7 @@ class _logInState extends State<logIn> {
                           decoration:const BoxDecoration(
                               color: Color(0xFFD8DADC)
                           ),),
-                        SizedBox(width: SizeConfig.horizontalBlock * 5),
                         Text("Or With", style: TextStyle(fontSize: SizeConfig.textRatio * 14),),
-                        SizedBox(width: SizeConfig.horizontalBlock * 5),
                         Container(
                           width: SizeConfig.horizontalBlock * 140,
                           height: SizeConfig.verticalBlock * 2,
@@ -112,11 +103,10 @@ class _logInState extends State<logIn> {
                           ),)
                       ],
                     ),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
                     customizeButton(buttonName: 'Google',buttonColor: Colors.white, buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing:SizeConfig.horizontalBlock * 5 ,
                       children: [
                         Text(
                           "Don't Have An Account?",
@@ -128,6 +118,7 @@ class _logInState extends State<logIn> {
                         ),
                         
                         SizedBox(width: SizeConfig.horizontalBlock * 5),
+
                         GestureDetector(
                           onTap: () {
                             Navigator.pushNamed(context, SignUp.id);
@@ -145,44 +136,11 @@ class _logInState extends State<logIn> {
 
                       ],
                     ),
-                    // FutureBuilder(
-                    //   future: getUser(),
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.connectionState == ConnectionState.waiting) {
-                    //       return Padding(
-                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
-                    //         child: Text("Loading..."),
-                    //       );
-                    //     } else if (snapshot.hasError) {
-                    //       print(snapshot.error);
-                    //       return Padding(
-                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
-                    //         child: Text("Error: ${snapshot.error}"),
-                    //       );
-                    //     } else if (snapshot.hasData) {
-                    //       return Padding(
-                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
-                    //         child: Text(
-                    //           "${snapshot.data}",
-                    //           style: TextStyle(
-                    //             color: Colors.green,
-                    //             fontFamily: 'roboto-regular',
-                    //             fontSize: SizeConfig.textRatio * 16,
-                    //           ),
-                    //         ),
-                    //       );
-                    //     } else {
-                    //       return Padding(
-                    //         padding: EdgeInsets.only(left: SizeConfig.horizontalBlock * 5),
-                    //         child: Text("No Data"),
-                    //       );
-                    //     }
-                    //   },
-                    // ),
+  
                   ],
                 ),
               ),
-                          ),
+              ),
             ),
           ),
     );
