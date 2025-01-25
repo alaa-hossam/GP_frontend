@@ -52,4 +52,8 @@ class customerViewModel {
   verifyCustomer(String code , String email){
     customerProcesses.verifyCustomer(code, email);
   }
+  resendCode(String email){
+
+    customerProcesses.resendCode(email);
+  }
 }

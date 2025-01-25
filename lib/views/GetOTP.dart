@@ -1,22 +1,21 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
-import 'package:gp_frontend/views/resetPassword.dart';
+import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
-import '../widgets/customizeOTPField.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/Dimensions.dart';
 
 class Getotp extends StatefulWidget {
   static String id = "GetOtpScreen";
 
-  String email ;
+  final String email;
 
   Getotp(this.email);
 
   @override
   State<Getotp> createState() => _GetotpState();
-
 }
 
 class _GetotpState extends State<Getotp> {
@@ -27,135 +26,238 @@ class _GetotpState extends State<Getotp> {
   TextEditingController code4 = TextEditingController();
   TextEditingController code5 = TextEditingController();
   TextEditingController code6 = TextEditingController();
-  verifyCustomer(String code , String email)async{
-    await customer.verifyCustomer(code, email);
+
+  FocusNode focusNode1 = FocusNode();
+  FocusNode focusNode2 = FocusNode();
+  FocusNode focusNode3 = FocusNode();
+  FocusNode focusNode4 = FocusNode();
+  FocusNode focusNode5 = FocusNode();
+  FocusNode focusNode6 = FocusNode();
+
+  int remainingTime = 60; // Initial countdown time in seconds
+  bool isButtonEnabled = true; // Verify button state
+  Timer? countdownTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    startCountdownTimer();
   }
+
+  @override
+  void dispose() {
+    countdownTimer?.cancel();
+    code1.dispose();
+    code2.dispose();
+    code3.dispose();
+    code4.dispose();
+    code5.dispose();
+    code6.dispose();
+    focusNode1.dispose();
+    focusNode2.dispose();
+    focusNode3.dispose();
+    focusNode4.dispose();
+    focusNode5.dispose();
+    focusNode6.dispose();
+    super.dispose();
+  }
+
+  void startCountdownTimer() {
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (remainingTime > 0) {
+        setState(() {
+          remainingTime--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          isButtonEnabled = false; // Disable the verify button
+        });
+      }
+    });
+  }
+
+  String formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  Future<String> resendCode(String email) async{
+    setState(() {
+      remainingTime = 60;
+      isButtonEnabled = true;
+    });
+    startCountdownTimer();
+
+    return await customer.resendCode(email);
+
+  }
+
+  Future<String> verifyCustomer(String code, String email) async {
+    return await customer.verifyCustomer(code, email);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: Color(0xFF292929),
-              size: SizeConfig.textRatio * 15,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF292929),
+            size: SizeConfig.textRatio * 15,
           ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: ListView(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height:SizeConfig.horizontalBlock * 50,),
-                Container(
-                  width: SizeConfig.horizontalBlock * 363,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Enter code',
-                        style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: SizeConfig.textRatio * 24,
-                          fontFamily: 'title-bold',
-                        ),
+      ),
+      body: ListView(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: SizeConfig.horizontalBlock * 50),
+              Container(
+                width: SizeConfig.horizontalBlock * 363,
+                child: Column(
+                  children: [
+                    Text(
+                      'Enter code',
+                      style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontSize: SizeConfig.textRatio * 24,
+                        fontFamily: 'title-bold',
                       ),
-                      SizedBox(height: SizeConfig.verticalBlock * 10),
-                      Text(
-                        'Please enter the 6 digit code sent to your email.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0x803C3C3C),
-                          fontSize: SizeConfig.textRatio * 16,
-                          fontFamily: 'caption-regular',
-                        ),
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 10),
+                    Text(
+                      'Please enter the 6-digit code sent to your email.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0x803C3C3C),
+                        fontSize: SizeConfig.textRatio * 16,
+                        fontFamily: 'caption-regular',
                       ),
-                      SizedBox(height: SizeConfig.verticalBlock * 30),
-                      Row(
-                        children: [
-                          MyTextFormField(controller: code1 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          MyTextFormField(controller: code2 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          MyTextFormField(controller: code3 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          MyTextFormField(controller: code4 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10)
-                          ,MyTextFormField(controller: code5 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          MyTextFormField(controller: code6 ,
-                            width: SizeConfig.horizontalBlock * 50,
-                            height: SizeConfig.verticalBlock * 60,),
-                          SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          // Customizeotpfield(),
-                          // SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          // Customizeotpfield(),
-                          // SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          // Customizeotpfield(),
-                          // SizedBox(width: SizeConfig.horizontalBlock * 23),
-                          // Customizeotpfield(),
-                          // SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          // Customizeotpfield(),
-                          // SizedBox(width: SizeConfig.horizontalBlock * 10),
-                          // Customizeotpfield(),
-                        ],
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 30),
+                    Row(
+                      children: [
+                        buildOTPField(code1, focusNode1, focusNode2),
+                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        buildOTPField(code2, focusNode2, focusNode3),
+                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        buildOTPField(code3, focusNode3, focusNode4),
+                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        buildOTPField(code4, focusNode4, focusNode5),
+                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        buildOTPField(code5, focusNode5, focusNode6),
+                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        buildOTPField(code6, focusNode6, null),
+                      ],
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 10),
+                    Text(
+                      formatTime(remainingTime),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFFB36995),
+                        fontSize: SizeConfig.textRatio * 15,
+                        fontFamily: 'Roboto-regular',
                       ),
-                      SizedBox(height: SizeConfig.verticalBlock * 10,),
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 10),
+                    GestureDetector(
+                      onTap: () async {
+                        String response = await resendCode(widget.email);
+                        print(widget.email);
+                        print(".........................");
+                        if (response == "Code Resend successfully") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Code Resend successfully")),
+                          );
 
-                      Text(
-                        '00:60',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFB36995),
-                          fontSize: SizeConfig.textRatio * 15,
-                          fontFamily: 'Roboto-regular',
-                        ),
-                      ),
-                      SizedBox(height: SizeConfig.verticalBlock * 10,),
-                      Text(
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("${response}")),
+                          );
+                        }
+                      },
+                      child: Text(
                         'Resend Code',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Color(0xFF5095B0),
+                          color: remainingTime == 0
+                              ? Color(0xFF5095B0)
+                              : Colors.grey,
                           fontSize: SizeConfig.textRatio * 16,
                           fontFamily: 'Roboto-medium',
                         ),
                       ),
-                      SizedBox(height: SizeConfig.verticalBlock * 16,),
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 16),
+                    customizeButton(
+                      buttonName: "Verify",
+                      buttonColor: isButtonEnabled
+                          ? SizeConfig.iconColor
+                          : Colors.grey, // Change button color based on state
+                      fontColor: Color(0xFFF5F5F5),
+                      onClickButton:()  {
+                        isButtonEnabled
+                            ? () async{
+                          String code = code1.text +
+                              code2.text +
+                              code3.text +
+                              code4.text +
+                              code5.text +
+                              code6.text;
+                          String response = await verifyCustomer(code , widget.email);
+                          if (response == "User verified successfully") {
 
-                      customizeButton(buttonName: "Verify", buttonColor: SizeConfig.iconColor, fontColor: Color(0xFFF5F5F5),onClickButton: () {
-                        // Navigator.pushNamed(
-                        //     context,
-                        //     resetPassword.id);
-                        String code = code1.text +code2.text +code3.text +code4.text
-                        +code5.text + code6.text;
-                        verifyCustomer(code, widget.email);
-                      })
-                    ],
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("User verified successfully")),
+                            );
+                            Navigator.pushNamed(context,Home.id);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("${response}")),
+                            );
+                          }
+                        }
+                            : null;
 
-                  ),
+                      },
+
+
+                       // Disable click when button is disabled
+                    ),
+                  ],
                 ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-              ],
-            )
-          ],
-        ),
+  Widget buildOTPField(TextEditingController controller, FocusNode currentNode,
+      FocusNode? nextNode) {
+    return MyTextFormField(
+      controller: controller,
+      focusNode: currentNode,
+      width: SizeConfig.horizontalBlock * 50,
+      height: SizeConfig.verticalBlock * 60,
+      onChanged: (value) {
+        if (value.isNotEmpty && nextNode != null) {
+          FocusScope.of(context).requestFocus(nextNode);
+        }
+      },
     );
   }
 }

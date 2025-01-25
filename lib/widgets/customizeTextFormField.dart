@@ -8,6 +8,8 @@ class MyTextFormField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool isObscureText , enable;
   double?  width , height;
+  FocusNode? focusNode = FocusNode();
+  ValueChanged<dynamic>? onChanged;
   final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
 
@@ -21,6 +23,8 @@ class MyTextFormField extends StatelessWidget {
     this.suffixIcon,
     this.width,
     this.height,
+    this.focusNode,
+    this.onChanged
   });
   @override
   Widget build(BuildContext context) {
@@ -53,11 +57,13 @@ class MyTextFormField extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(30.0)),
             borderSide: BorderSide(color: Color(0xFF5095B0)),
           ),
-          prefixIcon: Icon(
+          prefixIcon: icon != null
+              ? Icon(
             icon,
             size: SizeConfig.textRatio * 25,
             color: const Color(0xFF5095B0),
-          ),
+          )
+              : null, // Set null if no icon is provided
           hintText: hintName,
           hintStyle: TextStyle(
             color: SizeConfig.fontColor,
@@ -73,6 +79,8 @@ class MyTextFormField extends StatelessWidget {
             await onClickFunction!(context); // Pass the context to the callback
           }
         },
+        focusNode: focusNode,
+        onChanged: onChanged,
       ),
     );
   }

@@ -91,7 +91,6 @@ class customerServices {
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
 
-        // throw Exception('Failed to add customer: ${response.body}');
       }
 
     } catch (e) {
@@ -101,7 +100,7 @@ class customerServices {
     }
   }
 
-  Future<void> verifyCustomer(String code , String email) async {
+  Future<String> verifyCustomer(String code , String email) async {
     final request = {
       'query':'''
           mutation VerifyUserForSignUp {
@@ -123,16 +122,54 @@ class customerServices {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['errors'] != null) {
-          throw Exception("GraphQL Error: ${data['errors'][0]['message']}");
+          return data['errors'][0]['message'];
         }
-        print("User added successfully: ${data['data']}");
+        return "User verified successfully";
       } else {
-        throw Exception('Failed to add customer: ${response.body}');
+        return jsonDecode(response.body)['errors'][0]['message'];
+
       }
+
     } catch (e) {
       print("Exception: $e");
-      throw Exception('Error: $e');
-    }
+      return e.toString();
 
+    }
   }
+
+  Future<String> resendCode(String email) async{
+    final request = {
+      'query': '''
+          mutation ResendSignUpOtp {
+              ResendSignUpOtp(email: "${email}")
+          }
+      '''
+    };
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(request),
+      );
+
+      print("Response: ${response.body}"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+        return "Code Resend successfully";
+      } else {
+        return jsonDecode(response.body)['errors'][0]['message'];
+
+      }
+
+    } catch (e) {
+      print("Exception: $e");
+      return e.toString();
+
+    }
+  }
+
 }
