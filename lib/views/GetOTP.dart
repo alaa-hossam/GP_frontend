@@ -37,6 +37,8 @@ class _GetotpState extends State<Getotp> {
   int remainingTime = 60; // Initial countdown time in seconds
   bool isButtonEnabled = true; // Verify button state
   Timer? countdownTimer;
+  bool _isLoading = false; // Loading state
+
 
   @override
   void initState() {
@@ -83,7 +85,7 @@ class _GetotpState extends State<Getotp> {
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  Future<String> resendCode(String email) async{
+  Future<String> resendCode(String email) async {
     setState(() {
       remainingTime = 60;
       isButtonEnabled = true;
@@ -91,12 +93,10 @@ class _GetotpState extends State<Getotp> {
     startCountdownTimer();
 
     return await customer.resendCode(email);
-
   }
 
   Future<String> verifyCustomer(String code, String email) async {
     return await customer.verifyCustomer(code, email);
-
   }
 
   @override
@@ -153,7 +153,7 @@ class _GetotpState extends State<Getotp> {
                         buildOTPField(code2, focusNode2, focusNode3),
                         SizedBox(width: SizeConfig.horizontalBlock * 10),
                         buildOTPField(code3, focusNode3, focusNode4),
-                        SizedBox(width: SizeConfig.horizontalBlock * 10),
+                        SizedBox(width: SizeConfig.horizontalBlock * 20),
                         buildOTPField(code4, focusNode4, focusNode5),
                         SizedBox(width: SizeConfig.horizontalBlock * 10),
                         buildOTPField(code5, focusNode5, focusNode6),
@@ -174,18 +174,18 @@ class _GetotpState extends State<Getotp> {
                     SizedBox(height: SizeConfig.verticalBlock * 10),
                     GestureDetector(
                       onTap: () async {
-                        String response = await resendCode(widget.email);
-                        print(widget.email);
-                        print(".........................");
-                        if (response == "Code Resend successfully") {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Code Resend successfully")),
-                          );
+                        if (remainingTime == 0) {
+                          String response = await resendCode(widget.email);
 
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("${response}")),
-                          );
+                          if (response == "Code Resend successfully") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Code Resend successfully")),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("${response}")),
+                            );
+                          }
                         }
                       },
                       child: Text(
@@ -207,42 +207,54 @@ class _GetotpState extends State<Getotp> {
                           ? SizeConfig.iconColor
                           : Colors.grey, // Change button color based on state
                       fontColor: Color(0xFFF5F5F5),
-                      onClickButton:()  {
-                        isButtonEnabled
-                            ? () async{
+                      onClickButton: () async {
+                        if (isButtonEnabled) {
                           String code = code1.text +
                               code2.text +
                               code3.text +
                               code4.text +
                               code5.text +
                               code6.text;
-                          String response = await verifyCustomer(code , widget.email);
+                          setState(() {
+                            _isLoading = true; // Set loading to true
+                          });
+
+                          String response = await verifyCustomer(code, widget.email);
+
+                          setState(() {
+                            _isLoading = false; // Set loading to true
+                          });
+
                           if (response == "User verified successfully") {
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("User verified successfully")),
                             );
-                            Navigator.pushNamed(context,Home.id);
+                            Navigator.pushNamed(context, Home.id);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("${response}")),
                             );
                           }
                         }
-                            : null;
-
                       },
-
-
-                       // Disable click when button is disabled
                     ),
                   ],
                 ),
               ),
             ],
           ),
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
+
       ),
+
     );
   }
 

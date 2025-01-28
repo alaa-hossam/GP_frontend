@@ -43,7 +43,7 @@ class CustomerModel {
 
 
 class customerServices {
-  final String apiUrl = "http://192.168.1.4:3000/api/graphql";
+  final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
 
   Future<String> addCustomer(CustomerModel customer) async {
     // Await device token retrieval
@@ -101,6 +101,8 @@ class customerServices {
   }
 
   Future<String> verifyCustomer(String code , String email) async {
+    print(code);
+    print(email);
     final request = {
       'query':'''
           mutation VerifyUserForSignUp {

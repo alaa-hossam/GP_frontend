@@ -3,7 +3,7 @@ import 'package:gp_frontend/Models/CustomerModel.dart';
 import 'package:http/http.dart' as http;
 
 class customerViewModel {
-  final String apiUrl = "http://192.168.1.4:3000/api/graphql";
+  final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   customerServices customerProcesses = customerServices();
 
   Future<String> addUser({required birthDate,required email,required gender,required name,
@@ -49,11 +49,11 @@ class customerViewModel {
     }
   }
 
-  verifyCustomer(String code , String email){
-    customerProcesses.verifyCustomer(code, email);
+  Future<String> verifyCustomer(String code , String email){
+    return customerProcesses.verifyCustomer(code, email);
   }
-  resendCode(String email){
+  Future<String>resendCode(String email){
 
-    customerProcesses.resendCode(email);
+    return  customerProcesses.resendCode(email);
   }
 }

@@ -21,6 +21,7 @@ class SizeConfig {
     horizontalBlock = (_mediaQueryData.size.width) / designWidth;
     verticalBlock = (screenHeight - statusBarHeight) / (designHeight);
     textRatio = min(verticalBlock, horizontalBlock);
+
   }
 
 }

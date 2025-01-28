@@ -41,6 +41,7 @@ class customizeButton extends StatelessWidget {
               Icon(
                 buttonIcon,
                 color: SizeConfig.iconColor,
+                size: 20 * SizeConfig.textRatio,
               ),
             if (buttonIcon != null) SizedBox(width: 10),
             SizedBox(width: 10,),
