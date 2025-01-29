@@ -174,4 +174,178 @@ class customerServices {
     }
   }
 
+  Future<String> logInCustomer(String email, String password) async {
+    String deviceToken = "";
+    try {
+      deviceToken = await CustomerModel("", "", "", "", "", "", "").getDeviceToken();
+    } catch (e) {
+      print("Error retrieving device token: $e");
+    }
+    final request = {
+      'query': '''
+            mutation Login {
+              login(
+                loginInput: {
+                    deviceToken: "$deviceToken",
+                    email: "${email}",
+                    password: "${password}"
+                }
+              ){
+                accessToken
+            }
+}
+
+
+        ''',
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(request),
+      );
+
+      print("Response: ${response.body}"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+        return "User Log In Successfully";
+      } else {
+        return jsonDecode(response.body)['errors'][0]['message'];
+
+      }
+
+    } catch (e) {
+      print("Exception: $e");
+      return e.toString();
+
+    }
+  }
+
+  Future<String> forgetPassGetCode(String email) async {
+    final request = {
+      'query':'''
+          mutation SendResetPasswordOtp {
+              sendResetPasswordOtp(email: "${email}")
+          }
+
+      '''
+    };
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(request),
+      );
+
+      print("Response: ${response.body}"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+        return "Code Send Successfully";
+      } else {
+        return jsonDecode(response.body)['errors'][0]['message'];
+
+      }
+
+    } catch (e) {
+      print("Exception: $e");
+      return e.toString();
+
+    }
+  }
+
+  Future<String> checkResetPassCode(String email, String code) async {
+    print("Code: $code");
+    print("Email: $email");
+
+    final request = {
+      'query': '''
+      mutation CheckResetPasswordCode {
+        checkResetPasswordCode(
+          code: "$code", 
+          email: "$email"
+        )
+      }
+    '''
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(request),
+      );
+      print("Response: ${response.body}");
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+
+        if (data['data'] != null && data['data']['checkResetPasswordCode'] == true) {
+          return "Code Verified Successfully";
+        } else {
+          return "Invalid Code";
+        }
+      } else {
+        return jsonDecode(response.body)['errors'][0]['message'];
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return e.toString();
+    }
+  }
+
+  Future<String> ResetPass(String email, String newPass, String confirmPass) async {
+    final request = {
+      'query': '''
+      mutation ResetPassword {
+        resetPassword(
+          confirmPassword: "$confirmPass",
+          email: "$email", 
+          newPassword: "$newPass"
+        )
+      }
+    '''
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(request),
+      );
+
+      print("Response: ${response.body}"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+
+        if (data['data'] != null && data['data']['resetPassword'] == true) {
+          return "Password Changed Successfully";
+        } else {
+          return "Failed to Reset Password. Please Try Again.";
+        }
+      } else {
+        return jsonDecode(response.body)['errors'][0]['message'];
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return e.toString();
+    }
+  }
+
 }

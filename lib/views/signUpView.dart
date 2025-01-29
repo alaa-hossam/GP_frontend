@@ -178,7 +178,7 @@ class _SignUpState extends State<SignUp> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Getotp(_email.text), // Instantiate Getotp
+                            builder: (context) => Getotp(_email.text,0), // Instantiate Getotp
                           ),
                         );
                       } else {

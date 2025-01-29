@@ -56,4 +56,20 @@ class customerViewModel {
 
     return  customerProcesses.resendCode(email);
   }
+
+  Future<String> logIn({required email,required password})async{
+    return customerProcesses.logInCustomer(email, password);
+  }
+
+  Future<String> forgetPassCode({required email,})async{
+    return customerProcesses.forgetPassGetCode(email);
+  }
+
+  Future<String> verfiyResetPassCode({required email,required code})async{
+    return customerProcesses.checkResetPassCode(email, code);
+  }
+
+  Future<String> ResetPass({required email,required newPass,required confirmPass})async{
+    return customerProcesses.ResetPass(email, newPass, confirmPass);
+  }
 }

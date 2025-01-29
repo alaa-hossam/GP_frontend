@@ -18,131 +18,183 @@ class _logInState extends State<logIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool obscureText = true;
-  customerViewModel cmv= customerViewModel();
+  customerViewModel cvm= customerViewModel();
+  bool _isLoading = false;
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
     });
   }
-//   getUser()async{
-//     return await cmv.fetchUser("1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e");
-// }
+
+  Future<String> logInCustomer() async {
+    try {
+      return await cvm.logIn(
+          email: email.text,
+          password: password.text
+      );
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return  Scaffold(
-          body: SingleChildScrollView(
+    return Scaffold(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.only(top: SizeConfig.verticalBlock * 200),
               child: Form(
-              key: _globalKey,
-              child: Center(
-                child: Column(
-                  spacing:SizeConfig.verticalBlock * 10 ,
-                  children: [
-                    Text("Logo"),
-                    SizedBox(height: SizeConfig.verticalBlock * 70),
-                    MyTextFormField(
-                        controller: email,
-                        hintName: "Email",
-                        icon: Icons.email_outlined
-                    ),
-                    MyTextFormField(
-                      controller: password,
-                      hintName: "Password",
-                      icon: Icons.lock,
-                      isObscureText: obscureText,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscureText ? Icons.visibility_off : Icons.visibility,
-                        ),
-                        onPressed: togglePasswordVisibility,
+                key: _globalKey,
+                child: Center(
+                  child: Column(
+                    spacing: SizeConfig.verticalBlock * 10,
+                    children: [
+                      Text("Logo"),
+                      SizedBox(height: SizeConfig.verticalBlock * 70),
+                      MyTextFormField(
+                          controller: email,
+                          hintName: "Email",
+                          icon: Icons.email_outlined
                       ),
-                    ),
-                    Container(
-                      width: SizeConfig.horizontalBlock *363 ,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end, // Aligns children to the end
+                      MyTextFormField(
+                        controller: password,
+                        hintName: "Password",
+                        icon: Icons.lock,
+                        isObscureText: obscureText,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscureText ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: togglePasswordVisibility,
+                        ),
+                      ),
+                      Container(
+                        width: SizeConfig.horizontalBlock * 363,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacementNamed(context, forgetPassword.id);
+                              },
+                              child: Text(
+                                'Forget password?',
+                                style: TextStyle(
+                                  color: Color(0xFF5095B0),
+                                  fontFamily: 'roboto-medium',
+                                  fontSize: SizeConfig.textRatio * 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      customizeButton(
+                        buttonName: 'Log In',
+                        buttonColor: SizeConfig.iconColor,
+                        fontColor: const Color(0xFFF5F5F5),
+                        onClickButton: () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          String response = await logInCustomer();
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          if (response == "User Log In Successfully") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Log In Successful!")),
+                            );
+                            Navigator.pushNamed(context, Home.id);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response)),
+                            );
+                          }
+                        },
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 100),
+                      Row(
+                        spacing: SizeConfig.horizontalBlock *5,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Container(
+                            width: SizeConfig.horizontalBlock * 140,
+                            height: SizeConfig.verticalBlock * 2,
+                            decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                          ),
+                          Text(
+                            "Or With",
+                            style: TextStyle(fontSize: SizeConfig.textRatio * 14),
+                          ),
+                          Container(
+                            width: SizeConfig.horizontalBlock * 140,
+                            height: SizeConfig.verticalBlock * 2,
+                            decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                          )
+                        ],
+                      ),
+                      customizeButton(
+                        buttonName: 'Google',
+                        buttonColor: Colors.white,
+                        buttonIcon: Icons.mail,
+                        fontColor: Colors.black,
+                        buttonBorder: Border.all(color: SizeConfig.iconColor),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't Have An Account?",
+                            style: TextStyle(
+                              color: Color(0xFF000000),
+                              fontFamily: 'roboto-regular',
+                              fontSize: SizeConfig.textRatio * 16,
+                            ),
+                          ),
+                          SizedBox(width: SizeConfig.horizontalBlock * 5),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(context, forgetPassword.id);
+                              Navigator.pushReplacementNamed(context, SignUp.id);
                             },
-                            child: Text('Forget password?',
+                            child: Text(
+                              'Sign Up',
                               style: TextStyle(
                                 color: Color(0xFF5095B0),
                                 fontFamily: 'roboto-medium',
-                                fontSize: SizeConfig.textRatio * 16,),
+                                fontSize: SizeConfig.textRatio * 16,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    customizeButton(buttonName: 'Log In', buttonColor: SizeConfig.iconColor,fontColor:const Color(0xFFF5F5F5),onClickButton: (){
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(),));
-                    },),
-                    SizedBox(height: SizeConfig.verticalBlock * 100),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing:SizeConfig.horizontalBlock * 5 ,
-                      children: [
-                        Container(
-                          width: SizeConfig.horizontalBlock * 140,
-                          height: SizeConfig.verticalBlock * 2,
-                          decoration:const BoxDecoration(
-                              color: Color(0xFFD8DADC)
-                          ),),
-                        Text("Or With", style: TextStyle(fontSize: SizeConfig.textRatio * 14),),
-                        Container(
-                          width: SizeConfig.horizontalBlock * 140,
-                          height: SizeConfig.verticalBlock * 2,
-                          decoration:const BoxDecoration(
-                              color: Color(0xFFD8DADC)
-                          ),)
-                      ],
-                    ),
-                    customizeButton(buttonName: 'Google',buttonColor: Colors.white, buttonIcon: Icons.mail,fontColor: Colors.black, buttonBorder: Border.all(color: SizeConfig.iconColor),),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing:SizeConfig.horizontalBlock * 5 ,
-                      children: [
-                        Text(
-                          "Don't Have An Account?",
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontFamily: 'roboto-regular',
-                            fontSize: SizeConfig.textRatio * 16,
-                          ),
-                        ),
-                        
-                        SizedBox(width: SizeConfig.horizontalBlock * 5),
-
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, SignUp.id);
-                          },
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              color: Color(0xFF5095B0),
-                              fontFamily: 'roboto-medium',
-                              fontSize: SizeConfig.textRatio * 16,
-                            ),
-                          ),
-                          
-                        ),
-
-                      ],
-                    ),
-  
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               ),
             ),
           ),
+          // Loading Indicator (Placed inside Stack)
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
+
 }

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
+import 'package:gp_frontend/views/resetPassword.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/Dimensions.dart';
@@ -11,8 +12,8 @@ class Getotp extends StatefulWidget {
   static String id = "GetOtpScreen";
 
   final String email;
-
-  Getotp(this.email);
+  final int back;
+  Getotp(this.email,this.back);
 
   @override
   State<Getotp> createState() => _GetotpState();
@@ -99,6 +100,31 @@ class _GetotpState extends State<Getotp> {
     return await customer.verifyCustomer(code, email);
   }
 
+  Future<String> verfiyResetPassCode(String code) async {
+    try {
+      return await customer.verfiyResetPassCode(
+          email: widget.email, code: code
+      );
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String> getCode() async {
+    setState(() {
+      remainingTime = 60;
+      isButtonEnabled = true;
+    });
+    startCountdownTimer();
+    try {
+      return await customer.forgetPassCode(
+          email: widget.email
+      );
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -175,17 +201,32 @@ class _GetotpState extends State<Getotp> {
                     GestureDetector(
                       onTap: () async {
                         if (remainingTime == 0) {
-                          String response = await resendCode(widget.email);
+                          if(widget.back == 0){
+                            String response = await resendCode(widget.email);
 
-                          if (response == "Code Resend successfully") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Code Resend successfully")),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("${response}")),
-                            );
+                            if (response == "Code Resend successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Code Resend successfully")),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("${response}")),
+                              );
+                            }
+                          }else if(widget.back == 1){
+                            String response = await getCode();
+
+                            if (response == "Code Resend successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Code Resend successfully")),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("${response}")),
+                              );
+                            }
                           }
+
                         }
                       },
                       child: Text(
@@ -218,23 +259,44 @@ class _GetotpState extends State<Getotp> {
                           setState(() {
                             _isLoading = true; // Set loading to true
                           });
+                          if(widget.back == 0){
+                            String response = await verifyCustomer(code, widget.email);
 
-                          String response = await verifyCustomer(code, widget.email);
+                            setState(() {
+                              _isLoading = false; // Set loading to true
+                            });
 
-                          setState(() {
-                            _isLoading = false; // Set loading to true
-                          });
+                            if (response == "User verified successfully") {
 
-                          if (response == "User verified successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("User verified successfully")),
+                              );
+                              Navigator.pushReplacementNamed(context, Home.id);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("${response}")),
+                              );
+                            }
+                          } else if(widget.back == 1){
+                            String response = await verfiyResetPassCode(code);
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("User verified successfully")),
-                            );
-                            Navigator.pushNamed(context, Home.id);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("${response}")),
-                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
+
+                            if (response == "Code Verified Successfully") {
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Code Verified Successfully")),
+                              );
+                              Navigator.pushReplacement(context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      resetPassword(widget.email),));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("${response}")),
+                              );
+                            }
                           }
                         }
                       },

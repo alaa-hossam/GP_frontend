@@ -4,11 +4,9 @@ import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
-import 'package:gp_frontend/views/resetPassword.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
-import 'views/GetOTP.dart';
 
 
 void main() async{
@@ -46,8 +44,6 @@ class MyApp extends StatelessWidget {
         SignUp.id: (BuildContext context) => SignUp(),
         logIn.id: (BuildContext context) => logIn(),
         forgetPassword.id: (BuildContext context) => forgetPassword(),
-        resetPassword.id: (BuildContext context) => resetPassword(),
-        // Getotp.id:(BuildContext context) => Getotp(),
         Home.id:(BuildContext context) => Home(),
         Profile.id:(BuildContext context) => Profile()
 
