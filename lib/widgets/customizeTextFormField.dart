@@ -6,33 +6,36 @@ class MyTextFormField extends StatelessWidget {
   final String? hintName;
   final IconData? icon;
   final Widget? suffixIcon;
-  final bool isObscureText , enable;
-  double?  width , height;
-  FocusNode? focusNode = FocusNode();
-  ValueChanged<dynamic>? onChanged;
+  final bool isObscureText, enable;
+  final bool autofocus; // Add autofocus parameter
+  double? width, height;
+  final FocusNode? focusNode; // Make FocusNode nullable
+  final ValueChanged<dynamic>? onChanged;
   final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
 
   MyTextFormField({
     required this.controller,
     this.hintName,
-     this.icon,
+    this.icon,
     this.isObscureText = false,
     this.enable = true,
+    this.autofocus = false, // Default to false
     this.onClickFunction,
     this.suffixIcon,
     this.width,
     this.height,
-    this.focusNode,
-    this.onChanged
+    this.focusNode, // Nullable FocusNode
+    this.onChanged,
   });
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     width ??= SizeConfig.horizontalBlock * 363;
     height ??= SizeConfig.verticalBlock * 55;
-    return Container(
 
+    return Container(
       width: width,
       height: height,
       child: TextFormField(
@@ -49,6 +52,7 @@ class MyTextFormField extends StatelessWidget {
           return null;
         },
         enabled: enable,
+        autofocus: autofocus, // Pass the autofocus parameter to TextFormField
         decoration: InputDecoration(
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.transparent),
@@ -70,7 +74,7 @@ class MyTextFormField extends StatelessWidget {
             fontSize: SizeConfig.textRatio * 20,
             fontFamily: 'Roboto',
           ),
-          fillColor: const Color(0xFFF5F5F5),
+          fillColor: const Color(0x80E9E9E9),
           filled: true,
           suffixIcon: suffixIcon,
         ),
@@ -79,7 +83,7 @@ class MyTextFormField extends StatelessWidget {
             await onClickFunction!(context); // Pass the context to the callback
           }
         },
-        focusNode: focusNode,
+        focusNode: focusNode, // Use the nullable FocusNode
         onChanged: onChanged,
       ),
     );

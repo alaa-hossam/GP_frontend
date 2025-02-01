@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/views/logInView.dart';
-
 import '../ViewModels/customerViewModel.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
