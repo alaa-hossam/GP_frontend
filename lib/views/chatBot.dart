@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../Models/generateImageModel.dart';
+import '../ViewModels/generateImageViewModel.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 
@@ -12,17 +14,13 @@ class AIChat extends StatefulWidget {
 
 class _AIChatState extends State<AIChat> {
   TextEditingController message = TextEditingController();
-  List<Map<String, dynamic>> chatItems = []; // List to store chat items (messages and images)
-  List<String> imagesPath = [
-    "assets/images/p1.jpg",
-    "assets/images/p2.jpg",
-    "assets/images/p3.jpg"
-  ];
-  int currentImageIndex = 0;
+  List<generateImageModel> chatItems = [];
   bool write = false;
   bool edit = false;
-  int selectedIndex = -1; // Track the index of the selected message
+  bool isLoading = false; // Show loading indicator when generating image
+  int selectedIndex = -1;
   final FocusNode _focusNode = FocusNode();
+  final generateImageViewModel imageViewModel = generateImageViewModel();
 
   @override
   void initState() {
@@ -43,26 +41,70 @@ class _AIChatState extends State<AIChat> {
     });
   }
 
-  void sendMessage() {
-    if (message.text.isNotEmpty) {
+  void sendMessage() async {
+    if (message.text.isNotEmpty && !isLoading) {
+      print("message is ================= $message.text");
       setState(() {
-        chatItems.add({"type": "text", "content": message.text}); // Add the new message to the list
-        chatItems.add({"type": "image", "content": imagesPath[currentImageIndex]});
-        currentImageIndex = (currentImageIndex + 1) % imagesPath.length;
-        message.clear();
-        edit = false; // Reset edit mode
-        selectedIndex = -1; // Reset selected index
+        chatItems.add(generateImageModel(prompt: message.text, imageUrl: "", isLoading: true));
+        isLoading = true;
+        edit = false;
+        selectedIndex = -1;
       });
+
+      String prompt = message.text;
+      message.clear();
+      _focusNode.unfocus();
+
+      try {
+        // Generate image from API
+        String? generatedImagePath = await imageViewModel.generateImage(prompt: prompt);
+
+        setState(() {
+          isLoading = false;
+          if (generatedImagePath == null || generatedImagePath.isEmpty) {
+            // If the image is null or empty, remove the last item and show an error message
+            chatItems.removeLast();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Invalid prompt. Please try again."),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else {
+            // If the image is generated successfully, update the last item
+            chatItems.last = generateImageModel(prompt: prompt, imageUrl: generatedImagePath, isLoading: false);
+          }
+        });
+
+        // Save generated image if it's not null
+        if (generatedImagePath != null && generatedImagePath.isNotEmpty) {
+          await imageViewModel.saveGeneratedImage(prompt: prompt, imagePath: generatedImagePath);
+        }
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+          chatItems.removeLast();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to generate image. Please try again."),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+      }
     }
   }
+
   void editMessage(int index) {
-    setState(() {
-      message.text = chatItems[index]["content"]; // Load the message into the text field
-      edit = true; // Enable edit mode
-      write = true; // Focus the text field
-      selectedIndex = index; // Set the selected index
-      _focusNode.requestFocus();
-    });
+    if (!isLoading) {
+      setState(() {
+        message.text = chatItems[index].prompt;
+        edit = true;
+        write = true;
+        selectedIndex = index;
+        _focusNode.requestFocus();
+      });
+    }
   }
 
   @override
@@ -115,61 +157,10 @@ class _AIChatState extends State<AIChat> {
                     width: SizeConfig.verticalBlock * 65,
                     height: SizeConfig.verticalBlock * 65,
                   ),
-                  SizedBox(
-                    height: SizeConfig.verticalBlock * 20,
-                  ),
-                  Container(
-                    height: SizeConfig.verticalBlock * 59,
-                    width: SizeConfig.horizontalBlock * 325,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      color: Color(0x80E9E9E9),
-                    ),
-                    child: Center(
-                        child: Text(
-                          "Generate all the craft images you want.",
-                          style: TextStyle(
-                            color: const Color(0x803C3C3C),
-                            fontSize: SizeConfig.textRatio * 16,
-                            fontFamily: "Roboto",
-                          ),
-                        )),
-                  ),
-                  Container(
-                    height: SizeConfig.verticalBlock * 59,
-                    width: SizeConfig.horizontalBlock * 325,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      color: Color(0x80E9E9E9),
-                    ),
-                    child: Center(
-                        child: Text(
-                          "Answer all your questions about handicraft",
-                          style: TextStyle(
-                            color: const Color(0x803C3C3C),
-                            fontSize: SizeConfig.textRatio * 16,
-                            fontFamily: "Roboto",
-                          ),
-                        )),
-                  ),
-                  Container(
-                    height: SizeConfig.verticalBlock * 59,
-                    width: SizeConfig.horizontalBlock * 325,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                      color: Color(0x80E9E9E9),
-                    ),
-                    child: Center(
-                        child: Text(
-                          "Conversational AI (I can only send a photos)",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: const Color(0x803C3C3C),
-                            fontSize: SizeConfig.textRatio * 16,
-                            fontFamily: "Roboto",
-                          ),
-                        )),
-                  ),
+                  SizedBox(height: SizeConfig.verticalBlock * 20),
+                  _buildInfoContainer("Generate all the craft images you want."),
+                  _buildInfoContainer("Answer all your questions about handicraft"),
+                  _buildInfoContainer("Conversational AI (I can only send a photos)"),
                 ],
               )
                   : Stack(
@@ -179,166 +170,227 @@ class _AIChatState extends State<AIChat> {
                       spacing: SizeConfig.verticalBlock * 10,
                       children: [
                         SizedBox(height: SizeConfig.verticalBlock * 20),
-                        // Display all chat items (messages and images)
                         for (int i = 0; i < chatItems.length; i++)
-                          if (chatItems[i]["type"] == "text")
-                            Row(
-                              spacing: SizeConfig.horizontalBlock * 5,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: selectedIndex == i
-                                      ? SizeConfig.iconColor
-                                      : Colors.white,
-                                  radius: SizeConfig.horizontalBlock * 20,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: selectedIndex == i
-                                          ? Colors.white
-                                          : SizeConfig.iconColor,
-                                      size: SizeConfig.textRatio * 20,
-                                    ),
-                                    onPressed: () {
-                                      editMessage(
-                                          i); // Edit the selected message
-                                    },
-                                  ),
-                                ),
-                                Flexible(
-                                  child: IntrinsicWidth(
-                                    child: Container(
-                                      constraints: BoxConstraints(
-                                        minWidth:
-                                        SizeConfig.horizontalBlock * 100,
-                                        maxWidth:
-                                        SizeConfig.horizontalBlock * 325,
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal:
-                                        SizeConfig.horizontalBlock * 10,
-                                        vertical:
-                                        SizeConfig.verticalBlock * 10,
-                                      ),
-                                      decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(2),
-                                        ),
-                                        color: SizeConfig.iconColor,
-                                      ),
-                                      child: SingleChildScrollView(
-                                        child: Text(
-                                          chatItems[i]["content"],
-                                          textAlign: TextAlign.center,
-                                          softWrap:
-                                          true, // Enable text wrapping
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize:
-                                            SizeConfig.textRatio * 16,
-                                            fontFamily: "Roboto",
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          else if (chatItems[i]["type"] == "image")
-                            Row(
-                              spacing: SizeConfig.horizontalBlock * 5,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  chatItems[i]["content"],
-                                  width: SizeConfig.horizontalBlock * 237,
-                                  height: SizeConfig.verticalBlock * 256,
-                                ),
-                                CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: SizeConfig.horizontalBlock * 20,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.share_outlined,
-                                      color: SizeConfig.iconColor,
-                                      size: SizeConfig.textRatio * 20,
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                ),
-                              ],
-                            ),
+                          _buildChatItem(i),
                         SizedBox(height: SizeConfig.verticalBlock * 20),
                       ],
                     ),
                   ),
-                  if(!edit)
-                    Positioned(
-                      bottom: 0,
-                      right: 5,
-                      child: CircleAvatar(
-                        backgroundColor: SizeConfig.iconColor,
-                        radius: SizeConfig.horizontalBlock * 24,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: SizeConfig.textRatio * 25,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              write = false;
-                              message.clear();
-                              chatItems.clear(); // Clear all messages
-                              selectedIndex = -1;
-                            });
-                          },
+                  Positioned(
+                    bottom: 0,
+                    right: 5,
+                    child: CircleAvatar(
+                      backgroundColor: SizeConfig.iconColor,
+                      radius: SizeConfig.horizontalBlock * 24,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: SizeConfig.textRatio * 25,
                         ),
+                        onPressed: () {
+                          _focusNode.unfocus();
+                          setState(() {
+                            write = false;
+                            edit = false;
+                            message.clear();
+                            chatItems.clear(); // Clear all messages
+                            selectedIndex = -1;
+                          });
+                        },
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: SizeConfig.horizontalBlock * 5,
-              vertical: SizeConfig.verticalBlock * 10,
-            ),
-            child: Row(
-              spacing: SizeConfig.horizontalBlock * 5,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (edit || chatItems.isEmpty)
-                  GestureDetector(
-                    onTap: () {
-                      _focusNode.requestFocus();
-                    },
-                    child: MyTextFormField(
-                      controller: message,
-                      hintName: "Ask Me",
-                      focusNode: _focusNode,
-                      width: write
-                          ? SizeConfig.horizontalBlock * 300
-                          : SizeConfig.horizontalBlock * 361,
-                    ),
-                  ),
-                if (write && (edit || chatItems.isEmpty))
-                  CircleAvatar(
-                    backgroundColor: SizeConfig.iconColor,
-                    radius: SizeConfig.horizontalBlock * 24,
-                    child: IconButton(
-                      icon: Icon(Icons.send_outlined,
-                          color: Colors.white, size: SizeConfig.textRatio * 25),
-                      onPressed: sendMessage,
-                    ),
-                  ),
-              ],
-            ),
+          _buildInputField(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoContainer(String text) {
+    return Container(
+      height: SizeConfig.verticalBlock * 59,
+      width: SizeConfig.horizontalBlock * 325,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+        color: Color(0x80E9E9E9),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: const Color(0x803C3C3C),
+            fontSize: SizeConfig.textRatio * 16,
+            fontFamily: "Roboto",
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatItem(int index) {
+    return Column(
+      spacing: SizeConfig.horizontalBlock * 10,
+      children: [
+        // Message Row
+        Row(
+          spacing: SizeConfig.horizontalBlock * 5,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            CircleAvatar(
+              backgroundColor: selectedIndex == index ? SizeConfig.iconColor : Colors.white,
+              radius: SizeConfig.horizontalBlock * 20,
+              child: IconButton(
+                icon: Icon(
+                  Icons.edit,
+                  color: selectedIndex == index ? Colors.white : SizeConfig.iconColor,
+                  size: SizeConfig.textRatio * 20,
+                ),
+                onPressed: () => editMessage(index),
+              ),
+            ),
+            Flexible(
+              child: IntrinsicWidth(
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: SizeConfig.horizontalBlock * 100,
+                    maxWidth: SizeConfig.horizontalBlock * 325,
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.horizontalBlock * 10,
+                    vertical: SizeConfig.verticalBlock * 10,
+                  ),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(2),
+                    ),
+                    color: SizeConfig.iconColor,
+                  ),
+                  child: Text(
+                    chatItems[index].prompt,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: SizeConfig.textRatio * 16,
+                      fontFamily: "Roboto",
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Image Row
+        if (chatItems[index].isLoading)
+          CircularProgressIndicator()
+        else if (chatItems[index].imageUrl.isEmpty || !Uri.parse(chatItems[index].imageUrl).isAbsolute)
+          Container(
+            width: SizeConfig.horizontalBlock * 237,
+            height: SizeConfig.verticalBlock * 256,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                "The prompt must involve a handmade product",
+                textAlign: TextAlign.center,
+                softWrap: true,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: SizeConfig.textRatio * 16,
+                  fontFamily: "Roboto",
+                ),
+              ),
+            ),
+          )
+        else
+          Row(
+            spacing: SizeConfig.horizontalBlock * 5,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Image.network(
+                chatItems[index].imageUrl,
+                width: SizeConfig.horizontalBlock * 237,
+                height: SizeConfig.verticalBlock * 256,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: SizeConfig.horizontalBlock * 237,
+                    height: SizeConfig.verticalBlock * 256,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Failed to load image",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: SizeConfig.textRatio * 16,
+                          fontFamily: "Roboto",
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              // Share Button
+              CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: SizeConfig.horizontalBlock * 20,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.share_outlined,
+                    color: SizeConfig.iconColor,
+                    size: SizeConfig.textRatio * 20,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
+          ),
+
+      ],
+    );
+  }
+
+  Widget _buildInputField() {
+    return Container(
+      margin: EdgeInsets.only(bottom: SizeConfig.verticalBlock * 5),
+      padding: EdgeInsets.symmetric(
+        horizontal: SizeConfig.horizontalBlock * 5,
+        vertical: SizeConfig.verticalBlock * 10,
+      ),
+      child: Row(
+        spacing: SizeConfig.horizontalBlock * 5,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (edit || chatItems.isEmpty)
+            GestureDetector(
+              onTap: () => _focusNode.requestFocus(),
+              child: MyTextFormField(
+                controller: message,
+                hintName: "Ask Me",
+                focusNode: _focusNode,
+                width: write ? SizeConfig.horizontalBlock * 300 : SizeConfig.horizontalBlock * 361,
+              ),
+            ),
+          if (write && (edit || chatItems.isEmpty))
+            CircleAvatar(
+              backgroundColor: SizeConfig.iconColor,
+              radius: SizeConfig.horizontalBlock * 24,
+              child: IconButton(
+                icon: Icon(Icons.send_outlined, color: Colors.white, size: SizeConfig.textRatio * 25),
+                onPressed: sendMessage,
+              ),
+            ),
         ],
       ),
     );
