@@ -274,29 +274,30 @@ class _AIChatState extends State<AIChat> {
                       ],
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 5,
-                    child: CircleAvatar(
-                      backgroundColor: SizeConfig.iconColor,
-                      radius: SizeConfig.horizontalBlock * 24,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: SizeConfig.textRatio * 25,
+                  if(!edit)
+                    Positioned(
+                      bottom: 0,
+                      right: 5,
+                      child: CircleAvatar(
+                        backgroundColor: SizeConfig.iconColor,
+                        radius: SizeConfig.horizontalBlock * 24,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: SizeConfig.textRatio * 25,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              write = false;
+                              message.clear();
+                              chatItems.clear(); // Clear all messages
+                              selectedIndex = -1;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            write = false;
-                            message.clear();
-                            chatItems.clear(); // Clear all messages
-                            selectedIndex = -1;
-                          });
-                        },
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
