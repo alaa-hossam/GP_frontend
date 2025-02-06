@@ -2,13 +2,13 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
+import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'views/signUpView.dart';
-
 
 void main() async{
 
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: AIChat.id,
+      initialRoute: logIn.id,
       routes: {
         SignUp.id: (BuildContext context) => SignUp(),
         logIn.id: (BuildContext context) => logIn(),
@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
         Home.id:(BuildContext context) => Home(),
         Profile.id:(BuildContext context) => Profile(),
         AIChat.id:(BuildContext context) => AIChat(),
+        browseProducts.id:(BuildContext context) => browseProducts(),
       },
     );
   }
