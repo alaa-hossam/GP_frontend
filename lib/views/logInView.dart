@@ -26,7 +26,6 @@ class _logInState extends State<logIn> {
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-       token.recreateTokensTable();
 
     });
   }

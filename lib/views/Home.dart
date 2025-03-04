@@ -3,6 +3,7 @@ import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,36 @@ class _HomeState extends State<Home> {
   TextEditingController filter = TextEditingController();
   int selectedIndex = 0;
 
+  Token token = Token();
 
+  Future<List<Map>> getTokens() async {
+    Token token = Token();
+
+    String query = '''
+    SELECT * FROM TOKENS   
+  ''';
+    List<Map> tokensTable = await token.getToken(query);
+
+    // Print the tokens
+    print("Tokens in the TOKENS table:");
+    for (var token in tokensTable) {
+      print(token);
+    }
+
+    return tokensTable;
+  }
+
+
+  Future<int> getTokenCount() async {
+
+    // Query to count the number of rows in the TOKENS table
+    List<Map> result = await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
+
+    // Get the count from the result
+    int count = result[0]['count'] as int;
+    print(count);
+    return count;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +198,6 @@ class _HomeState extends State<Home> {
               if (categoryProvider.categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
-              // return Text('${categoryProvider.categories.length}');
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -176,23 +205,22 @@ class _HomeState extends State<Home> {
                   height: 43 * SizeConfig.verticalBlock,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount:
-                        categoryProvider.categories.length, // Number of items
+                    itemCount: categoryProvider.categories.length,
                     itemBuilder: (context, index) {
                       bool isSelected = index == selectedIndex;
                       var category = categoryProvider.categories[index];
                       return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedIndex =
-                                  index; // Update the selected index
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Customizecategory("${category}", isSelected)
-                            ],
-                          ));
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Customizecategory("${category}", isSelected),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ),

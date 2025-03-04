@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
 import 'package:http/http.dart' as http;
 
 class CategoryModel {
@@ -10,15 +11,22 @@ class CategoryModel {
 
 class CategoryService {
   final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
+  Token token = Token();
   List<CategoryModel> myCategories = [CategoryModel("0", "All")];
 
   // Add a method to get the token (you can replace this with your actual token retrieval logic)
-  String getToken() {
-    // Replace this with your actual token retrieval logic
-    return "your_bearer_token_here";
-  }
+  // Future<String> getToken() async{
+  //   String query = '''
+  //     SELECT TOKEN FROM TOKENS
+  // ''';
+  //   String myToken = await token.getToken(query);
+  //   print("My toooooooooooooken" + myToken);
+  //   return myToken;
+  // }
 
   Future<List<CategoryModel>> getBasedCategories() async {
+    print("Herrrrrrrrrre");
+
     final request = {
       'query': '''
       query GetBaseCategories {
@@ -32,14 +40,14 @@ class CategoryService {
 
     try {
       // Get the token
-      final token = getToken();
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
       // Make the HTTP request with the Bearer token
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Add the Bearer token here
+          'Authorization': 'Bearer $myToken', // Add the Bearer token here
         },
         body: jsonEncode(request),
       );

@@ -79,15 +79,17 @@ class Token {
 
   }
 
-  Future<bool> doesTokensTableExist() async {
+  Future<bool> isTokensTableEmpty() async {
     Database? myToken = await db; // Initialize the database
-    List<Map> result = await myToken!.rawQuery('''
-    SELECT name FROM sqlite_master
-    WHERE type='table' AND name='TOKENS'
-  ''');
 
-    // If the result is not empty, the table exists
-    return result.isNotEmpty;
+    // Query to count the number of rows in the TOKENS table
+    List<Map> result = await myToken!.rawQuery('SELECT COUNT(*) as count FROM TOKENS');
+
+    // Get the count from the result
+    int count = result[0]['count'] as int;
+
+    // If count is 0, the table is empty
+    return count == 0;
   }
 }
 

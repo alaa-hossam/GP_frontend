@@ -210,10 +210,9 @@ class customerServices {
         }
         final accessToken = data['data']['login']['accessToken'];
         final UUID = data['data']['login']['user']['id'];
-        print(UUID);
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, CREATED)
-                              VALUES ("1", "$accessToken", "1")
+                              VALUES ("$UUID", "$accessToken", "1")
                              ''';
         String updateQuery = '''
                         UPDATE  TOKENS,
@@ -222,10 +221,11 @@ class customerServices {
                         
                        ''';
 
-        if(await token.doesTokensTableExist()){
-          int tokenUpdateResponse = await token.updateToken(updateQuery);
+        if(await token.isTokensTableEmpty()){
+          await token.addToken(insertQuery);
         }else{
-          int tokenInsertResponse = await token.addToken(insertQuery);
+          await token.updateToken(updateQuery);
+
         }
 
         return "User Log In Successfully";
