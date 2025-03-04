@@ -3,12 +3,14 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 
-class productModel{
-  String _imageURL, _name , _category;
-  double _price , _rate;
+import '../SqfliteCodes/Token.dart';
 
+class productModel{
+  String _imageURL, _name , _category , _id;
+  double _price , _rate;
+  bool isCustom;
   productModel(
-      this._imageURL, this._name, this._category, this._price, this._rate);
+      this._id ,this._imageURL, this._name, this._category, this._price,this.isCustom ,this._rate);
 
   get rate => _rate;
 
@@ -23,6 +25,8 @@ class productModel{
 
 class productService{
   final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
+  Token token = Token();
+  List<productModel> products = [];
 
   Future<String> addProduct(productModel product) async {
     // Await device token retrieval
@@ -59,6 +63,58 @@ class productService{
       print("Exception: $e");
       return e.toString();
 
+    }
+  }
+
+  Future<List<productModel>> getAllProducts() async {
+    print("Fetching products from API...");
+
+    final request = {
+      'query': '''
+      query GetBaseCategories {
+        getBaseCategories {
+          id
+          name
+        }
+      }
+      ''',
+    };
+    print("==========================================================");
+    try {
+      print("==========================================================");
+
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getAllProducts']['data'];
+        print(prods);
+        products.clear();
+
+        for (var product in prods) {
+          products.add(productModel(product['id'],product['imageUrl'], product['name'],product['category']['name'],
+            product['finalProducts']['customPrice'],product['finalProducts']['isCustomMade'],product['averageRating']
+          ));
+        }
+
+        print("Categories fetched successfully: $products");
+        return products;
+      } else {
+        throw Exception('Failed to load categories: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching categories: $e");
+      return products;
     }
   }
 

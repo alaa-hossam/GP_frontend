@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
+import '../ViewModels/CategoryViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeCategory.dart';
@@ -81,7 +82,7 @@ class _BrowseProductsState extends State<browseProducts> {
                 icon: Icons.search,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    Icons.qr_code_scanner_outlined,
+                    Icons.camera_alt_outlined,
                     color: SizeConfig.iconColor,
                     size: 24 * SizeConfig.textRatio,
                   ),
@@ -117,25 +118,29 @@ class _BrowseProductsState extends State<browseProducts> {
               }
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categoryProvider.categories.length,
-                  itemBuilder: (context, index) {
-                    bool isSelected = index == selectedIndex;
-                    var category = categoryProvider.categories[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index; // Update the selected index
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          Customizecategory("${category}", isSelected),
-                        ],
-                      ),
-                    );
-                  },
+                child: Container(
+                  width: SizeConfig.horizontalBlock,
+                  height: 43 * SizeConfig.verticalBlock,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categoryProvider.categories.length,
+                    itemBuilder: (context, index) {
+                      bool isSelected = index == selectedIndex;
+                      var category = categoryProvider.categories[index];
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Customizecategory("${category}", isSelected),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               );
             },
@@ -146,3 +151,7 @@ class _BrowseProductsState extends State<browseProducts> {
     );
   }
 }
+
+
+
+

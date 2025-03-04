@@ -28,11 +28,15 @@ class CategoryProvider extends ChangeNotifier {
   List<String> get categories => _categories;
 
   CategoryProvider() {
+    print("CategoryProvider initialized");
     fetchCategories();
   }
 
   Future<void> fetchCategories() async {
+    print("Fetching categories...");
     await categoryVM.fetchCats();
-    notifyListeners(); // Notify listeners after fetching data
+    _categories = categoryVM.categories.map((cat) => cat.name).toList();
+    print("Categories fetched: $_categories");
+    notifyListeners();
   }
 }

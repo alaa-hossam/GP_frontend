@@ -3,6 +3,7 @@ import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:provider/provider.dart';
 import '../views/Home.dart';
 import '../views/ProfileView.dart';
+import '../views/chatBot.dart';
 
 class BottomBar extends StatefulWidget {
   final int selectedIndex;
@@ -46,6 +47,10 @@ class BottomBarState extends State<BottomBar> {
               label: '',
             ),
             BottomNavigationBarItem(
+              icon: Icon(Icons.chat),
+              label: '',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.account_circle_outlined),
               label: '',
             ),
@@ -62,6 +67,7 @@ class buttonProvider extends ChangeNotifier {
   int? _oldselected;
   static List<Widget> _widgetOptions = <Widget>[
     Home(),
+    AIChat(),
     Profile(),
   ];
   int get selectedIndex => _selectedIndex;

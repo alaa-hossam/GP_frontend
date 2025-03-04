@@ -45,9 +45,9 @@ class Token {
     return response;
   }
   getToken(String query) async{
-    Database? myToken;
+    Database? myToken = await db;
     List<Map> response = await myToken!.rawQuery(query);
-    return response;
+    return response[0]['TOKEN'];
   }
   updateToken(String query) async{
     Database? myToken;

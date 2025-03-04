@@ -14,18 +14,8 @@ class CategoryService {
   Token token = Token();
   List<CategoryModel> myCategories = [CategoryModel("0", "All")];
 
-  // Add a method to get the token (you can replace this with your actual token retrieval logic)
-  // Future<String> getToken() async{
-  //   String query = '''
-  //     SELECT TOKEN FROM TOKENS
-  // ''';
-  //   String myToken = await token.getToken(query);
-  //   print("My toooooooooooooken" + myToken);
-  //   return myToken;
-  // }
-
   Future<List<CategoryModel>> getBasedCategories() async {
-    print("Herrrrrrrrrre");
+    print("Fetching categories from API...");
 
     final request = {
       'query': '''
@@ -37,17 +27,18 @@ class CategoryService {
       }
       ''',
     };
-
+print("==========================================================");
     try {
-      // Get the token
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("==========================================================");
 
-      // Make the HTTP request with the Bearer token
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $myToken', // Add the Bearer token here
+          'Authorization': 'Bearer $myToken',
         },
         body: jsonEncode(request),
       );
@@ -55,24 +46,21 @@ class CategoryService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> categories = data['data']['getBaseCategories'];
-
-        // Clear existing categories before adding new ones
+        print(categories);
         myCategories.clear();
-
-        // Add the default category
         myCategories.add(CategoryModel("0", "All"));
 
-        // Map the fetched categories to CategoryModel
         for (var category in categories) {
           myCategories.add(CategoryModel(category['id'], category['name']));
         }
 
+        print("Categories fetched successfully: $myCategories");
         return myCategories;
       } else {
         throw Exception('Failed to load categories: ${response.body}');
       }
     } catch (e) {
-      print("Error: $e");
+      print("Error fetching categories: $e");
       return myCategories;
     }
   }
