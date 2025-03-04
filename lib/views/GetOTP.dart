@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
+import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/resetPassword.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import '../widgets/customizeButton.dart';
@@ -271,7 +272,7 @@ class _GetotpState extends State<Getotp> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("User verified successfully")),
                               );
-                              Navigator.pushReplacementNamed(context, Home.id);
+                              Navigator.pushReplacementNamed(context, logIn.id);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("${response}")),

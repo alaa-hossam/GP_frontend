@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
+import '../SqfliteCodes/Token.dart';
 
 class CustomerModel {
   String userName;
@@ -17,8 +18,8 @@ class CustomerModel {
   String birthDate;
   DateTime? lastActive;
 
-  CustomerModel(
-      this.name, this.userName, this.password, this.email, this.phone, this.gender, this.birthDate);
+  CustomerModel(this.name, this.userName, this.password, this.email, this.phone,
+      this.gender, this.birthDate);
 
   // Get the hashed device token
   Future<String> getDeviceToken() async {
@@ -41,9 +42,9 @@ class CustomerModel {
   }
 }
 
-
 class customerServices {
-  final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
+  final String apiUrl =
+      "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
 
   Future<String> addCustomer(CustomerModel customer) async {
     // Await device token retrieval
@@ -90,21 +91,18 @@ class customerServices {
         return "User added successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
-  Future<String> verifyCustomer(String code , String email) async {
+  Future<String> verifyCustomer(String code, String email) async {
     print(code);
     print(email);
     final request = {
-      'query':'''
+      'query': '''
           mutation VerifyUserForSignUp {
             verifyUserForSignUp(code: "${code}", email: "${email}") {
                 token
@@ -129,17 +127,14 @@ class customerServices {
         return "User verified successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
-  Future<String> resendCode(String email) async{
+  Future<String> resendCode(String email) async {
     final request = {
       'query': '''
           mutation ResendSignUpOtp {
@@ -164,20 +159,19 @@ class customerServices {
         return "Code Resend successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
   Future<String> logInCustomer(String email, String password) async {
+    Token token = Token();
     String deviceToken = "";
     try {
-      deviceToken = await CustomerModel("", "", "", "", "", "", "").getDeviceToken();
+      deviceToken =
+          await CustomerModel("", "", "", "", "", "", "").getDeviceToken();
     } catch (e) {
       print("Error retrieving device token: $e");
     }
@@ -212,23 +206,37 @@ class customerServices {
           return data['errors'][0]['message'];
         }
         final accessToken = data['data']['login']['accessToken'];
-        print(accessToken+"====================================");
+
+        String insertQuery = '''
+                              INSERT INTO TOKENS (UUID, TOKEN, CREATED)
+                              VALUES ("1", "$accessToken", "1")
+                             ''';
+        String updateQuery = '''
+                        UPDATE  TOKENS,
+                        SET TOKEN = "$accessToken", 
+                        CREATED = 2,
+                        
+                       ''';
+
+        if(await token.doesTokensTableExist()){
+          int tokenUpdateResponse = await token.updateToken(updateQuery);
+        }else{
+          int tokenInsertResponse = await token.addToken(insertQuery);
+        }
+
         return "User Log In Successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
   Future<String> forgetPassGetCode(String email) async {
     final request = {
-      'query':'''
+      'query': '''
           mutation SendResetPasswordOtp {
               sendResetPasswordOtp(email: "${email}")
           }
@@ -252,13 +260,10 @@ class customerServices {
         return "Code Send Successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
@@ -291,7 +296,8 @@ class customerServices {
           return data['errors'][0]['message'];
         }
 
-        if (data['data'] != null && data['data']['checkResetPasswordCode'] == true) {
+        if (data['data'] != null &&
+            data['data']['checkResetPasswordCode'] == true) {
           return "Code Verified Successfully";
         } else {
           return "Invalid Code";
@@ -305,7 +311,8 @@ class customerServices {
     }
   }
 
-  Future<String> ResetPass(String email, String newPass, String confirmPass) async {
+  Future<String> ResetPass(
+      String email, String newPass, String confirmPass) async {
     final request = {
       'query': '''
       mutation ResetPassword {
@@ -347,5 +354,4 @@ class customerServices {
       return e.toString();
     }
   }
-
 }

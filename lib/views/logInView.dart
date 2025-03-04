@@ -4,6 +4,7 @@ import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/signUpView.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
+import '../SqfliteCodes/Token.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 
@@ -20,10 +21,13 @@ class _logInState extends State<logIn> {
   bool obscureText = true;
   customerViewModel cvm= customerViewModel();
   bool _isLoading = false;
+  Token token = Token();
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
+       token.dropTable();
+
     });
   }
 
