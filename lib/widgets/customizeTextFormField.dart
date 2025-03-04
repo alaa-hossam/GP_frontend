@@ -44,10 +44,18 @@ class MyTextFormField extends StatelessWidget {
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter $hintName';
-          } else if (hintName == 'password' && value.length < 8) {
+          } else if (hintName == 'Password' && value.length < 8) {
             return 'Password should be at least 8 characters';
           } else if (!_emailRegex.hasMatch(value) && hintName == 'Email') {
             return 'Email address is not valid\n It should be an Email structure';
+          }else if (hintName == 'Birth Date') {
+            DateTime? parsedDate = DateTime.tryParse(value);
+            if (parsedDate == null) {
+              return 'Invalid date format';
+            }
+            if (parsedDate.year >= 2017) {
+              return 'Birth date must be before 2017';
+            }
           }
           return null;
         },
