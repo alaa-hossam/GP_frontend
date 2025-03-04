@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
+import '../Providers/CategoryProvider.dart';
 import '../ViewModels/productViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
@@ -161,11 +162,10 @@ class _HomeState extends State<Home> {
               );
             },
           ),
-
           SizedBox(height: 10 * SizeConfig.verticalBlock),
           Consumer<CategoryProvider>(
             builder: (context, categoryProvider, child) {
-              if (categoryProvider._categories.isEmpty) {
+              if (categoryProvider.categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
               // return Text('${categoryProvider.categories.length}');
@@ -356,23 +356,6 @@ class imageProvider extends ChangeNotifier {
     _timer?.cancel();
     pageController.dispose();
     super.dispose();
-  }
-}
-
-class CategoryProvider extends ChangeNotifier {
-  CategoryViewModel CatVM = CategoryViewModel();
-  List<String> _categories = [];
-
-  List<String> get categories => _categories;
-
-  CategoryProvider() {
-    fetchCategories();
-  }
-
-  void fetchCategories() {
-    CatVM.fetchCats();
-    _categories = CatVM.categories.map((cat) => cat.name).toList();
-    notifyListeners();
   }
 }
 

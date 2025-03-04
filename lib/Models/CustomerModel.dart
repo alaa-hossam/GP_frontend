@@ -179,15 +179,18 @@ class customerServices {
       'query': '''
             mutation Login {
               login(
-                loginInput: {
-                    deviceToken: "$deviceToken",
+                loginInput: { 
+                deviceToken: "$deviceToken",
                     email: "${email}",
                     password: "${password}"
-                }
-              ){
-                accessToken
-            }
-          }
+                     }) 
+                     {
+        user {
+            id
+        }
+        accessToken
+    }
+}
         ''',
     };
 
@@ -206,7 +209,8 @@ class customerServices {
           return data['errors'][0]['message'];
         }
         final accessToken = data['data']['login']['accessToken'];
-
+        final UUID = data['data']['login']['user']['id'];
+        print(UUID);
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, CREATED)
                               VALUES ("1", "$accessToken", "1")

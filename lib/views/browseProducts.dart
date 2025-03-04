@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../Providers/CategoryProvider.dart';
+import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
+import '../widgets/customizeCategory.dart';
+import '../widgets/customizeTextFormField.dart';
 import 'ProfileView.dart';
 
 class browseProducts extends StatefulWidget {
@@ -7,41 +12,137 @@ class browseProducts extends StatefulWidget {
 
   const browseProducts({super.key});
   @override
-  State<browseProducts> createState() => _browseProductsState();
+  State<browseProducts> createState() => _BrowseProductsState();
 }
 
-class _browseProductsState extends State<browseProducts> {
+class _BrowseProductsState extends State<browseProducts> {
+  TextEditingController search = TextEditingController();
+  int selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+      ),
       appBar: AppBar(
-        // leading: Icon(Icons.menu),
         centerTitle: true,
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20 * SizeConfig.verticalBlock),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.shopping_cart_outlined,
-                  size:24 * SizeConfig.textRatio,
-                ),
-                SizedBox(
-                  width: 10 * SizeConfig.horizontalBlock,
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, Profile.id);
-                  },
-                  icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
-                ),
-              ],
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.notifications_none, size:24 * SizeConfig.textRatio,),
+              ),
+              Icon(
+                Icons.shopping_cart_outlined,
+                size:24 * SizeConfig.textRatio,
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Profile.id);
+                },
+                icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
+              ),
+            ],
           )
         ],
-        title: Text("Logo"),
+        title: Row(
+          children: [
+            Image(
+              image: AssetImage("assets/images/Frame 36920.png"),
+              width: SizeConfig.textRatio * 40,
+              height: SizeConfig.textRatio * 40,
+              fit: BoxFit.cover,
+            ),
+            Text(
+              "SAN3A",
+              style: TextStyle(
+                color: Color(0xFF073477),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                fontFamily: 'Poppins',
+                fontSize: SizeConfig.textRatio * 24,
+              ),
+            ),
+          ],
+        ),
       ),
+      body: ListView(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: SizeConfig.horizontalBlock * 5,
+            children: [
+              MyTextFormField(
+                controller: search,
+                hintName: "Search",
+                icon: Icons.search,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.qr_code_scanner_outlined,
+                    color: SizeConfig.iconColor,
+                    size: 24 * SizeConfig.textRatio,
+                  ),
+                  onPressed: () {},
+                ),
+                width: 253 * SizeConfig.horizontalBlock,
+                height: 45 * SizeConfig.verticalBlock,
+              ),
+              Container(
+                width:48 * SizeConfig.horizontalBlock,
+                height: 45 * SizeConfig.verticalBlock,
+                decoration: BoxDecoration(
+                    color: Color(0x80E9E9E9),
+                    borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Icon(Icons.tune , size: 24 * SizeConfig.textRatio,),
+              ),
+              Container(
+                width:48 * SizeConfig.horizontalBlock,
+                height: 45 * SizeConfig.verticalBlock,
+                decoration: BoxDecoration(
+                    color: Color(0x80E9E9E9),
+                    borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Icon(Icons.compare_outlined , size: 24 * SizeConfig.textRatio,),
+              ),
+            ],
+          ),
+          Consumer<CategoryProvider>(
+            builder: (context, categoryProvider, child) {
+              if (categoryProvider.categories.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categoryProvider.categories.length,
+                  itemBuilder: (context, index) {
+                    bool isSelected = index == selectedIndex;
+                    var category = categoryProvider.categories[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index; // Update the selected index
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Customizecategory("${category}", isSelected),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomBar(selectedIndex: 0),
     );
   }
 }

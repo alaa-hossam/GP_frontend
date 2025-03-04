@@ -26,7 +26,7 @@ class _logInState extends State<logIn> {
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-       token.dropTable();
+       token.recreateTokensTable();
 
     });
   }
@@ -117,7 +117,7 @@ class _logInState extends State<logIn> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Log In Successful!")),
                             );
-                            Navigator.pushNamed(context, Home.id);
+                            Navigator.pushReplacementNamed(context, Home.id);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(response)),

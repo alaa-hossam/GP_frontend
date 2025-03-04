@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/Models/CategoryModel.dart';
 
-class CategoryViewModel  extends ChangeNotifier{
+class CategoryViewModel extends ChangeNotifier {
   final CategoryService apiServices = CategoryService();
   List<CategoryModel> _categories = [];
 
   List<CategoryModel> get categories => _categories;
 
-  void fetchCats() {
+  Future<void> fetchCats() async {
     try {
-      _categories = apiServices.getCategories();
+      _categories = await apiServices.getBasedCategories();
       notifyListeners();
     } catch (e) {
       debugPrint("Error fetching categories: $e");

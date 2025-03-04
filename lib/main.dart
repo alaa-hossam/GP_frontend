@@ -8,6 +8,7 @@ import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
+import 'Providers/CategoryProvider.dart';
 import 'views/signUpView.dart';
 
 void main() async{
