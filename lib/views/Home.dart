@@ -50,11 +50,10 @@ class _HomeState extends State<Home> {
     return tokensTable;
   }
 
-
   Future<int> getTokenCount() async {
-
     // Query to count the number of rows in the TOKENS table
-    List<Map> result = await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
+    List<Map> result =
+        await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
 
     // Get the count from the result
     int count = result[0]['count'] as int;
@@ -68,7 +67,37 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: Drawer(
         backgroundColor: Colors.white,
+        child: ListView(
+          children: [
+            Stack(children: [
+              Container(
+                color: Color(0xFFE9E9E9),
+                height: 251 * SizeConfig.verticalBlock,
+                width: 223 * SizeConfig.horizontalBlock,
+              ),
+              Positioned(
+                left: 15, // Align to the left
+                bottom: 15, // Align to the bottom
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                    children: [
+                Container(
+                decoration: BoxDecoration(
+                shape: BoxShape.circle, // Circular shape
+                  border: Border.all(
+                    color: Color(0xFF5095B0), // Border color
+                    width: 3, // Border width
+                  ),
+                ),
+                  child: CircleAvatar(
+                    radius: 50, // Size of the CircleAvatar
+                    backgroundImage: AssetImage('assets/images/p1.jpg'), // Image
+                  ),
+                )
+            ])
 
+        ),])
+        ])
       ),
       appBar: AppBar(
         // leading: Icon(Icons.menu),
@@ -80,7 +109,7 @@ class _HomeState extends State<Home> {
               children: [
                 Icon(
                   Icons.shopping_cart_outlined,
-                  size:24 * SizeConfig.textRatio,
+                  size: 24 * SizeConfig.textRatio,
                 ),
                 SizedBox(
                   width: 10 * SizeConfig.horizontalBlock,
@@ -89,7 +118,10 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     Navigator.pushNamed(context, Profile.id);
                   },
-                  icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
+                  icon: Icon(
+                    Icons.account_circle_outlined,
+                    size: 24 * SizeConfig.textRatio,
+                  ),
                 ),
               ],
             ),
@@ -108,7 +140,7 @@ class _HomeState extends State<Home> {
                 icon: Icons.search,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    Icons.qr_code_scanner_outlined,
+                    Icons.camera_alt_outlined,
                     color: SizeConfig.iconColor,
                     size: 24 * SizeConfig.textRatio,
                   ),
@@ -119,13 +151,15 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(width: 20 * SizeConfig.horizontalBlock),
               Container(
-                width:48 * SizeConfig.horizontalBlock,
+                width: 48 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
                 decoration: BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.all(Radius.circular(5))
+                    color: Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Icon(
+                  Icons.tune,
+                  size: 24 * SizeConfig.textRatio,
                 ),
-                child: Icon(Icons.tune , size: 24 * SizeConfig.textRatio,),
               ),
               // MyTextFormField(
               //   controller: filter,
@@ -148,14 +182,17 @@ class _HomeState extends State<Home> {
                       controller: imageProvider.pageController,
                       itemCount: imageProvider.AdsVM.ads.length,
                       onPageChanged: (index) {
-                        imageProvider.updateCurrentIndex(index); // Sync current index
+                        imageProvider
+                            .updateCurrentIndex(index); // Sync current index
                       },
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () async {
-                            final Uri url = Uri.parse(imageProvider.AdsVM.ads[index].link);
+                            final Uri url =
+                                Uri.parse(imageProvider.AdsVM.ads[index].link);
                             if (await canLaunchUrl(url)) {
-                              await launchUrl(url, mode: LaunchMode.inAppWebView);
+                              await launchUrl(url,
+                                  mode: LaunchMode.inAppWebView);
                             } else {
                               throw 'Could not launch ${imageProvider.AdsVM.ads[index].link}';
                             }
@@ -175,7 +212,7 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       imageProvider.AdsVM.ads.length,
-                          (index) => Container(
+                      (index) => Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         width: 10,
                         height: 10,
@@ -239,8 +276,6 @@ class _HomeState extends State<Home> {
                   fontWeight: FontWeight.bold),
             ),
           ),
-
-
           Consumer<productProvider>(
             builder: (context, productProvider, child) {
               if (productProvider.products.isEmpty) {
@@ -272,7 +307,8 @@ class _HomeState extends State<Home> {
             },
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock),
+            padding: EdgeInsets.symmetric(
+                horizontal: 10 * SizeConfig.horizontalBlock),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -291,15 +327,13 @@ class _HomeState extends State<Home> {
                       color: SizeConfig.iconColor,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     Navigator.pushNamed(context, browseProducts.id);
                   },
                 ),
               ],
             ),
           ),
-
-
           Consumer<productProvider>(
             builder: (context, productProvider, child) {
               if (productProvider.products.isEmpty) {
@@ -314,7 +348,7 @@ class _HomeState extends State<Home> {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount:
-                    productProvider.products.length, // Number of items
+                        productProvider.products.length, // Number of items
                     itemBuilder: (context, index) {
                       var product = productProvider.products[index];
                       return Row(
@@ -363,7 +397,6 @@ class imageProvider extends ChangeNotifier {
 
   void _startImageRotation() {
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-
       _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
       pageController.animateToPage(
         _currentIndex,

@@ -215,9 +215,9 @@ class customerServices {
                               VALUES ("$UUID", "$accessToken", "1")
                              ''';
         String updateQuery = '''
-                        UPDATE  TOKENS,
-                        SET TOKEN = "$accessToken", 
-                        CREATED = 2,
+                        UPDATE TOKENS
+SET TOKEN = "$accessToken", 
+    CREATED = "2"
                         
                        ''';
 
