@@ -316,7 +316,6 @@ class _GetotpState extends State<Getotp> {
         ],
 
       ),
-
     );
   }
 
