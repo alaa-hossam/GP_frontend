@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
+import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
@@ -240,12 +241,30 @@ class _HomeState extends State<Home> {
             },
           ),
           Padding(
-            padding: EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock),
-            child: Text(
-              "Recommended For you",
-              style: TextStyle(
-                  fontSize: 20 * SizeConfig.textRatio,
-                  fontWeight: FontWeight.bold),
+            padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Recommended For you",
+                  style: TextStyle(
+                    fontSize: 20 * SizeConfig.textRatio,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                GestureDetector(
+                  child: Text(
+                    "see more",
+                    style: TextStyle(
+                      fontSize: 16 * SizeConfig.textRatio,
+                      color: SizeConfig.iconColor,
+                    ),
+                  ),
+                  onTap: (){
+                    Navigator.pushNamed(context, browseProducts.id);
+                  },
+                ),
+              ],
             ),
           ),
 

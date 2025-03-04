@@ -193,9 +193,7 @@ class customerServices {
               ){
                 accessToken
             }
-}
-
-
+          }
         ''',
     };
 
@@ -213,6 +211,8 @@ class customerServices {
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
         }
+        final accessToken = data['data']['login']['accessToken'];
+        print(accessToken+"====================================");
         return "User Log In Successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];

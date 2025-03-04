@@ -9,11 +9,6 @@ class productViewModel  extends ChangeNotifier{
   List<productModel> get products => _products;
 
   void fetchProducts() {
-    try {
-      _products = apiServices.getProducts();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("Error fetching products: $e");
-    }
+
   }
 }
