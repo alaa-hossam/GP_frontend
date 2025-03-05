@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'package:gp_frontend/Models/ProductModel.dart';
-import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +9,15 @@ import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
+import '../Providers/ProductProvider.dart';
 import '../ViewModels/productViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
+import '../widgets/SideButton.dart';
+import 'SearchView.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
@@ -50,6 +51,12 @@ class _HomeState extends State<Home> {
     return tokensTable;
   }
 
+  Future<void> navigate(BuildContext context)async {
+    Navigator.pushNamed(context, searchView.id);
+
+  }
+
+
   Future<int> getTokenCount() async {
     // Query to count the number of rows in the TOKENS table
     List<Map> result =
@@ -66,38 +73,94 @@ class _HomeState extends State<Home> {
     SizeConfig().init(context);
     return Scaffold(
       drawer: Drawer(
+        width: 223 * SizeConfig.horizontalBlock,
         backgroundColor: Colors.white,
-        child: ListView(
+        child: Stack(
           children: [
-            Stack(children: [
-              Container(
-                color: Color(0xFFE9E9E9),
-                height: 251 * SizeConfig.verticalBlock,
-                width: 223 * SizeConfig.horizontalBlock,
-              ),
-              Positioned(
-                left: 15, // Align to the left
-                bottom: 15, // Align to the bottom
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+            ListView(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      color: const Color(0xFFE9E9E9),
+                      height: 251 * SizeConfig.verticalBlock,
+                      width: 223 * SizeConfig.horizontalBlock,
+                    ),
+                    Positioned(
+                      left: 15, // Align to the left
+                      bottom: 15, // Align to the bottom
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Align text to the left
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle, // Circular shape
+                              border: Border.all(
+                                color: Color(0xFF5095B0), // Border color
+                                width: 3, // Border width
+                              ),
+                            ),
+                            child: const CircleAvatar(
+                              radius: 50, // Size of the CircleAvatar
+                              backgroundImage:
+                                  AssetImage('assets/images/p1.jpg'), // Image
+                            ),
+                          ),
+                          Text(
+                            "my name",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20 * SizeConfig.textRatio),
+                          ),
+                          Text(
+                            "myemail.gmail.com",
+                            style:
+                                TextStyle(fontSize: 14 * SizeConfig.textRatio),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 10 * SizeConfig.textRatio,
+                      top: 10 * SizeConfig.textRatio),
+                  child: Column(
                     children: [
-                Container(
-                decoration: BoxDecoration(
-                shape: BoxShape.circle, // Circular shape
-                  border: Border.all(
-                    color: Color(0xFF5095B0), // Border color
-                    width: 3, // Border width
+                      sideButton("My Account", Icons.account_circle_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("My orders", Icons.shopping_cart_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("History", Icons.history_outlined,
+                          SizeConfig.iconColor),
+                      sideButton(
+                          "My posts", Icons.post_add, SizeConfig.iconColor),
+                      sideButton("compare Products", Icons.compare_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("Recommend Gifts",
+                          Icons.card_giftcard_outlined, SizeConfig.iconColor),
+                      sideButton("Event reminder",
+                          Icons.event_available_outlined, SizeConfig.iconColor),
+                      sideButton("Add Advertisement",
+                          Icons.camera_roll_outlined, SizeConfig.iconColor),
+                      sideButton("Join as Handcrafter",
+                          Icons.shopping_bag_outlined, SizeConfig.iconColor),
+                    ],
                   ),
                 ),
-                  child: CircleAvatar(
-                    radius: 50, // Size of the CircleAvatar
-                    backgroundImage: AssetImage('assets/images/p1.jpg'), // Image
-                  ),
-                )
-            ])
+              ],
+            ),
 
-        ),])
-        ])
+            // Log Out Button at the Bottom-Left
+            Positioned(
+              left: 10, // Align to the left
+              bottom: 10, // Align to the bottom
+              child: sideButton("Log Out", Icons.logout_outlined, Colors.red),
+            ),
+          ],
+        ),
       ),
       appBar: AppBar(
         // leading: Icon(Icons.menu),
@@ -144,10 +207,16 @@ class _HomeState extends State<Home> {
                     color: SizeConfig.iconColor,
                     size: 24 * SizeConfig.textRatio,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Handle camera icon press
+                  },
                 ),
                 width: 300 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
+                onClickFunction: navigate
+
+
+
               ),
               SizedBox(width: 20 * SizeConfig.horizontalBlock),
               Container(
@@ -337,7 +406,6 @@ class _HomeState extends State<Home> {
           Consumer<productProvider>(
             builder: (context, productProvider, child) {
               if (productProvider.products.isEmpty) {
-                // print(productProvider.products.length);
                 return Center(child: CircularProgressIndicator());
               }
               return Padding(
@@ -420,19 +488,3 @@ class imageProvider extends ChangeNotifier {
   }
 }
 
-class productProvider extends ChangeNotifier {
-  productViewModel productVM = productViewModel();
-  List<productModel> _products = [];
-
-  List<productModel> get products => _products;
-
-  productProvider() {
-    fetchProducts();
-  }
-
-  void fetchProducts() {
-    productVM.fetchProducts();
-    _products = productVM.products.map((product) => product).toList();
-    notifyListeners();
-  }
-}

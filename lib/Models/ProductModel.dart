@@ -29,11 +29,6 @@ class productService{
   List<productModel> products = [];
 
   Future<String> addProduct(productModel product) async {
-    // Await device token retrieval
-
-    // Ensure gender is in the correct format based on the enum
-
-    // Construct GraphQL mutation query
     final request = {
       'query': '''
         ''',
@@ -117,6 +112,47 @@ class productService{
       return products;
     }
   }
+
+   searchProduct (String word) async{
+    Future<List<String>> products;
+    final request = {
+      'query': '''
+      query GetAllProducts {
+          getAllProducts(options: { search: "${word}" }) {
+            data {
+              name
+            }
+          }   
+      }
+
+      ''',
+    };
+
+    try {
+
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+         products = data['data']['getAllProducts']['data']['name'];
+        print(products);
+        return products;
+      } else {
+        throw Exception('Failed to load categories: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching categories: $e");
+      return e;
+    }
+}
 
 
 }

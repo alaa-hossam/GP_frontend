@@ -11,4 +11,8 @@ class productViewModel  extends ChangeNotifier{
   void fetchProducts() {
 
   }
+
+  searchProduct(String word){
+    return apiServices.searchProduct(word);
+  }
 }
