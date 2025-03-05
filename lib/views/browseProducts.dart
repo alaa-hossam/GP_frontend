@@ -4,6 +4,7 @@ import '../Providers/CategoryProvider.dart';
 import '../ViewModels/CategoryViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
+import '../widgets/SideButton.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
 import 'ProfileView.dart';
@@ -25,7 +26,94 @@ class _BrowseProductsState extends State<browseProducts> {
     SizeConfig().init(context);
     return Scaffold(
       drawer: Drawer(
+        width: 223 * SizeConfig.horizontalBlock,
         backgroundColor: Colors.white,
+        child: Stack(
+          children: [
+            ListView(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      color: const Color(0xFFE9E9E9),
+                      height: 251 * SizeConfig.verticalBlock,
+                      width: 223 * SizeConfig.horizontalBlock,
+                    ),
+                    Positioned(
+                      left: 15, // Align to the left
+                      bottom: 15, // Align to the bottom
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start, // Align text to the left
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle, // Circular shape
+                              border: Border.all(
+                                color: Color(0xFF5095B0), // Border color
+                                width: 3, // Border width
+                              ),
+                            ),
+                            child: const CircleAvatar(
+                              radius: 50, // Size of the CircleAvatar
+                              backgroundImage:
+                              AssetImage('assets/images/p1.jpg'), // Image
+                            ),
+                          ),
+                          Text(
+                            "my name",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20 * SizeConfig.textRatio),
+                          ),
+                          Text(
+                            "myemail.gmail.com",
+                            style:
+                            TextStyle(fontSize: 14 * SizeConfig.textRatio),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 10 * SizeConfig.textRatio,
+                      top: 10 * SizeConfig.textRatio),
+                  child: Column(
+                    children: [
+                      sideButton("My Account", Icons.account_circle_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("My orders", Icons.shopping_cart_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("History", Icons.history_outlined,
+                          SizeConfig.iconColor),
+                      sideButton(
+                          "My posts", Icons.post_add, SizeConfig.iconColor),
+                      sideButton("compare Products", Icons.compare_outlined,
+                          SizeConfig.iconColor),
+                      sideButton("Recommend Gifts",
+                          Icons.card_giftcard_outlined, SizeConfig.iconColor),
+                      sideButton("Event reminder",
+                          Icons.event_available_outlined, SizeConfig.iconColor),
+                      sideButton("Add Advertisement",
+                          Icons.camera_roll_outlined, SizeConfig.iconColor),
+                      sideButton("Join as Handcrafter",
+                          Icons.shopping_bag_outlined, SizeConfig.iconColor),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Log Out Button at the Bottom-Left
+            Positioned(
+              left: 10, // Align to the left
+              bottom: 10, // Align to the bottom
+              child: sideButton("Log Out", Icons.logout_outlined, Colors.red),
+            ),
+          ],
+        ),
       ),
       appBar: AppBar(
         centerTitle: true,

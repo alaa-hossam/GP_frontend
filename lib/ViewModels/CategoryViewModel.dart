@@ -10,9 +10,7 @@ class CategoryViewModel extends ChangeNotifier {
 
   Future<void> fetchCats() async {
     try {
-      print("Fetching categories from API...");
       _categories = await apiServices.getBasedCategories();
-      print("Categories fetched successfully: $_categories");
       notifyListeners();
     } catch (e) {
       debugPrint("Error fetching categories: $e");

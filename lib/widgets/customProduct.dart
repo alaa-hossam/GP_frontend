@@ -5,7 +5,7 @@ import 'Dimensions.dart';
 
 class customProduct extends StatefulWidget {
   String imageURL, Name, Category;
-  double Price, rate;
+  int Price, rate;
 
   customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate);
 
@@ -17,7 +17,7 @@ class customProduct extends StatefulWidget {
 class _customProductState extends State<customProduct> {
   bool isFav = false;
   String imageURL, Name, Category;
-  double Price, rate;
+  int Price, rate;
 
   _customProductState(
       this.imageURL, this.Name, this.Category, this.Price, this.rate);
@@ -47,7 +47,7 @@ class _customProductState extends State<customProduct> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(
                     5 * SizeConfig.textRatio), // Set the border radius
-                child: Image.asset(
+                child: Image.network(
                   imageURL,
                   width: 160 * SizeConfig.horizontalBlock,
                   height: 165 * SizeConfig.verticalBlock,

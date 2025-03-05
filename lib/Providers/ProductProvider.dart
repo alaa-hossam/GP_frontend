@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-
 import '../Models/ProductModel.dart';
 import '../ViewModels/productViewModel.dart';
 
@@ -10,12 +9,15 @@ class productProvider extends ChangeNotifier {
   List<productModel> get products => _products;
 
   productProvider() {
+    print("ProductProvider initialized");
     fetchProducts();
   }
 
-  void fetchProducts() {
-    productVM.fetchProducts();
+  Future<void> fetchProducts() async{
+    print("Fetching products...");
+    await productVM.fetchProducts();
     _products = productVM.products.map((product) => product).toList();
+    print("products fetched: $_products");
     notifyListeners();
   }
 

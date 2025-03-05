@@ -38,10 +38,10 @@ class Token {
   }
 
   // Get Token
-  Future<List<Map>> getToken(String query) async {
+  getToken(String query) async {
     Database? myToken = await db; // Initialize the database
     List<Map> response = await myToken!.rawQuery(query);
-    return response;
+    return response[0]['TOKEN'];
   }
 
   // Update Token

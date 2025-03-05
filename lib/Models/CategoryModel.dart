@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:gp_frontend/SqfliteCodes/cart.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:http/http.dart' as http;
 
 class CategoryModel {
@@ -15,8 +15,6 @@ class CategoryService {
   List<CategoryModel> myCategories = [CategoryModel("0", "All")];
 
   Future<List<CategoryModel>> getBasedCategories() async {
-    print("Fetching categories from API...");
-
     final request = {
       'query': '''
       query GetBaseCategories {
@@ -27,12 +25,9 @@ class CategoryService {
       }
       ''',
     };
-print("==========================================================");
     try {
-      print("==========================================================");
 
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-      print("Token retrieved: $myToken");
 
       final response = await http.post(
         Uri.parse(apiUrl),

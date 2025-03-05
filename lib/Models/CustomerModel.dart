@@ -23,6 +23,8 @@ class CustomerModel {
 
   // Get the hashed device token
   Future<String> getDeviceToken() async {
+
+
     final deviceInfo = DeviceInfoPlugin();
     String deviceId;
 
@@ -177,18 +179,19 @@ class customerServices {
     }
     final request = {
       'query': '''
-            mutation Login {
-              login(
-                loginInput: { 
-                deviceToken: "$deviceToken",
-                    email: "${email}",
-                    password: "${password}"
-                     }) 
-                     {
+          mutation Login {
+    login(loginInput: { 
+    deviceToken: "$deviceToken", 
+    email: "${email}", 
+    password: "${password}" }) {
+        token {
+            expireAt
+            token
+            createdAt
+        }
         user {
             id
         }
-        accessToken
     }
 }
         ''',
@@ -201,14 +204,16 @@ class customerServices {
         body: jsonEncode(request),
       );
 
-      print("Response: ${response.body}"); // Debugging the response
+      print("Response: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
         }
-        final accessToken = data['data']['login']['accessToken'];
+        final accessToken = data['data']['login']['token']['token'];
+        final createdAt = data['data']['login']['token']['createdAt'];
+        final expireAt = data['data']['login']['token']['expireAt'];
         final UUID = data['data']['login']['user']['id'];
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, CREATED)
@@ -221,11 +226,10 @@ class customerServices {
                         
                        ''';
 
-        if(await token.isTokensTableEmpty()){
+        if (await token.isTokensTableEmpty()) {
           await token.addToken(insertQuery);
-        }else{
+        } else {
           await token.updateToken(updateQuery);
-
         }
 
         return "User Log In Successfully";

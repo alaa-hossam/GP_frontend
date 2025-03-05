@@ -95,7 +95,6 @@ class _ProfileState extends State<Profile> {
                 ],
               ),
               SizedBox(height: SizeConfig.verticalBlock *20,),
-              customizeNavigatorProfile(buttonName: 'My Account', buttonIcon: Icons.account_circle_outlined, iconColor: SizeConfig.iconColor, onClickButton: (){}),
               customizeNavigatorProfile(buttonName: 'My Orders', buttonIcon:  Icons.shopping_cart_outlined, iconColor: SizeConfig.iconColor, onClickButton: (){}),
               customizeNavigatorProfile(buttonName: 'History', buttonIcon: Icons.history_outlined, iconColor: SizeConfig.iconColor, onClickButton: (){}),
               customizeNavigatorProfile(buttonName: 'Setting', buttonIcon: Icons.settings_outlined, iconColor: SizeConfig.iconColor, onClickButton: (){}),

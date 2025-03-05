@@ -2,19 +2,17 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
-
 import '../SqfliteCodes/Token.dart';
 
 class productModel{
   String _imageURL, _name , _category , _id;
-  double _price , _rate;
-  bool isCustom;
+  int _price , _rate;
   productModel(
-      this._id ,this._imageURL, this._name, this._category, this._price,this.isCustom ,this._rate);
+      this._id ,this._imageURL, this._name, this._category, this._price,this._rate);
 
   get rate => _rate;
 
-  double get price => _price;
+  get price => _price;
 
   get category => _category;
 
@@ -66,15 +64,29 @@ class productService{
 
     final request = {
       'query': '''
-      query GetBaseCategories {
-        getBaseCategories {
-          id
-          name
-        }
+          query GetAllProducts {
+            getAllProducts {
+                data {
+                    category {
+                        name
+                    }
+                    averageRating
+                    id
+                    imageUrl
+                    lowestCustomPrice
+                    name
+                }
+            }
       }
       ''',
     };
     print("==========================================================");
+    // var fbm = FirebaseMessaging.instance ;
+    // fbm.getToken().then((value){
+    //   print("Tokkkken============================================================");
+    //   print(value);
+    //   print("Tokkkken============================================================");
+    // });
     try {
       print("==========================================================");
 
@@ -98,17 +110,17 @@ class productService{
 
         for (var product in prods) {
           products.add(productModel(product['id'],product['imageUrl'], product['name'],product['category']['name'],
-            product['finalProducts']['customPrice'],product['finalProducts']['isCustomMade'],product['averageRating']
+            product['lowestCustomPrice'],product['averageRating']
           ));
         }
 
-        print("Categories fetched successfully: $products");
+        print("products fetched successfully: $products");
         return products;
       } else {
-        throw Exception('Failed to load categories: ${response.body}');
+        throw Exception('Failed to load products: ${response.body}');
       }
     } catch (e) {
-      print("Error fetching categories: $e");
+      print("Error fetching products: $e");
       return products;
     }
   }

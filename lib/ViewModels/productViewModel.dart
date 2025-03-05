@@ -8,8 +8,16 @@ class productViewModel  extends ChangeNotifier{
 
   List<productModel> get products => _products;
 
-  void fetchProducts() {
-
+  Future<void> fetchProducts() async{
+    try {
+      print("Fetching products from API...");
+      _products = await apiServices.getAllProducts();
+      print("products fetched successfully: $_products");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching products in VM: $e");
+      notifyListeners();
+    }
   }
 
   searchProduct(String word){
