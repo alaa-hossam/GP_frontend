@@ -125,7 +125,7 @@ class productService{
     }
   }
 
-   searchProduct (String word) async{
+  Future<List<String>> searchProduct (String word) async{
     Future<List<String>> products;
     final request = {
       'query': '''
@@ -151,18 +151,21 @@ class productService{
         },
         body: jsonEncode(request),
       );
-
+      print("response status:");
+      print(response.statusCode);
       if (response.statusCode == 200) {
+        print("products inside the api");
+
         final data = jsonDecode(response.body);
-         products = data['data']['getAllProducts']['data']['name'];
-        print(products);
+         products = data['data']['getAllProducts']['data'];
+        print(2);
         return products;
       } else {
         throw Exception('Failed to load categories: ${response.body}');
       }
     } catch (e) {
       print("Error fetching categories: $e");
-      return e;
+      return [];
     }
 }
 

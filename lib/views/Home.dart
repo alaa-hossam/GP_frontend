@@ -34,19 +34,17 @@ class _HomeState extends State<Home> {
 
   Token token = Token();
 
-  Future<List<Map>> getTokens() async {
+  Future<String> getTokens() async {
     Token token = Token();
 
     String query = '''
     SELECT * FROM TOKENS   
   ''';
-    List<Map> tokensTable = await token.getToken(query);
+    String tokensTable = await token.getToken(query);
 
     // Print the tokens
     print("Tokens in the TOKENS table:");
-    for (var token in tokensTable) {
-      print(token);
-    }
+    print(tokensTable);
 
     return tokensTable;
   }
@@ -57,20 +55,21 @@ class _HomeState extends State<Home> {
   }
 
 
-  Future<int> getTokenCount() async {
-    // Query to count the number of rows in the TOKENS table
-    List<Map> result =
-        await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
-
-    // Get the count from the result
-    int count = result[0]['count'] as int;
-    print(count);
-    return count;
-  }
+  // Future<int> getTokenCount() async {
+  //   // Query to count the number of rows in the TOKENS table
+  //   List<Map> result =
+  //       await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
+  //
+  //   // Get the count from the result
+  //   int count = result[0]['count'] as int;
+  //   print(count);
+  //   return count;
+  // }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+     getTokens();
     return Scaffold(
       drawer: Drawer(
         width: 223 * SizeConfig.horizontalBlock,

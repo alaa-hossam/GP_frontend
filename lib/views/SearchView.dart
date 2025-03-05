@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/ViewModels/productViewModel.dart';
 
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -17,6 +18,8 @@ class searchView extends StatefulWidget {
 class _searchState extends State<searchView> {
 
   late FocusNode _focusNode;
+  productViewModel PVM= productViewModel();
+  List<String>? products;
 
   @override
   void initState() {
@@ -90,7 +93,13 @@ class _searchState extends State<searchView> {
               ),
               width: 300 * SizeConfig.horizontalBlock,
               height: 45 * SizeConfig.verticalBlock,
+            onChanged: (value) async{
+              // Call the API whenever the text changes
+             products = await PVM.searchProduct(value);
+             print("Products:");
+             print(products);
 
+            },
 
 
           ),
