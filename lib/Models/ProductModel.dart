@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
@@ -81,15 +79,8 @@ class productService{
       ''',
     };
     print("==========================================================");
-    // var fbm = FirebaseMessaging.instance ;
-    // fbm.getToken().then((value){
-    //   print("Tokkkken============================================================");
-    //   print(value);
-    //   print("Tokkkken============================================================");
-    // });
     try {
       print("==========================================================");
-
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       print("Token retrieved: $myToken");
 

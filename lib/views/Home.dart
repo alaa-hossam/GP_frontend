@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,7 +9,6 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
-import '../ViewModels/productViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -55,21 +53,23 @@ class _HomeState extends State<Home> {
   }
 
 
-  // Future<int> getTokenCount() async {
-  //   // Query to count the number of rows in the TOKENS table
-  //   List<Map> result =
-  //       await token.getToken('SELECT COUNT(*) as count FROM TOKENS');
-  //
-  //   // Get the count from the result
-  //   int count = result[0]['count'] as int;
-  //   print(count);
-  //   return count;
-  // }
+  Future<int> getTokenCount() async {
+    // Query to count the number of rows in the TOKENS table
+    int result =
+        (await token.getToken('SELECT COUNT(*) as count FROM TOKENS')) as int;
+
+    // Get the count from the result
+    int count = result;
+    print(count);
+    return count;
+  }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-     getTokens();
+    print('----------------------------HOME------------------------------------');
+
+     var token= getTokens();
     return Scaffold(
       drawer: Drawer(
         width: 223 * SizeConfig.horizontalBlock,
@@ -303,6 +303,7 @@ class _HomeState extends State<Home> {
               if (categoryProvider.categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
+              getTokens();
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(

@@ -17,7 +17,7 @@ class productProvider extends ChangeNotifier {
     print("Fetching products...");
     await productVM.fetchProducts();
     _products = productVM.products.map((product) => product).toList();
-    print("products fetched: $_products");
+    print("products fetched allllllllll: $_products");
     notifyListeners();
   }
 

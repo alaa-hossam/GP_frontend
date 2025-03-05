@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
+import '../Providers/ProductProvider.dart';
 import '../ViewModels/CategoryViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/SideButton.dart';
+import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
 import 'ProfileView.dart';
@@ -226,6 +228,55 @@ class _BrowseProductsState extends State<browseProducts> {
                             Customizecategory("${category}", isSelected),
                           ],
                         ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+          Consumer<productProvider>(
+            builder: (context, productProvider, child) {
+              if (productProvider.products.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 250 * SizeConfig.verticalBlock, // Set a fixed height
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: (productProvider.products.length / 2).ceil(),
+                    itemBuilder: (context, index) {
+                      var firstProductIndex = index * 2;
+                      var secondProductIndex = firstProductIndex + 1;
+                      var product1 = productProvider.products[firstProductIndex];
+                      var product2 = secondProductIndex < productProvider.products.length
+                          ? productProvider.products[secondProductIndex]
+                          : null;
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          customProduct(
+                            product1.imageURL,
+                            product1.name,
+                            product1.category,
+                            product1.price,
+                            product1.rate,
+                          ),
+                          SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                          product2 != null
+                              ? customProduct(
+                            product2.imageURL,
+                            product2.name,
+                            product2.category,
+                            product2.price,
+                            product2.rate,
+                          )
+                              : SizedBox.shrink(),
+                        ],
                       );
                     },
                   ),
