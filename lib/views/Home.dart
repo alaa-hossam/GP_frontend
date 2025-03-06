@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
     String tokensTable = await token.getToken(query);
 
     // Print the tokens
-    print("Tokens in the TOKENS table:");
+    print("Expired in the TOKENS table:");
     print(tokensTable);
 
     return tokensTable;
@@ -68,8 +68,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     print('----------------------------HOME------------------------------------');
-
-     var token= getTokens();
     return Scaffold(
       drawer: Drawer(
         width: 223 * SizeConfig.horizontalBlock,

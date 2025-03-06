@@ -13,6 +13,7 @@ class MyTextFormField extends StatelessWidget {
   final ValueChanged<dynamic>? onChanged;
   final Future<void> Function(BuildContext)? onClickFunction; // Nullable function
   RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
+  TextInputType? type;
 
   MyTextFormField({
     required this.controller,
@@ -27,6 +28,7 @@ class MyTextFormField extends StatelessWidget {
     this.height,
     this.focusNode, // Nullable FocusNode
     this.onChanged,
+    this.type,
   });
 
   @override
@@ -41,6 +43,7 @@ class MyTextFormField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         obscureText: isObscureText,
+        keyboardType:type,
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter $hintName';

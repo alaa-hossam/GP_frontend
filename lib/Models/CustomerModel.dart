@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
@@ -101,17 +102,26 @@ class customerServices {
   }
 
   Future<String> verifyCustomer(String code, String email) async {
-    print(code);
+    Token token = Token();
+
+  print(code);
     print(email);
     final request = {
       'query': '''
           mutation VerifyUserForSignUp {
-            verifyUserForSignUp(code: "${code}", email: "${email}") {
-                token
-           }
+    verifyUserForSignUp(code: "$code", email: "$email") {
+        token {
+            expireAt
+            id
+            token
+        }
+    }
 }
+
+
       '''
     };
+    print(request);
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -125,6 +135,25 @@ class customerServices {
         final data = jsonDecode(response.body);
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
+        }
+        final accessToken = data['data']['login']['token']['token'];
+        final expireAt = data['data']['login']['token']['expireAt'];
+        final UUID = data['data']['login']['user']['id'];
+        String insertQuery = '''
+                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
+                              VALUES ("$UUID", "$accessToken", "$expireAt")
+                             ''';
+        String updateQuery = '''
+                                UPDATE TOKENS
+                                SET TOKEN = "$accessToken", 
+                                 EXPIRED = "$expireAt"
+                        
+                       ''';
+
+        if (await token.isTokensTableEmpty()) {
+          await token.addToken(insertQuery);
+        } else {
+          await token.updateToken(updateQuery);
         }
         return "User verified successfully";
       } else {
@@ -216,13 +245,13 @@ class customerServices {
         final expireAt = data['data']['login']['token']['expireAt'];
         final UUID = data['data']['login']['user']['id'];
         String insertQuery = '''
-                              INSERT INTO TOKENS (UUID, TOKEN, CREATED)
-                              VALUES ("$UUID", "$accessToken", "1")
+                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
+                              VALUES ("$UUID", "$accessToken", "$expireAt")
                              ''';
         String updateQuery = '''
                                 UPDATE TOKENS
                                 SET TOKEN = "$accessToken", 
-                                 CREATED = "2"
+                                 EXPIRED = "$expireAt"
                         
                        ''';
 

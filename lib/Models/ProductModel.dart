@@ -116,14 +116,15 @@ class productService{
     }
   }
 
-  Future<List<String>> searchProduct (String word) async{
-    Future<List<String>> products;
+  Future<List<dynamic>> searchProduct (String word) async{
+    List<dynamic> products;
     final request = {
       'query': '''
       query GetAllProducts {
           getAllProducts(options: { search: "${word}" }) {
             data {
               name
+              imageUrl
             }
           }   
       }
@@ -149,13 +150,13 @@ class productService{
 
         final data = jsonDecode(response.body);
          products = data['data']['getAllProducts']['data'];
-        print(2);
+        print(data);
         return products;
       } else {
         throw Exception('Failed to load categories: ${response.body}');
       }
     } catch (e) {
-      print("Error fetching categories: $e");
+      print("Error fetching products: $e");
       return [];
     }
 }

@@ -323,6 +323,7 @@ class _GetotpState extends State<Getotp> {
   Widget buildOTPField(TextEditingController controller, FocusNode currentNode,
       FocusNode? nextNode) {
     return MyTextFormField(
+      type: TextInputType.numberWithOptions(),
       controller: controller,
       focusNode: currentNode,
       width: SizeConfig.horizontalBlock * 50,

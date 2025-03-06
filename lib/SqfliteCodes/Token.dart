@@ -25,7 +25,7 @@ class Token {
       CREATE TABLE TOKENS(
       UUID TEXT ,
       TOKEN TEXT ,
-      CREATED TEXT
+      EXPIRED TEXT
       )
         ''');
   }
@@ -43,6 +43,7 @@ class Token {
     List<Map> response = await myToken!.rawQuery(query);
     return response[0]['TOKEN'];
   }
+
 
   // Update Token
   Future<int> updateToken(String query) async {
