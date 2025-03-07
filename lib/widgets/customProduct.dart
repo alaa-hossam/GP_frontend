@@ -1,35 +1,59 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../SqfliteCodes/wishList.dart';
 import 'Dimensions.dart';
 
 class customProduct extends StatefulWidget {
-  String imageURL, Name, Category;
-  int Price, rate;
+  String imageURL, Name, Category, id;
+  int Price, rate ;
 
-  customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate);
+  customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
 
   @override
   State<customProduct> createState() => _customProductState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate);
+      this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id );
 }
 
 class _customProductState extends State<customProduct> {
-  bool isFav = false;
-  String imageURL, Name, Category;
+  String imageURL, Name, Category, id;
   int Price, rate;
+  wishList wishListObj = wishList();
 
   _customProductState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate);
+      this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id );
 
-  toggleFavourite() {
+  toggleFavourite(String color) {
+wishListObj.isWishlistTableEmpty;
     setState(() {
-      isFav = !isFav;
+      if (color == "${SizeConfig.fontColor}") {
+        wishListObj.addProduct(
+            '''
+            INSERT INTO wishList(ID , IMAGEURL, NAME, CATEGORY, PRICE, RATE) 
+            VALUES (
+                "$id",
+                "$imageURL", 
+                "$Name", 
+                "$Category", 
+                $Price, 
+                $rate
+                
+                
+            )
+''');
+      }else{
+        wishListObj.deleteProduct('''
+      DELETE FROM wishList 
+      WHERE ID = '$id'
+      ''');
+      }
     });
+    // wishListObj.recreateWishListTable();
+
   }
 
   @override
   Widget build(BuildContext context) {
+    // wishListObj.recreateWishListTable();
     return Container(
       padding: EdgeInsets.all(5),
       width: 170 * SizeConfig.horizontalBlock,
@@ -60,15 +84,34 @@ class _customProductState extends State<customProduct> {
                 child: CircleAvatar(
                     radius: 15 * SizeConfig.verticalBlock,
                     backgroundColor: Colors.white,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.favorite,
-                        size: 22 * SizeConfig.textRatio,
-                        color: isFav ? Colors.red : SizeConfig.fontColor,
-                      ),
-                      onPressed: () {
-                        toggleFavourite();
+                    child: FutureBuilder<bool>(
+                      future: wishListObj.doesIdExist(id), // Call the async function
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Show a loading indicator while waiting for the result
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Handle errors
+                          return Icon(
+                            Icons.favorite,
+                            size: 22 * SizeConfig.textRatio,
+                            color: SizeConfig.fontColor,
+                          );
+                        } else {
+                          // Use the result (true or false) to determine the color
+                          bool exists = snapshot.data ?? false;
+                          return IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.favorite,
+                              size: 22 * SizeConfig.textRatio,
+                              color: exists ? Colors.red : SizeConfig.fontColor,
+                            ),
+                            onPressed: () {
+                              toggleFavourite(exists ? "red" : "${SizeConfig.fontColor}",);
+                            },
+                          );
+                        }
                       },
                     )),
               ),
@@ -113,13 +156,16 @@ class _customProductState extends State<customProduct> {
               Container(
                 width: 30 * SizeConfig.horizontalBlock,
                 height: 24 * SizeConfig.verticalBlock,
-
                 decoration: BoxDecoration(
                   color: SizeConfig.iconColor,
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 child: Center(
-                  child:Icon(Icons.add , size: 14* SizeConfig.textRatio, color: Colors.white,),
+                  child: Icon(
+                    Icons.add,
+                    size: 14 * SizeConfig.textRatio,
+                    color: Colors.white,
+                  ),
                 ),
               )
             ],

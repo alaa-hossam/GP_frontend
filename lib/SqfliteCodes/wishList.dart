@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class Token {
+class wishList {
   static Database? _db;
 
   Future<Database?> get db async {
@@ -15,47 +15,87 @@ class Token {
 
   initialDB() async {
     String databasePath = await getDatabasesPath();
-    String path = join(databasePath, 'token.db');
-    Database myToken = await openDatabase(path, onCreate: _createDB);
-    return myToken;
+    String path = join(databasePath, 'wishlist.db');
+    Database myWishlist = await openDatabase(path, version: 1, onCreate: _createDB);
+    return myWishlist;
   }
 
   _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE "wishList"(
-      ID INTEGER AUTOINCREMENT NOT NULL PRIMARY KEY,
-      IMAGEURL TEXT NOT NULL,
-      NAME TEXT NOT NULL,
-      CATEGORY TEXT NOT NULL,
-      PRICE REAL NOT NULL,
-      RATE REAL NOT NULL,
+      CREATE TABLE "WISHLIST"(
+        ID TEXT PRIMARY KEY, 
+        IMAGEURL TEXT NOT NULL,
+        NAME TEXT NOT NULL,
+        CATEGORY TEXT NOT NULL,
+        PRICE REAL NOT NULL,
+        RATE REAL NOT NULL
       )
-        ''');
+    ''');
   }
 
-  addToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawInsert(query);
+  // Corrected method: Initialize myWishlist using the db getter
+  addProduct(String query) async {
+    Database? myWishlist = await db; // Initialize the database
+    int response = await myWishlist!.rawInsert(query);
     return response;
   }
 
-  getToken(String query) async{
-    Database? myToken;
-    List<Map> response = await myToken!.rawQuery(query);
+  // Corrected method: Initialize myWishlist using the db getter
+  Future<List<Map>> getProduct(String query) async {
+    Database? myWishlist = await db; // Initialize the database
+    List<Map> response = await myWishlist!.rawQuery(query);
     return response;
   }
 
-  updateToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawUpdate(query);
+  // Corrected method: Initialize myWishlist using the db getter
+  updateProduct(String query) async {
+    Database? myWishlist = await db; // Initialize the database
+    int response = await myWishlist!.rawUpdate(query);
     return response;
   }
 
-  deleteToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawDelete(query);
+  // Corrected method: Initialize myWishlist using the db getter
+  deleteProduct(String query) async {
+    Database? myWishlist = await db; // Initialize the database
+    int response = await myWishlist!.rawDelete(query);
+    print("delete in wish");
+    print(await myWishlist.rawQuery('SELECT COUNT(*) as count FROM WISHLIST'));
     return response;
   }
 
+  Future<bool> isWishlistTableEmpty() async {
+    Database? myWishList = await db; // Initialize the database
+
+    // Query to count the number of rows in the WISHLIST table
+    List<Map> result = await myWishList!.rawQuery('SELECT COUNT(*) as count FROM WISHLIST');
+
+    // Get the count from the result
+    int count = result[0]['count'] as int;
+
+    // If count is 0, the table is empty
+    return count == 0;
+  }
+
+  Future<void> recreateWishListTable() async {
+    Database? myWish = await db; // Initialize the database
+
+    // Drop the table if it exists
+    await myWish!.execute('DROP TABLE IF EXISTS WISHLIST');
+    print("Wishlist table dropped successfully");
+
+    // Recreate the table
+    await _createDB(myWish, 1);
+    print("Wishlist table recreated successfully");
+  }
+
+  Future<bool> doesIdExist(String id) async {
+    Database? myWishlist = await db;
+
+    List<Map> result = await myWishlist!.rawQuery(
+      'SELECT 1 FROM WISHLIST WHERE ID = ?',
+      [id],
+    );
+
+    return result.isNotEmpty;
+  }
 }
-

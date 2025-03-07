@@ -1,19 +1,21 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import '../Models/ProductModel.dart';
 import '../ViewModels/productViewModel.dart';
 
 class productProvider extends ChangeNotifier {
   productViewModel productVM = productViewModel();
   List<productModel> _products = [];
-
   List<productModel> get products => _products;
+  wishList wishListSql = wishList();
+  List<Map> wishListProducts = [];
 
   productProvider() {
     print("ProductProvider initialized");
     fetchProducts();
   }
 
-  Future<void> fetchProducts() async{
+  Future<void> fetchProducts() async {
     print("Fetching products...");
     await productVM.fetchProducts();
     _products = productVM.products.map((product) => product).toList();
@@ -21,8 +23,30 @@ class productProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  getSearchProducts(String word){
+  getSearchProducts(String word) {
     productVM.searchProduct(word);
-    _products= productVM.products.map((product) =>product).toList();
+    _products = productVM.products.map((product) => product).toList();
+  }
+
+  // Make this method async and await the result
+  Future<void> getWishProducts() async {
+
+    wishListProducts = await wishListSql.getProduct('SELECT * FROM WISHLIST');
+    print("inside provider");
+    print(wishListProducts);
+    notifyListeners(); // Notify listeners after updating the data
+  }
+  Future<void> deleteProduct(String id) async {
+    // Delete the product from the database
+    await wishList().deleteProduct('''
+      DELETE FROM wishList 
+      WHERE ID = '$id'
+    ''');
+
+    // Remove the product from the wishListProducts list
+    wishListProducts.removeWhere((product) => product['ID'] == id);
+    // Notify listeners to rebuild the UI
+    notifyListeners();
+    fetchProducts();
   }
 }

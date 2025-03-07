@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class Token {
+class cart {
   static Database? _db;
 
   Future<Database?> get db async {

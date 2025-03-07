@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
-import '../ViewModels/CategoryViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/SideButton.dart';
@@ -10,6 +9,7 @@ import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
 import 'ProfileView.dart';
+import 'logInView.dart';
 
 class browseProducts extends StatefulWidget {
   static String id = "browseProductsScreen";
@@ -85,23 +85,41 @@ class _BrowseProductsState extends State<browseProducts> {
                   child: Column(
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor,() {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("History", Icons.history_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton(
-                          "My posts", Icons.post_add, SizeConfig.iconColor),
+                          "My posts", Icons.post_add, SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton("compare Products", Icons.compare_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Recommend Gifts",
-                          Icons.card_giftcard_outlined, SizeConfig.iconColor),
+                          Icons.card_giftcard_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Event reminder",
-                          Icons.event_available_outlined, SizeConfig.iconColor),
+                          Icons.event_available_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Add Advertisement",
-                          Icons.camera_roll_outlined, SizeConfig.iconColor),
+                          Icons.camera_roll_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Join as Handcrafter",
-                          Icons.shopping_bag_outlined, SizeConfig.iconColor),
+                          Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                     ],
                   ),
                 ),
@@ -112,7 +130,9 @@ class _BrowseProductsState extends State<browseProducts> {
             Positioned(
               left: 10, // Align to the left
               bottom: 10, // Align to the bottom
-              child: sideButton("Log Out", Icons.logout_outlined, Colors.red),
+              child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+                Navigator.pushReplacementNamed(context, logIn.id);
+              }),
             ),
           ],
         ),
@@ -265,6 +285,7 @@ class _BrowseProductsState extends State<browseProducts> {
                             product1.category,
                             product1.price,
                             product1.rate,
+                            product1.id
                           ),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock),
                           product2 != null
@@ -274,6 +295,7 @@ class _BrowseProductsState extends State<browseProducts> {
                             product2.category,
                             product2.price,
                             product2.rate,
+                            product2.id
                           )
                               : SizedBox.shrink(),
                         ],

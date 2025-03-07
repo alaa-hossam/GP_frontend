@@ -6,17 +6,16 @@ class sideButton extends StatelessWidget{
   String text = "";
   IconData? icon;
   Color myColor;
+  final void Function() onPressedFunction; // Nullable function
 
 
-  sideButton(this.text, this.icon , this.myColor);
+  sideButton(this.text, this.icon , this.myColor, this.onPressedFunction);
 
   @override
   Widget build(BuildContext context){
     SizeConfig().init(context);
     return TextButton(
-      onPressed: () {
-        // Add functionality for Event Reminder
-      },
+      onPressed:onPressedFunction,
       style: TextButton.styleFrom(
         padding: EdgeInsets.zero,
         alignment: Alignment.centerLeft,

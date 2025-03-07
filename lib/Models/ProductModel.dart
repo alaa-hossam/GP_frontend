@@ -17,6 +17,8 @@ class productModel{
   get name => _name;
 
   String get imageURL => _imageURL;
+
+  get id => _id;
 }
 
 class productService{

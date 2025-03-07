@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
+import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +11,7 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
+import '../SqfliteCodes/wishList.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -32,20 +35,20 @@ class _HomeState extends State<Home> {
 
   Token token = Token();
 
-  Future<String> getTokens() async {
-    Token token = Token();
-
-    String query = '''
-    SELECT * FROM TOKENS   
-  ''';
-    String tokensTable = await token.getToken(query);
-
-    // Print the tokens
-    print("Expired in the TOKENS table:");
-    print(tokensTable);
-
-    return tokensTable;
-  }
+  // Future<String> getTokens() async {
+  //   Token token = Token();
+  //
+  //   String query = '''
+  //   SELECT * FROM TOKENS
+  // ''';
+  //   String tokensTable = await token.getToken(query);
+  //
+  //   // Print the tokens
+  //   print("Expired in the TOKENS table:");
+  //   print(tokensTable);
+  //
+  //   return tokensTable;
+  // }
 
   Future<void> navigate(BuildContext context)async {
     Navigator.pushNamed(context, searchView.id);
@@ -53,21 +56,23 @@ class _HomeState extends State<Home> {
   }
 
 
-  Future<int> getTokenCount() async {
-    // Query to count the number of rows in the TOKENS table
-    int result =
-        (await token.getToken('SELECT COUNT(*) as count FROM TOKENS')) as int;
-
-    // Get the count from the result
-    int count = result;
-    print(count);
-    return count;
-  }
+  // Future<int> getTokenCount() async {
+  //   // Query to count the number of rows in the TOKENS table
+  //   int result =
+  //       (await token.getToken('SELECT COUNT(*) as count FROM TOKENS')) as int;
+  //
+  //   // Get the count from the result
+  //   int count = result;
+  //   print(count);
+  //   return count;
+  // }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     print('----------------------------HOME------------------------------------');
+// wishList w = wishList();
+// w.initialDB();
     return Scaffold(
       drawer: Drawer(
         width: 223 * SizeConfig.horizontalBlock,
@@ -127,23 +132,41 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor,() {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("History", Icons.history_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton(
-                          "My posts", Icons.post_add, SizeConfig.iconColor),
+                          "My posts", Icons.post_add, SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton("compare Products", Icons.compare_outlined,
-                          SizeConfig.iconColor),
+                          SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Recommend Gifts",
-                          Icons.card_giftcard_outlined, SizeConfig.iconColor),
+                          Icons.card_giftcard_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Event reminder",
-                          Icons.event_available_outlined, SizeConfig.iconColor),
+                          Icons.event_available_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Add Advertisement",
-                          Icons.camera_roll_outlined, SizeConfig.iconColor),
+                          Icons.camera_roll_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("Join as Handcrafter",
-                          Icons.shopping_bag_outlined, SizeConfig.iconColor),
+                          Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                     ],
                   ),
                 ),
@@ -154,40 +177,56 @@ class _HomeState extends State<Home> {
             Positioned(
               left: 10, // Align to the left
               bottom: 10, // Align to the bottom
-              child: sideButton("Log Out", Icons.logout_outlined, Colors.red),
+              child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+                Navigator.pushReplacementNamed(context, logIn.id);
+              }),
             ),
           ],
         ),
       ),
       appBar: AppBar(
-        // leading: Icon(Icons.menu),
-        centerTitle: true,
+        // centerTitle: true,
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20 * SizeConfig.verticalBlock),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 24 * SizeConfig.textRatio,
-                ),
-                SizedBox(
-                  width: 10 * SizeConfig.horizontalBlock,
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, Profile.id);
-                  },
-                  icon: Icon(
-                    Icons.account_circle_outlined,
-                    size: 24 * SizeConfig.textRatio,
-                  ),
-                ),
-              ],
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.notifications_none, size:24 * SizeConfig.textRatio,),
+              ),
+              Icon(
+                Icons.shopping_cart_outlined,
+                size:24 * SizeConfig.textRatio,
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Profile.id);
+                },
+                icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
+              ),
+            ],
           )
         ],
-        title: Text("Logo"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image(
+              image: AssetImage("assets/images/Frame 36920.png"),
+              width: SizeConfig.textRatio * 40,
+              height: SizeConfig.textRatio * 40,
+              fit: BoxFit.cover,
+            ),
+            Text(
+              "SAN3A",
+              style: TextStyle(
+                color: Color(0xFF073477),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                fontFamily: 'Poppins',
+                fontSize: SizeConfig.textRatio * 24,
+              ),
+            ),
+          ],
+        ),
       ),
       body: ListView(
         children: [
@@ -208,7 +247,7 @@ class _HomeState extends State<Home> {
                     // Handle camera icon press
                   },
                 ),
-                width: 300 * SizeConfig.horizontalBlock,
+                width: 253 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
                 onClickFunction: navigate
 
@@ -227,12 +266,16 @@ class _HomeState extends State<Home> {
                   size: 24 * SizeConfig.textRatio,
                 ),
               ),
-              // MyTextFormField(
-              //   controller: filter,
-              //   icon: Icons.tune,
-              //   width: 48 * SizeConfig.horizontalBlock,
-              //   height: 45 * SizeConfig.verticalBlock,
-              // )
+              Container(
+                width:48 * SizeConfig.horizontalBlock,
+                height: 45 * SizeConfig.verticalBlock,
+                decoration: BoxDecoration(
+                    color: Color(0x80E9E9E9),
+                    borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Icon(Icons.compare_outlined , size: 24 * SizeConfig.textRatio,),
+              ),
+
             ],
           ),
           SizedBox(
@@ -301,7 +344,6 @@ class _HomeState extends State<Home> {
               if (categoryProvider.categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
-              getTokens();
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -363,7 +405,7 @@ class _HomeState extends State<Home> {
                       return Row(
                         children: [
                           customProduct(product.imageURL, product.name,
-                              product.category, product.price, product.rate),
+                              product.category, product.price, product.rate, product.id),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock)
                         ],
                       );
@@ -420,7 +462,7 @@ class _HomeState extends State<Home> {
                       return Row(
                         children: [
                           customProduct(product.imageURL, product.name,
-                              product.category, product.price, product.rate),
+                              product.category, product.price, product.rate, product.id),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock)
                         ],
                       );

@@ -1,5 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
@@ -7,14 +8,17 @@ import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
+import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
+import 'SqfliteCodes/wishList.dart';
 import 'views/signUpView.dart';
 
 void main() async{
-
+  // wishList w = wishList();
+  // w.initialDB();
   runApp(
       MultiProvider(
         providers: [
@@ -30,6 +34,8 @@ void main() async{
 
   ));
 }
+
+
 
 
 class MyApp extends StatelessWidget {
@@ -54,6 +60,7 @@ class MyApp extends StatelessWidget {
         AIChat.id:(BuildContext context) => AIChat(),
         browseProducts.id:(BuildContext context) => browseProducts(),
         searchView.id:(BuildContext context) => searchView(),
+        wishListView.id:(BuildContext context) => wishListView(),
       },
     );
   }
