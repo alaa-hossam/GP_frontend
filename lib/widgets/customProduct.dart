@@ -5,7 +5,7 @@ import 'Dimensions.dart';
 
 class customProduct extends StatefulWidget {
   String imageURL, Name, Category, id;
-  int Price, rate ;
+  double Price, rate ;
 
   customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
 
@@ -16,7 +16,7 @@ class customProduct extends StatefulWidget {
 
 class _customProductState extends State<customProduct> {
   String imageURL, Name, Category, id;
-  int Price, rate;
+  double Price, rate;
   wishList wishListObj = wishList();
 
   _customProductState(
@@ -120,9 +120,13 @@ wishListObj.isWishlistTableEmpty;
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                Name,
-                style: TextStyle(fontSize: 14 * SizeConfig.textRatio),
+              Flexible(
+                child: Text(
+                  Name, // Remember to use quotes around the string
+                  style: TextStyle(fontSize: 14 * SizeConfig.textRatio),
+                  overflow: TextOverflow.ellipsis, // Optional: handle overflow
+                  maxLines: 1, // Optional: limit to one line
+                ),
               ),
               Row(
                 children: [

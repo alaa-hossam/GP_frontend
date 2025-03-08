@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/GetOTP.dart';
 import 'package:gp_frontend/views/logInView.dart';
@@ -28,10 +29,11 @@ class _SignUpState extends State<SignUp> {
   customerViewModel cvm = customerViewModel();
   bool obscureText = true;
   bool _isLoading = false; // Loading state
-
+Token token=Token();
   void togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
+      token.recreateTokensTable();
     });
   }
 

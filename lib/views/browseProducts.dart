@@ -42,24 +42,22 @@ class _BrowseProductsState extends State<browseProducts> {
                       width: 223 * SizeConfig.horizontalBlock,
                     ),
                     Positioned(
-                      left: 15, // Align to the left
-                      bottom: 15, // Align to the bottom
+                      left: 15,
+                      bottom: 15,
                       child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start, // Align text to the left
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle, // Circular shape
+                              shape: BoxShape.circle,
                               border: Border.all(
-                                color: Color(0xFF5095B0), // Border color
-                                width: 3, // Border width
+                                color: Color(0xFF5095B0),
+                                width: 3,
                               ),
                             ),
                             child: const CircleAvatar(
-                              radius: 50, // Size of the CircleAvatar
-                              backgroundImage:
-                              AssetImage('assets/images/p1.jpg'), // Image
+                              radius: 50,
+                              backgroundImage: AssetImage('assets/images/p1.jpg'),
                             ),
                           ),
                           Text(
@@ -70,8 +68,7 @@ class _BrowseProductsState extends State<browseProducts> {
                           ),
                           Text(
                             "myemail.gmail.com",
-                            style:
-                            TextStyle(fontSize: 14 * SizeConfig.textRatio),
+                            style: TextStyle(fontSize: 14 * SizeConfig.textRatio),
                           ),
                         ],
                       ),
@@ -85,7 +82,7 @@ class _BrowseProductsState extends State<browseProducts> {
                   child: Column(
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor,() {
+                          SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
@@ -96,28 +93,27 @@ class _BrowseProductsState extends State<browseProducts> {
                           SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
-                      sideButton(
-                          "My posts", Icons.post_add, SizeConfig.iconColor, () {
+                      sideButton("My posts", Icons.post_add, SizeConfig.iconColor, () {
                         Navigator.pushNamed(context, Profile.id);
                       }),
                       sideButton("compare Products", Icons.compare_outlined,
                           SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
-                      sideButton("Recommend Gifts",
-                          Icons.card_giftcard_outlined, SizeConfig.iconColor, () {
+                      sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
+                          SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
-                      sideButton("Event reminder",
-                          Icons.event_available_outlined, SizeConfig.iconColor, () {
+                      sideButton("Event reminder", Icons.event_available_outlined,
+                          SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
-                      sideButton("Add Advertisement",
-                          Icons.camera_roll_outlined, SizeConfig.iconColor, () {
+                      sideButton("Add Advertisement", Icons.camera_roll_outlined,
+                          SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
-                      sideButton("Join as Handcrafter",
-                          Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
+                      sideButton("Join as Handcrafter", Icons.shopping_bag_outlined,
+                          SizeConfig.iconColor, () {
                             Navigator.pushNamed(context, Profile.id);
                           }),
                     ],
@@ -125,11 +121,9 @@ class _BrowseProductsState extends State<browseProducts> {
                 ),
               ],
             ),
-
-            // Log Out Button at the Bottom-Left
             Positioned(
-              left: 10, // Align to the left
-              bottom: 10, // Align to the bottom
+              left: 10,
+              bottom: 10,
               child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
                 Navigator.pushReplacementNamed(context, logIn.id);
               }),
@@ -144,17 +138,17 @@ class _BrowseProductsState extends State<browseProducts> {
             children: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.notifications_none, size:24 * SizeConfig.textRatio,),
+                icon: Icon(Icons.notifications_none, size: 24 * SizeConfig.textRatio),
               ),
               Icon(
                 Icons.shopping_cart_outlined,
-                size:24 * SizeConfig.textRatio,
+                size: 24 * SizeConfig.textRatio,
               ),
               IconButton(
                 onPressed: () {
                   Navigator.pushNamed(context, Profile.id);
                 },
-                icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
+                icon: Icon(Icons.account_circle_outlined, size: 24 * SizeConfig.textRatio),
               ),
             ],
           )
@@ -180,139 +174,123 @@ class _BrowseProductsState extends State<browseProducts> {
           ],
         ),
       ),
-      body: ListView(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: SizeConfig.horizontalBlock * 5,
-            children: [
-              MyTextFormField(
-                controller: search,
-                hintName: "Search",
-                icon: Icons.search,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.camera_alt_outlined,
-                    color: SizeConfig.iconColor,
-                    size: 24 * SizeConfig.textRatio,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Search Bar and Filters
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MyTextFormField(
+                  controller: search,
+                  hintName: "Search",
+                  icon: Icons.search,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.camera_alt_outlined,
+                      color: SizeConfig.iconColor,
+                      size: 24 * SizeConfig.textRatio,
+                    ),
+                    onPressed: () {},
                   ),
-                  onPressed: () {},
+                  width: 253 * SizeConfig.horizontalBlock,
+                  height: 45 * SizeConfig.verticalBlock,
                 ),
-                width: 253 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-              ),
-              Container(
-                width:48 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-                decoration: BoxDecoration(
+                SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                Container(
+                  width: 48 * SizeConfig.horizontalBlock,
+                  height: 45 * SizeConfig.verticalBlock,
+                  decoration: BoxDecoration(
                     color: Color(0x80E9E9E9),
-                    borderRadius: BorderRadius.all(Radius.circular(5))
-                ),
-                child: Icon(Icons.tune , size: 24 * SizeConfig.textRatio,),
-              ),
-              Container(
-                width:48 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-                decoration: BoxDecoration(
-                    color: Color(0x80E9E9E9),
-                    borderRadius: BorderRadius.all(Radius.circular(5))
-                ),
-                child: Icon(Icons.compare_outlined , size: 24 * SizeConfig.textRatio,),
-              ),
-            ],
-          ),
-          Consumer<CategoryProvider>(
-            builder: (context, categoryProvider, child) {
-              if (categoryProvider.categories.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: SizeConfig.horizontalBlock,
-                  height: 43 * SizeConfig.verticalBlock,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categoryProvider.categories.length,
-                    itemBuilder: (context, index) {
-                      bool isSelected = index == selectedIndex;
-                      var category = categoryProvider.categories[index];
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Customizecategory("${category}", isSelected),
-                          ],
-                        ),
-                      );
-                    },
+                    borderRadius: BorderRadius.circular(5),
                   ),
+                  child: Icon(Icons.tune, size: 24 * SizeConfig.textRatio),
                 ),
-              );
-            },
-          ),
-          Consumer<productProvider>(
-            builder: (context, productProvider, child) {
-              if (productProvider.products.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
+                SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                Container(
+                  width: 48 * SizeConfig.horizontalBlock,
+                  height: 45 * SizeConfig.verticalBlock,
+                  decoration: BoxDecoration(
+                    color: Color(0x80E9E9E9),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Icon(Icons.compare_outlined, size: 24 * SizeConfig.textRatio),
+                ),
+              ],
+            ),
 
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 250 * SizeConfig.verticalBlock, // Set a fixed height
-                  child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemCount: (productProvider.products.length / 2).ceil(),
-                    itemBuilder: (context, index) {
-                      var firstProductIndex = index * 2;
-                      var secondProductIndex = firstProductIndex + 1;
-                      var product1 = productProvider.products[firstProductIndex];
-                      var product2 = secondProductIndex < productProvider.products.length
-                          ? productProvider.products[secondProductIndex]
-                          : null;
-
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          customProduct(
-                            product1.imageURL,
-                            product1.name,
-                            product1.category,
-                            product1.price,
-                            product1.rate,
-                            product1.id
+            // Category List
+            Consumer<CategoryProvider>(
+              builder: (context, categoryProvider, child) {
+                if (categoryProvider.categories.isEmpty) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 43 * SizeConfig.verticalBlock,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: categoryProvider.categories.length,
+                      itemBuilder: (context, index) {
+                        bool isSelected = index == selectedIndex;
+                        var category = categoryProvider.categories[index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Customizecategory("${category}", isSelected),
+                            ],
                           ),
-                          SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                          product2 != null
-                              ? customProduct(
-                            product2.imageURL,
-                            product2.name,
-                            product2.category,
-                            product2.price,
-                            product2.rate,
-                            product2.id
-                          )
-                              : SizedBox.shrink(),
-                        ],
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            // Products Grid
+            Consumer<productProvider>(
+              builder: (context, productProvider, child) {
+                if (productProvider.products.isEmpty) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(), // Disable GridView's scrolling
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // Two products per row
+                      crossAxisSpacing: 10.0, // Spacing between columns
+                      mainAxisSpacing: 10.0, // Spacing between rows
+                      childAspectRatio: 0.7, // Adjust based on your design
+                    ),
+                    itemCount: productProvider.products.length,
+                    itemBuilder: (context, index) {
+                      var product = productProvider.products[index];
+                      return customProduct(
+                        product.imageURL,
+                        product.name,
+                        product.category,
+                        product.price,
+                        product.rate,
+                        product.id,
                       );
                     },
                   ),
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomBar(selectedIndex: 0),
     );
   }
 }
-
-
-
-

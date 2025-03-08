@@ -112,8 +112,10 @@ class customerServices {
     verifyUserForSignUp(code: "$code", email: "$email") {
         token {
             expireAt
-            id
             token
+        }
+        user {
+            id
         }
     }
 }
@@ -136,9 +138,9 @@ class customerServices {
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
         }
-        final accessToken = data['data']['login']['token']['token'];
-        final expireAt = data['data']['login']['token']['expireAt'];
-        final UUID = data['data']['login']['user']['id'];
+        final accessToken = data['data']['verifyUserForSignUp']['token']['token'];
+        final String expireAt = data['data']['verifyUserForSignUp']['token']['expireAt'];
+        final UUID = data['data']['verifyUserForSignUp']['user']['id'];
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
                               VALUES ("$UUID", "$accessToken", "$expireAt")
