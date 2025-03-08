@@ -28,16 +28,10 @@ wishListObj.isWishlistTableEmpty;
       if (color == "${SizeConfig.fontColor}") {
         wishListObj.addProduct(
             '''
-            INSERT INTO wishList(ID , IMAGEURL, NAME, CATEGORY, PRICE, RATE) 
+            INSERT INTO WISHLIST(ID) 
             VALUES (
-                "$id",
-                "$imageURL", 
-                "$Name", 
-                "$Category", 
-                $Price, 
-                $rate
-                
-                
+                "$id"
+             
             )
 ''');
       }else{

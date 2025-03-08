@@ -14,11 +14,15 @@ import 'package:provider/provider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
 import 'SqfliteCodes/wishList.dart';
+import 'firebase_options.dart';
 import 'views/signUpView.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'fireBaseNotification.dart';
 
 void main() async{
   // wishList w = wishList();
-  // w.initialDB();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
   runApp(
       MultiProvider(
         providers: [

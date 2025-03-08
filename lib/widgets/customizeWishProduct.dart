@@ -8,7 +8,8 @@ import 'package:provider/provider.dart';
 
 class customizeWishProuct extends StatefulWidget {
   String imageURL, Name, Category, id;
-  double Price, rate ;
+  int rate ;
+  dynamic Price;
 
   customizeWishProuct(this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
   State<customizeWishProuct> createState() => _customizeWishProuctState(
@@ -19,7 +20,8 @@ class customizeWishProuct extends StatefulWidget {
 class _customizeWishProuctState extends State<customizeWishProuct> {
   bool isFav = false;
   String imageURL, Name, Category, id;
-  double Price, rate;
+  int rate;
+  dynamic Price;
 
   _customizeWishProuctState(
       this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);

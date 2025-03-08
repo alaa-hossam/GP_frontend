@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:gp_frontend/SqfliteCodes/cart.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
@@ -11,7 +10,6 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
-import '../SqfliteCodes/wishList.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';

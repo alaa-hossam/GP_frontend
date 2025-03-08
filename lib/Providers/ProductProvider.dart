@@ -8,7 +8,7 @@ class productProvider extends ChangeNotifier {
   List<productModel> _products = [];
   List<productModel> get products => _products;
   wishList wishListSql = wishList();
-  List<Map> wishListProducts = [];
+  List<dynamic> wishListProducts = [];
 
   productProvider() {
     print("ProductProvider initialized");
@@ -31,7 +31,7 @@ class productProvider extends ChangeNotifier {
   // Make this method async and await the result
   Future<void> getWishProducts() async {
 
-    wishListProducts = await wishListSql.getProduct('SELECT * FROM WISHLIST');
+    wishListProducts = await productVM.wishProducts();
     print("inside provider");
     print(wishListProducts);
     notifyListeners(); // Notify listeners after updating the data
@@ -47,6 +47,5 @@ class productProvider extends ChangeNotifier {
     wishListProducts.removeWhere((product) => product['ID'] == id);
     // Notify listeners to rebuild the UI
     notifyListeners();
-    fetchProducts();
   }
 }

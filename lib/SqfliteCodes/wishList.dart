@@ -23,15 +23,18 @@ class wishList {
   _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE "WISHLIST"(
-        ID TEXT PRIMARY KEY, 
-        IMAGEURL TEXT NOT NULL,
-        NAME TEXT NOT NULL,
-        CATEGORY TEXT NOT NULL,
-        PRICE REAL NOT NULL,
-        RATE REAL NOT NULL
+        ID TEXT PRIMARY KEY
+       
       )
     ''');
   }
+
+  //
+  // IMAGEURL TEXT NOT NULL,
+  //     NAME TEXT NOT NULL,
+  // CATEGORY TEXT NOT NULL,
+  // RATE REAL NOT NULL
+  //     PRICE REAL NOT NULL,
 
   // Corrected method: Initialize myWishlist using the db getter
   addProduct(String query) async {

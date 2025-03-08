@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
+import '../fireBaseNotification.dart';
 
 class CustomerModel {
   String userName;
@@ -23,25 +24,9 @@ class CustomerModel {
       this.gender, this.birthDate);
 
   // Get the hashed device token
-  Future<String> getDeviceToken() async {
+  Future<String?> getDeviceToken() async {
+    return NotificationFire().initNotification() ;
 
-
-    final deviceInfo = DeviceInfoPlugin();
-    String deviceId;
-
-    if (await deviceInfo.deviceInfo is AndroidDeviceInfo) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id ?? "unknown";
-    } else if (await deviceInfo.deviceInfo is IosDeviceInfo) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor ?? "unknown";
-    } else {
-      deviceId = "Unknown Device";
-    }
-
-    var bytes = utf8.encode(deviceId);
-    String token = sha256.convert(bytes).toString();
-    return token;
   }
 }
 
@@ -51,7 +36,7 @@ class customerServices {
 
   Future<String> addCustomer(CustomerModel customer) async {
     // Await device token retrieval
-    String deviceToken = await customer.getDeviceToken();
+    String? deviceToken = await customer.getDeviceToken();
 
     // Ensure gender is in the correct format based on the enum
 
@@ -199,7 +184,7 @@ class customerServices {
 
   Future<String> logInCustomer(String email, String password) async {
     Token token = Token();
-    String deviceToken = "";
+    String? deviceToken = "";
     try {
       deviceToken =
           await CustomerModel("", "", "", "", "", "", "").getDeviceToken();

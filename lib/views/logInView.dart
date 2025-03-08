@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
@@ -22,11 +23,11 @@ class _logInState extends State<logIn> {
   customerViewModel cvm= customerViewModel();
   bool _isLoading = false;
   Token token = Token();
+  wishList wish = wishList();
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-
     });
   }
 

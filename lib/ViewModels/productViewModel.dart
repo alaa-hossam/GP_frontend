@@ -24,4 +24,9 @@ class productViewModel  extends ChangeNotifier{
     return apiServices.searchProduct(word);
   }
 
+  wishProducts(){
+    return apiServices.getWishProducts();
+
+  }
+
 }

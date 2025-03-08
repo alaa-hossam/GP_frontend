@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "684091793203",
+    "project_id": "san3a-ee8fe",
+    "storage_bucket": "san3a-ee8fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684091793203:android:1104a68fc7175d8a5fa846",
+        "android_client_info": {
+          "package_name": "com.example.gp_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwINGAtn3AlPG3cN4cCF2-81Fjfic3YC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
