@@ -15,6 +15,9 @@ class productProvider extends ChangeNotifier {
     fetchProducts();
   }
 
+
+
+
   Future<void> fetchProducts() async {
     print("Fetching products...");
     await productVM.fetchProducts();
@@ -44,7 +47,7 @@ class productProvider extends ChangeNotifier {
     ''');
 
     // Remove the product from the wishListProducts list
-    wishListProducts.removeWhere((product) => product['ID'] == id);
+    wishListProducts.removeWhere((product) => product.id == id);
     // Notify listeners to rebuild the UI
     notifyListeners();
   }

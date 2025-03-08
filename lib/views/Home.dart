@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   TextEditingController filter = TextEditingController();
   int selectedIndex = 0;
+  productProvider myProductProvider = productProvider();
 
   Token token = Token();
 
@@ -48,11 +49,15 @@ class _HomeState extends State<Home> {
   //   return tokensTable;
   // }
 
-  Future<void> navigate(BuildContext context)async {
-    Navigator.pushNamed(context, searchView.id);
-
+  Future getProducts() async{
+    print("all products");
+    await myProductProvider.fetchProducts();
+    // print("all products");
   }
 
+  Future<void> navigate(BuildContext context) async {
+    Navigator.pushNamed(context, searchView.id);
+  }
 
   // Future<int> getTokenCount() async {
   //   // Query to count the number of rows in the TOKENS table
@@ -68,7 +73,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    print('----------------------------HOME------------------------------------');
+    print(
+        '----------------------------HOME------------------------------------');
 // wishList w = wishList();
 // w.initialDB();
     return Scaffold(
@@ -130,41 +136,47 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor,() {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
+                          SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
                           SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton("History", Icons.history_outlined,
                           SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton(
                           "My posts", Icons.post_add, SizeConfig.iconColor, () {
                         Navigator.pushNamed(context, Profile.id);
                       }),
                       sideButton("compare Products", Icons.compare_outlined,
                           SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton("Recommend Gifts",
-                          Icons.card_giftcard_outlined, SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton("Event reminder",
-                          Icons.event_available_outlined, SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
+                      sideButton(
+                          "Recommend Gifts",
+                          Icons.card_giftcard_outlined,
+                          SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
+                      sideButton(
+                          "Event reminder",
+                          Icons.event_available_outlined,
+                          SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                       sideButton("Add Advertisement",
                           Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton("Join as Handcrafter",
-                          Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
+                      sideButton(
+                          "Join as Handcrafter",
+                          Icons.shopping_bag_outlined,
+                          SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, Profile.id);
+                      }),
                     ],
                   ),
                 ),
@@ -175,7 +187,8 @@ class _HomeState extends State<Home> {
             Positioned(
               left: 10, // Align to the left
               bottom: 10, // Align to the bottom
-              child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+              child:
+                  sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
                 Navigator.pushReplacementNamed(context, logIn.id);
               }),
             ),
@@ -183,23 +196,30 @@ class _HomeState extends State<Home> {
         ),
       ),
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         // centerTitle: true,
         actions: [
           Row(
             children: [
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.notifications_none, size:24 * SizeConfig.textRatio,),
+                icon: Icon(
+                  Icons.notifications_none,
+                  size: 24 * SizeConfig.textRatio,
+                ),
               ),
               Icon(
                 Icons.shopping_cart_outlined,
-                size:24 * SizeConfig.textRatio,
+                size: 24 * SizeConfig.textRatio,
               ),
               IconButton(
                 onPressed: () {
                   Navigator.pushNamed(context, Profile.id);
                 },
-                icon: Icon(Icons.account_circle_outlined, size:24 * SizeConfig.textRatio,),
+                icon: Icon(
+                  Icons.account_circle_outlined,
+                  size: 24 * SizeConfig.textRatio,
+                ),
               ),
             ],
           )
@@ -232,26 +252,22 @@ class _HomeState extends State<Home> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               MyTextFormField(
-                controller: search,
-                hintName: "Search",
-                icon: Icons.search,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.camera_alt_outlined,
-                    color: SizeConfig.iconColor,
-                    size: 24 * SizeConfig.textRatio,
+                  controller: search,
+                  hintName: "Search",
+                  icon: Icons.search,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.camera_alt_outlined,
+                      color: SizeConfig.iconColor,
+                      size: 24 * SizeConfig.textRatio,
+                    ),
+                    onPressed: () {
+                      // Handle camera icon press
+                    },
                   ),
-                  onPressed: () {
-                    // Handle camera icon press
-                  },
-                ),
-                width: 253 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-                onClickFunction: navigate
-
-
-
-              ),
+                  width: 253 * SizeConfig.horizontalBlock,
+                  height: 45 * SizeConfig.verticalBlock,
+                  onClickFunction: navigate),
               SizedBox(width: 20 * SizeConfig.horizontalBlock),
               Container(
                 width: 48 * SizeConfig.horizontalBlock,
@@ -265,15 +281,16 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Container(
-                width:48 * SizeConfig.horizontalBlock,
+                width: 48 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
                 decoration: BoxDecoration(
                     color: Color(0x80E9E9E9),
-                    borderRadius: BorderRadius.all(Radius.circular(5))
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Icon(
+                  Icons.compare_outlined,
+                  size: 24 * SizeConfig.textRatio,
                 ),
-                child: Icon(Icons.compare_outlined , size: 24 * SizeConfig.textRatio,),
               ),
-
             ],
           ),
           SizedBox(
@@ -386,7 +403,6 @@ class _HomeState extends State<Home> {
           Consumer<productProvider>(
             builder: (context, productProvider, child) {
               if (productProvider.products.isEmpty) {
-                // print(productProvider.products.length);
                 return Center(child: CircularProgressIndicator());
               }
               return Padding(
@@ -394,19 +410,36 @@ class _HomeState extends State<Home> {
                 child: Container(
                   width: SizeConfig.horizontalBlock,
                   height: 250 * SizeConfig.verticalBlock,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount:
-                        productProvider.products.length, // Number of items
-                    itemBuilder: (context, index) {
-                      var product = productProvider.products[index];
-                      return Row(
-                        children: [
-                          customProduct(product.imageURL, product.name,
-                              product.category, product.price, product.rate, product.id),
-                          SizedBox(width: 10 * SizeConfig.horizontalBlock)
-                        ],
-                      );
+                  child: FutureBuilder(
+                    future: getProducts(), // Ensure this returns a Future
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                            return ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: productProvider.products.length,
+                              itemBuilder: (context, index) {
+                                var product = productProvider.products[index];
+                                return Row(
+                                  children: [
+                                    customProduct(
+                                      product.imageURL,
+                                      product.name,
+                                      product.category,
+                                      product.price,
+                                      product.rate,
+                                      product.id,
+                                    ),
+                                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                                  ],
+                                );
+                              },
+                            );
+
+                      }
                     },
                   ),
                 ),
@@ -459,8 +492,13 @@ class _HomeState extends State<Home> {
                       var product = productProvider.products[index];
                       return Row(
                         children: [
-                          customProduct(product.imageURL, product.name,
-                              product.category, product.price, product.rate, product.id),
+                          customProduct(
+                              product.imageURL,
+                              product.name,
+                              product.category,
+                              product.price,
+                              product.rate,
+                              product.id),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock)
                         ],
                       );
@@ -525,4 +563,3 @@ class imageProvider extends ChangeNotifier {
     super.dispose();
   }
 }
-

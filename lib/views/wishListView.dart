@@ -137,8 +137,8 @@ class _wishListViewState extends State<wishListView> {
                           product['imageUrl'],
                           product['name'],
                           product['category']['name'],
-                          product['lowestCustomPrice'],
-                          product['averageRating'],
+                          product['lowestCustomPrice'].toDouble(),
+                          product['averageRating'].toDouble(),
                           product['id']
                         );
                       },

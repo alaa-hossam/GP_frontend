@@ -7,24 +7,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class customizeWishProuct extends StatefulWidget {
-  String imageURL, Name, Category, id;
-  int rate ;
-  dynamic Price;
+  final String imageURL, Name, Category, id;
+  final double rate, Price;
 
   customizeWishProuct(this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
-  State<customizeWishProuct> createState() => _customizeWishProuctState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate , this.id);
 
+  @override
+  State<customizeWishProuct> createState() => _customizeWishProuctState();
 }
 
 class _customizeWishProuctState extends State<customizeWishProuct> {
   bool isFav = false;
-  String imageURL, Name, Category, id;
-  int rate;
-  dynamic Price;
-
-  _customizeWishProuctState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +26,18 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          horizontal: 15.0 * SizeConfig.horizontalBlock,
-          vertical: 5 * SizeConfig.verticalBlock),
+        horizontal: 15.0 * SizeConfig.horizontalBlock,
+        vertical: 5 * SizeConfig.verticalBlock,
+      ),
       child: Container(
+        height: 110 * SizeConfig.verticalBlock,
         decoration: BoxDecoration(
           color: Color(0x50E9E9E9),
           borderRadius: BorderRadius.all(Radius.circular(20)),
           border: Border.all(
-              width: 2 * SizeConfig.textRatio, color: SizeConfig.iconColor),
+            width: 2 * SizeConfig.textRatio,
+            color: SizeConfig.iconColor,
+          ),
         ),
         width: 358 * SizeConfig.horizontalBlock,
         child: Row(
@@ -53,37 +50,49 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(15)),
                     child: Image.network(
-                      imageURL,
+                      widget.imageURL,
                       width: 100 * SizeConfig.horizontalBlock,
                       height: 100 * SizeConfig.verticalBlock,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
+                SizedBox(width: 10), // Add spacing
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("$Name",
-                            style: GoogleFonts.roboto(
-                                color: Color(0x90000000),
-                                fontSize: 20 * SizeConfig.textRatio,
-                                fontWeight: FontWeight.bold)),
-                        Text("$Category",
-                            style: GoogleFonts.rubik(
-                                color: Color(0x50000000),
-                                fontSize: 11 * SizeConfig.textRatio,
-                                fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Text("$Price " + "E",
+                    SizedBox(
+                      width: 150 * SizeConfig.horizontalBlock, // Constrain the width
+                      child: Text(
+                        widget.Name,
                         style: GoogleFonts.roboto(
-                            color: Color(0xFF000000),
-                            fontSize: 20 * SizeConfig.textRatio,
-                            fontWeight: FontWeight.bold)),
+                          color: Color(0x90000000),
+                          fontSize: 20 * SizeConfig.textRatio,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    SizedBox(height: 5), // Add spacing
+                    Text(
+                      widget.Category,
+                      style: GoogleFonts.rubik(
+                        color: Color(0x50000000),
+                        fontSize: 11 * SizeConfig.textRatio,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5), // Add spacing
+                    Text(
+                      "${widget.Price} E",
+                      style: GoogleFonts.roboto(
+                        color: Color(0xFF000000),
+                        fontSize: 20 * SizeConfig.textRatio,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -91,6 +100,7 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
@@ -101,10 +111,10 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
                     ),
                     onPressed: () {
                       // Call deleteProduct from the provider
-                      wishProvider.deleteProduct(id);
+                      wishProvider.deleteProduct(widget.id);
                     },
                   ),
-                  SizedBox(height: 20 * SizeConfig.verticalBlock),
+                  SizedBox(height: 10 * SizeConfig.verticalBlock), // Add spacing
                   Row(
                     children: [
                       Icon(
@@ -112,16 +122,20 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
                         size: 20 * SizeConfig.textRatio,
                         color: const Color(0xFFD4931C),
                       ),
-                      Text("$rate",
-                          style: GoogleFonts.rubik(
-                              color: Color(0x50000000),
-                              fontSize: 11 * SizeConfig.textRatio,
-                              fontWeight: FontWeight.bold)),
+                      SizedBox(width: 5), // Add spacing
+                      Text(
+                        "${widget.rate}",
+                        style: GoogleFonts.rubik(
+                          color: Color(0x50000000),
+                          fontSize: 11 * SizeConfig.textRatio,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
