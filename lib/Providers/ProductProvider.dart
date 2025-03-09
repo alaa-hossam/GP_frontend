@@ -12,19 +12,24 @@ class productProvider extends ChangeNotifier {
 
   productProvider() {
     print("ProductProvider initialized");
-    fetchProducts();
   }
 
-
-
-
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts(String categoryId) async {
     print("Fetching products...");
-    await productVM.fetchProducts();
+    print("///////////////////IDddddddd///////////////////////");
+    print(categoryId);
+    await productVM.fetchProducts(categoryId);
     _products = productVM.products.map((product) => product).toList();
-    print("products fetched allllllllll: $_products");
+    print("Products fetched: $_products");
     notifyListeners();
   }
+  // Future<void> fetchProductsCategory(String categoryId) async {
+  //   print("Fetching products category...");
+  //   await productVM.fetchProductsByCategory(categoryId);
+  //   _productsCategory = productVM.productsCategory.map((product) => product).toList();
+  //   print("products fetched allllllllll: $_productsCategory");
+  //   notifyListeners();
+  // }
 
   getSearchProducts(String word) {
     productVM.searchProduct(word);

@@ -32,6 +32,14 @@ class _HomeState extends State<Home> {
   int selectedIndex = 0;
   productProvider myProductProvider = productProvider();
 
+  late CategoryProvider catProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    catProvider = Provider.of<CategoryProvider>(context, listen: false);
+    catProvider.fetchCategories();
+  }
   Token token = Token();
 
   // Future<String> getTokens() async {
@@ -51,7 +59,7 @@ class _HomeState extends State<Home> {
 
   Future getProducts() async{
     print("all products");
-    await myProductProvider.fetchProducts();
+    await myProductProvider.fetchProducts('0');
     // print("all products");
   }
 
@@ -355,21 +363,20 @@ class _HomeState extends State<Home> {
           ),
           SizedBox(height: 10 * SizeConfig.verticalBlock),
           Consumer<CategoryProvider>(
-            builder: (context, categoryProvider, child) {
-              if (categoryProvider.categories.isEmpty) {
+            builder: (context, catProvider, child) {
+              if (catProvider.categories.isEmpty) {
                 return Center(child: CircularProgressIndicator());
               }
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  width: SizeConfig.horizontalBlock,
                   height: 43 * SizeConfig.verticalBlock,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: categoryProvider.categories.length,
+                    itemCount: catProvider.categories.length,
                     itemBuilder: (context, index) {
                       bool isSelected = index == selectedIndex;
-                      var category = categoryProvider.categories[index];
+                      var category = catProvider.categories[index];
                       return GestureDetector(
                         onTap: () {
                           setState(() {
@@ -378,7 +385,7 @@ class _HomeState extends State<Home> {
                         },
                         child: Row(
                           children: [
-                            Customizecategory("${category}", isSelected),
+                            Customizecategory("${category.name}", isSelected),
                           ],
                         ),
                       );

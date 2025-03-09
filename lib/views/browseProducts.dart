@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:provider/provider.dart';
+import '../Models/CategoryModel.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
 import '../widgets/BottomBar.dart';
@@ -13,7 +14,6 @@ import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
 import 'ProfileView.dart';
 import 'logInView.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class browseProducts extends StatefulWidget {
   static String id = "browseProductsScreen";
@@ -26,44 +26,78 @@ class browseProducts extends StatefulWidget {
 class _BrowseProductsState extends State<browseProducts> {
   TextEditingController search = TextEditingController();
   int selectedIndex = 0;
+  int selectedChildIndex = 0;
   bool showCompare = false;
+  bool isLoading = false; // Track loading state
   List<productModel> comparedProducts = [];
+  late productProvider prodProvider;
+  late CategoryProvider catProvider;
+  String? selectedCategoryId; // Track the selected category ID
+  List<CategoryModel> categoryChildren = []; // Track children of the selected category
 
+  @override
+  void initState() {
+    super.initState();
+    prodProvider = Provider.of<productProvider>(context, listen: false);
+    catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-
+    // Fetch all products on initialization
+    prodProvider.products.clear();
+    prodProvider.fetchProducts('0');
+    // Fetch categories only when the widget is initialized
+    catProvider.fetchCategories();
+  }
   void _handleCompare(productModel product) {
-    bool  exist = false;
-    int index=0;
+    bool exist = false;
+    int index = 0;
     setState(() {
-
-      // comparedProducts.clear();
-      for(int i = 0; i < comparedProducts.length ; i++) {
+      for (int i = 0; i < comparedProducts.length; i++) {
         if (comparedProducts[i].id == product.id) {
           exist = true;
-          index=i;
+          index = i;
           break;
         }
       }
-        if (!comparedProducts.isEmpty) {
-          if (comparedProducts.length == 2 ) {
-            if (exist) {
-              comparedProducts.remove(comparedProducts[index]);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("You only can compare 2 products.")),
-              );
-            }
-          } else if(comparedProducts.length != 2){
-            if(exist) {
-              comparedProducts.remove(comparedProducts[index]);
-            }else{
-              comparedProducts.add(product);
-            }
+      if (!comparedProducts.isEmpty) {
+        if (comparedProducts.length == 2) {
+          if (exist) {
+            comparedProducts.remove(comparedProducts[index]);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("You can only compare 2 products.")),
+            );
           }
-        } else {
-          comparedProducts.add(product);
+        } else if (comparedProducts.length != 2) {
+          if (exist) {
+            comparedProducts.remove(comparedProducts[index]);
+          } else {
+            comparedProducts.add(product);
+          }
         }
-        // print(comparedProducts.length);
+      } else {
+        comparedProducts.add(product);
+      }
+    });
+  }
+
+  Future<void> _handleCategorySelection(CategoryModel category) async {
+    setState(() {
+      selectedIndex = catProvider.categories.indexOf(category);
+      selectedCategoryId = category.id; // Set the selected category ID
+      isLoading = true; // Set loading state to true
+      selectedChildIndex = 0;
+    });
+
+    // Fetch category children
+    await catProvider.fetchCategoryChildren(category.id);
+
+    // Fetch products for the selected category
+    await prodProvider.fetchProducts(selectedCategoryId!);
+
+    // Store category children
+    setState(() {
+      categoryChildren = catProvider.categoryCildren;
+      isLoading = false; // Reset loading state
     });
   }
 
@@ -102,7 +136,7 @@ class _BrowseProductsState extends State<browseProducts> {
                             child: const CircleAvatar(
                               radius: 50,
                               backgroundImage:
-                                  AssetImage('assets/images/p1.jpg'),
+                              AssetImage('assets/images/p1.jpg'),
                             ),
                           ),
                           Text(
@@ -114,7 +148,7 @@ class _BrowseProductsState extends State<browseProducts> {
                           Text(
                             "myemail.gmail.com",
                             style:
-                                TextStyle(fontSize: 14 * SizeConfig.textRatio),
+                            TextStyle(fontSize: 14 * SizeConfig.textRatio),
                           ),
                         ],
                       ),
@@ -129,24 +163,24 @@ class _BrowseProductsState extends State<browseProducts> {
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton("History", Icons.history_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton(
                           "My posts", Icons.post_add, SizeConfig.iconColor, () {
                         Navigator.pushNamed(context, Profile.id);
                       }),
-                      sideButton("compare Products", Icons.compare_outlined,
+                      sideButton("Compare Products", Icons.compare_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton(
                           "Recommend Gifts",
                           Icons.card_giftcard_outlined,
@@ -161,8 +195,8 @@ class _BrowseProductsState extends State<browseProducts> {
                       }),
                       sideButton("Add Advertisement",
                           Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
+                            Navigator.pushNamed(context, Profile.id);
+                          }),
                       sideButton(
                           "Join as Handcrafter",
                           Icons.shopping_bag_outlined,
@@ -178,7 +212,7 @@ class _BrowseProductsState extends State<browseProducts> {
               left: 10,
               bottom: 10,
               child:
-                  sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+              sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
                 Navigator.pushReplacementNamed(context, logIn.id);
               }),
             ),
@@ -235,7 +269,7 @@ class _BrowseProductsState extends State<browseProducts> {
           SingleChildScrollView(
             child: Column(
               children: [
-                // Search Bar and Filters
+// Search Bar and Filters
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -286,11 +320,11 @@ class _BrowseProductsState extends State<browseProducts> {
                     ),
                   ],
                 ),
-
-                // Category List
-                Consumer<CategoryProvider>(
-                  builder: (context, categoryProvider, child) {
-                    if (categoryProvider.categories.isEmpty) {
+                // Base Category List
+                if (categoryChildren.isEmpty)
+                  Consumer<CategoryProvider>(
+                  builder: (context, catProvider, child) {
+                    if (catProvider.categories.isEmpty) {
                       return Center(child: CircularProgressIndicator());
                     }
                     return Padding(
@@ -299,19 +333,20 @@ class _BrowseProductsState extends State<browseProducts> {
                         height: 43 * SizeConfig.verticalBlock,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: categoryProvider.categories.length,
+                          itemCount: catProvider.categories.length,
                           itemBuilder: (context, index) {
                             bool isSelected = index == selectedIndex;
-                            var category = categoryProvider.categories[index];
+                            var category = catProvider.categories[index];
                             return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  selectedIndex = index;
-                                });
+                                  _handleCategorySelection(category);
                               },
                               child: Row(
                                 children: [
-                                  Customizecategory("${category}", isSelected),
+                                  Customizecategory(
+                                    "${category.name}",
+                                    isSelected,
+                                  ),
                                 ],
                               ),
                             );
@@ -322,46 +357,86 @@ class _BrowseProductsState extends State<browseProducts> {
                   },
                 ),
 
-                // Products Grid
-                Consumer<productProvider>(
-                  builder: (context, productProvider, child) {
-                    if (productProvider.products.isEmpty) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Disable GridView's scrolling
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // Two products per row
-                          crossAxisSpacing: 10.0, // Spacing between columns
-                          mainAxisSpacing: 10.0, // Spacing between rows
-                          childAspectRatio: 0.7, // Adjust based on your design
+                // Category Children List
+                if (categoryChildren.isNotEmpty)
+                  Consumer<CategoryProvider>(
+                    builder: (context, catProvider, child) {
+                      if (catProvider.categoryCildren.isEmpty) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          height: 43 * SizeConfig.verticalBlock,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: catProvider.categoryCildren.length,
+                            itemBuilder: (context, index) {
+                              bool isSelected = selectedChildIndex == index; // Use the correct index for selection
+                              var category = catProvider.categoryCildren[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedChildIndex = 0; // Update selected index
+                                    _handleCategorySelection(category); // Fetch products for selected child category
+                                  });
+                                },
+                                child: Row(
+                                  children: [
+                                    Customizecategory(
+                                      "${category.name}",
+                                      isSelected,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                        itemCount: productProvider.products.length,
-                        itemBuilder: (context, index) {
-                          var product = productProvider.products[index];
-                          // print("compare product in browse: " );
-                          // print(comparedProducts.length);
-                          return customProduct(
-                            product.imageURL,
-                            product.name,
-                            product.category,
-                            product.price,
-                            product.rate,
-                            product.id,
-                            showCompare,
-                            onComparePressed: _handleCompare,
-                            comparedNum: comparedProducts.length,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
+
+                // Show loading indicator instead of products when loading
+                if (isLoading)
+                  Center(child: CircularProgressIndicator())
+                else
+                // Products Grid
+                  Consumer<productProvider>(
+                    builder: (context, prodProvider, child) {
+                      if (prodProvider.products.isEmpty) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(), // Disable GridView's scrolling
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, // Two products per row
+                            crossAxisSpacing: 10.0, // Spacing between columns
+                            mainAxisSpacing: 10.0, // Spacing between rows
+                            childAspectRatio: 0.7, // Adjust based on your design
+                          ),
+                          itemCount: prodProvider.products.length,
+                          itemBuilder: (context, index) {
+                            var product = prodProvider.products[index];
+                            return customProduct(
+                              product.imageURL,
+                              product.name,
+                              product.category,
+                              product.price,
+                              product.rate,
+                              product.id,
+                              showCompare,
+                              onComparePressed: _handleCompare,
+                              comparedNum: comparedProducts.length,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
               ],
             ),
           ),

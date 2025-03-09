@@ -65,7 +65,7 @@ class productService{
     }
   }
 
-  Future<List<productModel>> getAllProducts() async {
+  Future<List<productModel>> getAllProducts(String categoryId) async {
     print("Fetching products from API...");
 
     final request = {
@@ -90,19 +90,53 @@ class productService{
   }
   ''',
     };
+    final requestCategory = {
+      'query': '''
+          query GetAllProducts {
+    getAllProducts(categoryId: "$categoryId") {
+        data {
+            averageRating
+            id
+            imageUrl
+            lowestCustomPrice
+            name
+            category {
+                name
+            }
+            description
+            finalProducts {
+                stockQuantity
+            }
+        }
+    }
+}
+
+      ''',
+    };
 
     try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       print("Token retrieved: $myToken");
-
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $myToken',
-        },
-        body: jsonEncode(request),
-      );
+      final response;
+      if(categoryId == '0') {
+        response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $myToken',
+          },
+          body: jsonEncode(request),
+        );
+      }else{
+        response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $myToken',
+          },
+          body: jsonEncode(requestCategory),
+        );
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -136,6 +170,74 @@ class productService{
       return []; // Return an empty list in case of error
     }
   }
+  // Future<List<productModel>> getAllProductsByCategory(String categoryId) async {
+  //   List<productModel> productsCtegory = [];
+  //
+  //   print("Fetching products category from API...");
+  //
+  //   final request = {
+  //     'query': '''
+  //         query GetAllProducts {
+  //             query GetAllProducts {
+  //                 getAllProducts(
+  //                     categoryId: "$categoryId")
+  //                 {
+  //                     data {
+  //                         averageRating
+  //                         category {
+  //                             name
+  //                         }
+  //                         id
+  //                         imageUrl
+  //                         lowestCustomPrice
+  //                         name
+  //                 }
+  //             }
+  //         }
+  //     ''',
+  //   };
+  //
+  //   try {
+  //     final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+  //     print("Token retrieved: $myToken");
+  //
+  //     final response = await http.post(
+  //       Uri.parse(apiUrl),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $myToken',
+  //       },
+  //       body: jsonEncode(request),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       List<dynamic> prods = data['data']['getAllProducts']['data'];
+  //       print(data);
+  //
+  //       productsCtegory.clear();
+  //
+  //       for (var product in prods) {
+  //         productsCtegory.add(productModel(
+  //           product['id'],
+  //           product['imageUrl'],
+  //           product['name'],
+  //           product['category']['name'],
+  //           product['lowestCustomPrice'].toDouble(),
+  //           product['averageRating'].toDouble(),
+  //         ));
+  //       }
+  //
+  //       print("Products category fetched successfully: $products");
+  //       return productsCtegory;
+  //     } else {
+  //       throw Exception('Failed to load products category: ${response.body}');
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching products category: $e");
+  //     return []; // Return an empty list in case of error
+  //   }
+  // }
 
   Future<List<dynamic>> searchProduct (String word) async{
     List<dynamic> products;
