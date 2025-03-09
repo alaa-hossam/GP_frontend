@@ -104,7 +104,7 @@ class _wishListViewState extends State<wishListView> {
                         },
                         child: Row(
                           children: [
-                            Customizecategory("${category}", isSelected),
+                            Customizecategory("${category.name}", isSelected),
                           ],
                         ),
                       );

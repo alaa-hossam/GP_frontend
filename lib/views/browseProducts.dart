@@ -321,7 +321,6 @@ class _BrowseProductsState extends State<browseProducts> {
                   ],
                 ),
                 // Base Category List
-                if (categoryChildren.isEmpty)
                   Consumer<CategoryProvider>(
                   builder: (context, catProvider, child) {
                     if (catProvider.categories.isEmpty) {
