@@ -7,8 +7,10 @@ import '../views/chatBot.dart';
 
 class BottomBar extends StatefulWidget {
   final int selectedIndex;
+  final bool isVisible;
 
-  BottomBar({this.selectedIndex = 0});
+
+  BottomBar({this.selectedIndex = 0 , required this.isVisible} );
 
   @override
   BottomBarState createState() => BottomBarState();
@@ -31,30 +33,34 @@ class BottomBarState extends State<BottomBar> {
 
     return Consumer<buttonProvider>(
       builder: (context, buttonProvider, child) {
-        return BottomNavigationBar(
-          currentIndex: buttonProvider.selectedIndex,
-          selectedItemColor: SizeConfig.iconColor,
-          unselectedItemColor: SizeConfig.fontColor,
-          iconSize: SizeConfig.textRatio * 24,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          onTap: (index) {
-            buttonProvider.updateIndex(context,index);
-          },
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined),
-              label: '',
-            ),
-          ],
+        return Visibility(
+          visible: widget.isVisible,
+          child: BottomNavigationBar(
+
+            currentIndex: buttonProvider.selectedIndex,
+            selectedItemColor: SizeConfig.iconColor,
+            unselectedItemColor: SizeConfig.fontColor,
+            iconSize: SizeConfig.textRatio * 24,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            onTap: (index) {
+              buttonProvider.updateIndex(context,index);
+            },
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.chat),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.account_circle_outlined),
+                label: '',
+              ),
+            ],
+          ),
         );
       },
     );

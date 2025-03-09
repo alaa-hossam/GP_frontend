@@ -105,7 +105,7 @@ class _ProfileState extends State<Profile> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 1),
+      bottomNavigationBar: BottomBar(selectedIndex: 1 ,isVisible:  true),
     );
   }
 }

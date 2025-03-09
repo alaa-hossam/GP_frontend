@@ -4,10 +4,13 @@ import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
 class productModel{
-  String _imageURL, _name , _category , _id;
+  String _imageURL, _name , _category , _id ;
+  String? description;
   double _price , _rate;
+  int? stock;
   productModel(
-      this._id ,this._imageURL, this._name, this._category, this._price,this._rate);
+      this._id ,this._imageURL, this._name, this._category, this._price,this._rate,
+      {this.description , this.stock});
 
   get rate => _rate;
 
@@ -18,6 +21,7 @@ class productModel{
   get name => _name;
 
   String get imageURL => _imageURL;
+
 
   get id => _id;
 }
@@ -77,6 +81,10 @@ class productService{
                 imageUrl
                 lowestCustomPrice
                 name
+            description
+             finalProducts {
+                stockQuantity
+            }
             }
         }
   }
@@ -113,6 +121,8 @@ class productService{
             // Convert to double to avoid type errors
             product['lowestCustomPrice'].toDouble(),
             product['averageRating'].toDouble(),
+            description: product['description'],
+            stock: product['stockQuantity'],
           ));
         }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
-import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';

@@ -1,40 +1,61 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
+import '../Models/ProductModel.dart';
 import '../SqfliteCodes/wishList.dart';
 import 'Dimensions.dart';
 
 class customProduct extends StatefulWidget {
   String imageURL, Name, Category, id;
-  double Price, rate ;
+  double Price, rate;
+  bool showCompare;
+  int? comparedNum;
+  final Function(productModel)? onComparePressed;
 
-  customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id);
+  customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate,
+      this.id, this.showCompare,
+      {this.onComparePressed, this.comparedNum});
 
   @override
   State<customProduct> createState() => _customProductState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id );
+      this.imageURL,
+      this.Name,
+      this.Category,
+      this.Price,
+      this.rate,
+      this.id,
+      this.showCompare,
+      onComparePressed: this.onComparePressed,
+      comparNum: this.comparedNum);
 }
 
 class _customProductState extends State<customProduct> {
   String imageURL, Name, Category, id;
   double Price, rate;
   wishList wishListObj = wishList();
+  bool showCompare;
+  int? comparNum;
+  final Function(productModel)? onComparePressed;
+  bool isTapped = true;
 
-  _customProductState(
-      this.imageURL, this.Name, this.Category, this.Price, this.rate, this.id );
+  _customProductState(this.imageURL, this.Name, this.Category, this.Price,
+      this.rate, this.id, this.showCompare,
+      {this.onComparePressed, this.comparNum});
+
+
 
   toggleFavourite(String color) {
-wishListObj.isWishlistTableEmpty;
+    wishListObj.isWishlistTableEmpty;
     setState(() {
       if (color == "${SizeConfig.fontColor}") {
-        wishListObj.addProduct(
-            '''
+        wishListObj.addProduct('''
             INSERT INTO WISHLIST(ID) 
             VALUES (
                 "$id"
              
             )
 ''');
-      }else{
+      } else {
         wishListObj.deleteProduct('''
       DELETE FROM wishList 
       WHERE ID = '$id'
@@ -42,12 +63,46 @@ wishListObj.isWishlistTableEmpty;
       }
     });
     // wishListObj.recreateWishListTable();
+  }
 
+  Tapping() {
+
+    if (widget.comparedNum == 2 && isTapped) {
+      print("iam in");
+
+      if (widget.onComparePressed != null) {
+
+        productModel product = productModel(
+          widget.id,
+          widget.imageURL,
+          widget.Name,
+          widget.Category,
+          widget.Price,
+          widget.rate,
+        );
+        widget.onComparePressed!(product);
+      }
+    } else {
+      setState(() {
+        isTapped = !isTapped;
+      });
+      if (widget.onComparePressed != null) {
+        productModel product = productModel(
+          widget.id,
+          widget.imageURL,
+          widget.Name,
+          widget.Category,
+          widget.Price,
+          widget.rate,
+        );
+        widget.onComparePressed!(product);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // wishListObj.recreateWishListTable();
+
     return Container(
       padding: EdgeInsets.all(5),
       width: 170 * SizeConfig.horizontalBlock,
@@ -79,12 +134,14 @@ wishListObj.isWishlistTableEmpty;
                     radius: 15 * SizeConfig.verticalBlock,
                     backgroundColor: Colors.white,
                     child: FutureBuilder<bool>(
-                      future: wishListObj.doesIdExist(id), // Call the async function
+                      future: wishListObj
+                          .doesIdExist(id), // Call the async function
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          // Show a loading indicator while waiting for the result
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
+                        // if (snapshot.connectionState == ConnectionState.waiting) {
+                        //   // Show a loading indicator while waiting for the result
+                        //   return CircularProgressIndicator();
+                        // } else
+                        if (snapshot.hasError) {
                           // Handle errors
                           return Icon(
                             Icons.favorite,
@@ -102,13 +159,35 @@ wishListObj.isWishlistTableEmpty;
                               color: exists ? Colors.red : SizeConfig.fontColor,
                             ),
                             onPressed: () {
-                              toggleFavourite(exists ? "red" : "${SizeConfig.fontColor}",);
+                              toggleFavourite(
+                                exists ? "red" : "${SizeConfig.fontColor}",
+                              );
                             },
                           );
                         }
                       },
                     )),
               ),
+              if (widget.showCompare)
+                Positioned(
+                    bottom: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      child: Container(
+                        width: 75 * SizeConfig.horizontalBlock,
+                        height: 32 * SizeConfig.verticalBlock,
+                        decoration: BoxDecoration(
+                            color: !isTapped
+                                ? SizeConfig.iconColor
+                                : Color(0x50E9E9E9),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Center(child: Text("Compare")),
+                      ),
+                      onTap: () {
+                        Tapping();
+                      },
+                    ))
             ],
           ),
           Row(

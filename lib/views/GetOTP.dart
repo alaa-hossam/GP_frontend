@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/logInView.dart';
@@ -268,7 +269,8 @@ class _GetotpState extends State<Getotp> {
                             });
 
                             if (response == "User verified successfully") {
-
+                              wishList wish = wishList();
+                              wish.initialDB();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("User verified successfully")),
                               );

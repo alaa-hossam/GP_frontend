@@ -1,11 +1,13 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/chatBot.dart';
+import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
@@ -65,6 +67,7 @@ class MyApp extends StatelessWidget {
         browseProducts.id:(BuildContext context) => browseProducts(),
         searchView.id:(BuildContext context) => searchView(),
         wishListView.id:(BuildContext context) => wishListView(),
+        compareScreen.id:(BuildContext context) => compareScreen(),
       },
     );
   }

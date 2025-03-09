@@ -432,6 +432,7 @@ class _HomeState extends State<Home> {
                                       product.price,
                                       product.rate,
                                       product.id,
+                                      false
                                     ),
                                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                                   ],
@@ -498,7 +499,8 @@ class _HomeState extends State<Home> {
                               product.category,
                               product.price,
                               product.rate,
-                              product.id),
+                              product.id,
+                          false),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock)
                         ],
                       );
@@ -510,7 +512,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0),
+      bottomNavigationBar: BottomBar(selectedIndex: 0 , isVisible: true),
     );
   }
 }
