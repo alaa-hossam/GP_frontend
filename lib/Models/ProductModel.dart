@@ -5,12 +5,13 @@ import '../SqfliteCodes/Token.dart';
 
 class productModel{
   String _imageURL, _name , _category , _id ;
-  String? description;
+  String? description , handcrafterName;
   double _price , _rate;
   int? stock;
+  double? ratingCount;
   productModel(
       this._id ,this._imageURL, this._name, this._category, this._price,this._rate,
-      {this.description , this.stock});
+      {this.description , this.stock , this.handcrafterName , this.ratingCount});
 
   get rate => _rate;
 
@@ -362,5 +363,88 @@ class productService{
       return products;
     }
   }
+
+
+  Future<productModel> getProductDetails(String productID , viewerID) async {
+    productModel product ;
+
+const productID = "04395c12-3327-4c02-baeb-e071be4a5a54";
+const viewerID = "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e";
+
+    const String query = '''
+    query GetProduct {
+    getProduct(
+        productId: "${productID}"
+        viewerId: "${viewerID}"
+    ) {
+        description
+        imageUrl
+        name
+        ratingCount
+        averageRating
+        lowestCustomPrice
+        variations {
+            variationType
+            variationValue
+            product {
+                imageUrl
+                lowestCustomPrice
+            }
+        }
+    }
+}
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'productId': productID,
+        'viewerId': viewerID,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        product = data['data']['getProduct'];
+        print(product);
+
+        // Step 7: Map the response to productModel objects
+        // for (var product in prods) {
+        //   products.add(productModel(
+        //     product['id'],
+        //     product['imageUrl'],
+        //     product['name'],
+        //     product['category']['name'],
+        //     product['lowestCustomPrice'],
+        //     product['averageRating'],
+        //   ));
+        // }
+
+        print("Products fetched successfully: $product");
+        return product;
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return productModel("","", "", "", 0, 0);
+    }
+  }
+
+
 
 }
