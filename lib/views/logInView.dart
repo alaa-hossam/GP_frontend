@@ -35,6 +35,9 @@ class _logInState extends State<logIn> {
   Future<String> logInCustomer() async {
     try {
 
+      token.initialDB();
+      wish.initialDB();
+
       return await cvm.logIn(
           email: email.text,
           password: password.text

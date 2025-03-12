@@ -270,9 +270,9 @@ class _productDetailsState extends State<productDetails> {
                                         onPressed: () {
                                           Navigator.pushNamed(context, Productreviews.id);
                                         },
-                                        icon: Icon(
-                                          Icons.chat, // Wrap Icons.chat in an Icon widget
-                                          color: SizeConfig.iconColor, // Set the icon color
+                                        icon:const Icon(
+                                          Icons.chat,
+                                          color: SizeConfig.iconColor,
                                         ),
                                       ),
                                       SizedBox(width: 5 * SizeConfig.verticalBlock),
@@ -338,7 +338,7 @@ class _productDetailsState extends State<productDetails> {
                         //                               .toList()[index];
                         //                           final variationValue = variation['variationValue'];
                         //                           final isSelected = selectedVariations[variationType] == variationValue;
-                        //
+
                         //                           return GestureDetector(
                         //                             onTap: () {
                         //                               print('Variation selected: $variationValue');
@@ -431,7 +431,7 @@ class _productDetailsState extends State<productDetails> {
                         //     ],
                         //   ),
                         SizedBox(height: 10 * SizeConfig.verticalBlock,),
-                        Text('${myProduct.variations}'),
+                        // Text('${myProduct.variations}'),
                         variationScreen(myProduct.variations, myProduct.finalProducts)
                       ],
                     ),

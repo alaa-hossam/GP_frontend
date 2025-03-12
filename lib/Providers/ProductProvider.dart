@@ -10,8 +10,7 @@ class productProvider extends ChangeNotifier {
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
-  Map<String, dynamic> _selectedVariations = {};
-  Map<String, dynamic> get selectedVariations => _selectedVariations;
+
 
 
   productProvider() {
@@ -68,8 +67,8 @@ class productProvider extends ChangeNotifier {
   }
 
 
-  void selectVariation(String variationType, dynamic variationValue) {
-  _selectedVariations[variationType] = variationValue;
-  notifyListeners();
-  }
+
+
+
+
 }

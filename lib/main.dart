@@ -17,6 +17,7 @@ import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
+import 'Providers/detailsProvider.dart';
 import 'SqfliteCodes/wishList.dart';
 import 'firebase_options.dart';
 import 'views/signUpView.dart';
@@ -34,6 +35,7 @@ void main() async{
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
           ChangeNotifierProvider(create: (_) => buttonProvider()),
           ChangeNotifierProvider(create: (_) => productProvider()),
+          ChangeNotifierProvider(create: (_) => detailsProvider()),
         ],
         child: DevicePreview(
           builder: (context) => MyApp(),
