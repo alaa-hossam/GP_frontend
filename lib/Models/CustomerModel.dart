@@ -238,7 +238,8 @@ class customerServices {
         String updateQuery = '''
                                 UPDATE TOKENS
                                 SET TOKEN = "$accessToken", 
-                                 EXPIRED = "$expireAt"
+                                 EXPIRED = "$expireAt",
+                                 UUID = "$UUID"
                         
                        ''';
 

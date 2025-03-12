@@ -6,41 +6,43 @@ import '../SqfliteCodes/wishList.dart';
 import 'Dimensions.dart';
 
 class customProduct extends StatefulWidget {
-  String imageURL, Name, Category, id;
+  String imageURL, Name, id;
   double Price, rate;
   bool showCompare;
   int? comparedNum;
+  String? Category;
   final Function(productModel)? onComparePressed;
 
-  customProduct(this.imageURL, this.Name, this.Category, this.Price, this.rate,
+  customProduct(this.imageURL, this.Name, this.Price, this.rate,
       this.id, this.showCompare,
-      {this.onComparePressed, this.comparedNum});
+      {this.onComparePressed, this.comparedNum , this.Category});
 
   @override
   State<customProduct> createState() => _customProductState(
       this.imageURL,
       this.Name,
-      this.Category,
       this.Price,
       this.rate,
       this.id,
       this.showCompare,
       onComparePressed: this.onComparePressed,
-      comparNum: this.comparedNum);
+      comparNum: this.comparedNum,
+  Category:this.Category,);
 }
 
 class _customProductState extends State<customProduct> {
-  String imageURL, Name, Category, id;
+  String imageURL, Name, id;
   double Price, rate;
   wishList wishListObj = wishList();
   bool showCompare;
   int? comparNum;
+  String? Category;
   final Function(productModel)? onComparePressed;
   bool isTapped = true;
 
-  _customProductState(this.imageURL, this.Name, this.Category, this.Price,
+  _customProductState(this.imageURL, this.Name, this.Price,
       this.rate, this.id, this.showCompare,
-      {this.onComparePressed, this.comparNum});
+      {this.onComparePressed, this.comparNum , this.Category});
 
 
 
@@ -76,7 +78,7 @@ class _customProductState extends State<customProduct> {
           widget.id,
           widget.imageURL,
           widget.Name,
-          widget.Category,
+          category: widget.Category,
           widget.Price,
           widget.rate,
         );
@@ -91,7 +93,7 @@ class _customProductState extends State<customProduct> {
           widget.id,
           widget.imageURL,
           widget.Name,
-          widget.Category,
+          category:widget.Category,
           widget.Price,
           widget.rate,
         );
@@ -218,7 +220,7 @@ class _customProductState extends State<customProduct> {
             ],
           ),
           Text(
-            Category,
+            Category?.isNotEmpty == true ? Category! : "No Category",
             style: TextStyle(fontSize: 11 * SizeConfig.textRatio),
           ),
           Row(

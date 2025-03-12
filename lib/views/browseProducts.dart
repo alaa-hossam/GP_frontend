@@ -423,7 +423,7 @@ class _BrowseProductsState extends State<browseProducts> {
                             return customProduct(
                               product.imageURL,
                               product.name,
-                              product.category,
+                              Category:product.category,
                               product.price,
                               product.rate,
                               product.id,

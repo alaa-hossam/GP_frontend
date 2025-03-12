@@ -1,34 +1,38 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
-class productModel{
-  String _imageURL, _name , _category , _id ;
-  String? description , handcrafterName;
-  double _price , _rate;
-  int? stock;
-  double? ratingCount;
-  productModel(
-      this._id ,this._imageURL, this._name, this._category, this._price,this._rate,
-      {this.description , this.stock , this.handcrafterName , this.ratingCount});
+class productModel {
+  String _imageURL, _name, _id;
+  String? description, handcrafterName, category;
+  double _price, _rate;
+  int? stock, ratingCount;
+  List<dynamic>? finalProducts, variations;
+  productModel(this._id, this._imageURL, this._name, this._price, this._rate,
+      {this.description,
+      this.stock,
+      this.handcrafterName,
+      this.ratingCount,
+      this.category,
+      this.finalProducts,
+      this.variations,});
 
   get rate => _rate;
 
   get price => _price;
 
-  get category => _category;
-
   get name => _name;
 
   String get imageURL => _imageURL;
 
-
   get id => _id;
 }
 
-class productService{
-  final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
+class productService {
+  final String apiUrl =
+      "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
   wishList wish = wishList();
   List<productModel> products = [];
@@ -56,13 +60,10 @@ class productService{
         return "User added successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
-
       }
-
     } catch (e) {
       print("Exception: $e");
       return e.toString();
-
     }
   }
 
@@ -119,7 +120,7 @@ class productService{
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       print("Token retrieved: $myToken");
       final response;
-      if(categoryId == '0') {
+      if (categoryId == '0') {
         response = await http.post(
           Uri.parse(apiUrl),
           headers: {
@@ -128,7 +129,7 @@ class productService{
           },
           body: jsonEncode(request),
         );
-      }else{
+      } else {
         response = await http.post(
           Uri.parse(apiUrl),
           headers: {
@@ -152,7 +153,7 @@ class productService{
             product['id'],
             product['imageUrl'],
             product['name'],
-            product['category']['name'],
+            category: product['category']['name'],
             // Convert to double to avoid type errors
             product['lowestCustomPrice'].toDouble(),
             product['averageRating'].toDouble(),
@@ -240,7 +241,7 @@ class productService{
   //   }
   // }
 
-  Future<List<dynamic>> searchProduct (String word) async{
+  Future<List<dynamic>> searchProduct(String word) async {
     List<dynamic> products;
     print("before");
     final request = {
@@ -260,7 +261,6 @@ class productService{
     print("after");
 
     try {
-
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -276,7 +276,7 @@ class productService{
         print("products inside the api");
 
         final data = jsonDecode(response.body);
-         products = data['data']['getAllProducts']['data'];
+        products = data['data']['getAllProducts']['data'];
         print(data);
         return products;
       } else {
@@ -286,11 +286,11 @@ class productService{
       print("Error fetching products: $e");
       return [];
     }
-}
-
+  }
 
   Future<List<dynamic>> getWishProducts() async {
-    List<String> ids = await wish.getProduct("SELECT * FROM WISHLIST").then((result) {
+    List<String> ids =
+        await wish.getProduct("SELECT * FROM WISHLIST").then((result) {
       return result.map<String>((row) => row['ID'].toString()).toList();
     });
 
@@ -364,42 +364,48 @@ class productService{
     }
   }
 
+  Future<productModel> getProductDetails(String productId) async {
+    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
 
-  Future<productModel> getProductDetails(String productID , viewerID) async {
-    productModel product ;
-
-const productID = "04395c12-3327-4c02-baeb-e071be4a5a54";
-const viewerID = "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e";
-
-    const String query = '''
+    String query = '''
     query GetProduct {
     getProduct(
-        productId: "${productID}"
-        viewerId: "${viewerID}"
+        productId:  "${productId}"
+        viewerId:  "${viewerId}"
     ) {
         description
         imageUrl
         name
         ratingCount
         averageRating
-        lowestCustomPrice
+        id
         variations {
             variationType
             variationValue
-            product {
-                imageUrl
-                lowestCustomPrice
+            sizeUnit
+        }
+        finalProducts {
+            imageUrl
+            isCustomMade
+            duration
+            customPrice
+            stockQuantity
+            finalProductVariation {
+                id
             }
         }
+        
+        
     }
 }
+
   ''';
 
     final request = {
       'query': query,
       'variables': {
-        'productId': productID,
-        'viewerId': viewerID,
+        'productId': productId,
+        'viewerId': viewerId,
       },
     };
 
@@ -415,36 +421,69 @@ const viewerID = "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e";
         body: jsonEncode(request),
       );
 
-      print(response.body);
-
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        product = data['data']['getProduct'];
-        print(product);
+        final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Step 7: Map the response to productModel objects
-        // for (var product in prods) {
-        //   products.add(productModel(
-        //     product['id'],
-        //     product['imageUrl'],
-        //     product['name'],
-        //     product['category']['name'],
-        //     product['lowestCustomPrice'],
-        //     product['averageRating'],
-        //   ));
-        // }
+        // Access getProduct safely
+        final Map<String, dynamic>? getProduct = data['data']?['getProduct'];
+        if (getProduct != null) {
+          // Access fields in getProduct
+          final String name = getProduct['name'] ?? 'No Name';
+          final String description =
+              getProduct['description'] ?? 'No Description';
+          final String imageUrl =
+              getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
+          final double averageRating =
+              getProduct['averageRating']?.toDouble() ?? 0.0;
+          final double lowestCustomPrice =
+              getProduct['lowestCustomPrice']?.toDouble() ?? 0.0;
+          final int ratingCount = getProduct['ratingCount'] ?? 0;
 
-        print("Products fetched successfully: $product");
-        return product;
+          final String id = getProduct['id'] ?? 'No ID';
+
+          // Access variations
+          final List<dynamic>? variations = getProduct['variations'];
+          print("before variations" + '${variations}');
+
+          if (variations != null && variations.isNotEmpty) {
+            for (final variation in variations) {
+              final String variationType =
+                  variation['variationType'] ?? 'No Type';
+              final String variationValue =
+                  variation['variationValue'] ?? 'No Value';
+              final String sizeUnit = variation['sizeUnit'] ?? 'No Unit';
+            }
+          } else {
+            print('No variations available');
+          }
+
+          // Access finalProducts
+          final List<dynamic> finalProducts = getProduct['finalProducts'];
+
+          productModel myProduct = productModel(
+            id,
+            imageUrl,
+            name,
+            finalProducts: finalProducts,
+            lowestCustomPrice,
+            averageRating,
+            ratingCount: ratingCount,
+            description: description,
+            variations: variations
+          );
+          return myProduct;
+        } else {
+          print('getProduct is null');
+          return productModel(" ", " ", " ", 0, 0);
+        }
       } else {
-        throw Exception('Failed to load products: ${response.body}');
+        print('Failed to load product: ${response.statusCode}');
+
+        return productModel(" ", " ", " ", 0, 0);
       }
     } catch (e) {
-      print("Error fetching products: $e");
-      return productModel("","", "", "", 0, 0);
+      print('Error fetching product: $e');
+      return productModel(" ", " ", " ", 0, 0);
     }
   }
-
-
-
 }

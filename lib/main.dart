@@ -10,6 +10,7 @@ import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
+import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
         searchView.id:(BuildContext context) => searchView(),
         wishListView.id:(BuildContext context) => wishListView(),
         compareScreen.id:(BuildContext context) => compareScreen(),
+        productDetails.id:(BuildContext context) => productDetails(),
       },
     );
   }

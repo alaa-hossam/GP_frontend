@@ -2,20 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/views/productDetails.dart';
 
 import 'Dimensions.dart';
 
 class compareColumn extends StatelessWidget {
-  String id, imageUrl, name, category;
+  String id, imageUrl, name;
   double price, rate;
+  String? category;
 
   compareColumn(
-      this.id, this.imageUrl, this.name, this.category, this.price, this.rate);
+      this.id, this.imageUrl, this.name, this.price, this.rate , {this.category});
 
   @override
   Widget build(BuildContext context) {
     productModel product =
-        productModel(id, imageUrl, name, category, price, rate);
+        productModel(id, imageUrl, name,category:  category, price, rate);
 
     return Stack(
       children: [
@@ -195,6 +197,7 @@ class compareColumn extends StatelessWidget {
               ),
             ),
             onTap: () {
+              Navigator.pushNamed(context,productDetails.id , arguments: product.id);
             },
           ),
         )

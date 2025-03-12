@@ -9,18 +9,19 @@ class productProvider extends ChangeNotifier {
   List<productModel> get products => _products;
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
+  productModel productDetails = productModel("","", "",0,0);
 
   productProvider() {
     print("ProductProvider initialized");
   }
 
   Future<void> fetchProducts(String categoryId) async {
-    print("Fetching products...");
-    print("///////////////////IDddddddd///////////////////////");
-    print(categoryId);
+    // print("Fetching products...");
+    // print("///////////////////IDddddddd///////////////////////");
+    // print(categoryId);
     await productVM.fetchProducts(categoryId);
     _products = productVM.products.map((product) => product).toList();
-    print("Products fetched: $_products");
+    // print("Products fetched: $_products");
     notifyListeners();
   }
   // Future<void> fetchProductsCategory(String categoryId) async {
@@ -55,5 +56,11 @@ class productProvider extends ChangeNotifier {
     wishListProducts.removeWhere((product) => product.id == id);
     // Notify listeners to rebuild the UI
     notifyListeners();
+  }
+
+  Future<productModel> getProductDetails(String productId)async{
+    print("in get product details provider");
+    productDetails =await productVM.productDetails(productId);
+    return productDetails;
   }
 }

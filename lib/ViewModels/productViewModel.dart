@@ -39,7 +39,7 @@ class productViewModel  extends ChangeNotifier{
 
   }
 
-  productDetails(String productId , String viewerId){
-    return apiServices.getProductDetails(productId, viewerId)
+  productDetails(String productId){
+    return apiServices.getProductDetails(productId);
   }
 }
