@@ -70,6 +70,6 @@ class productProvider extends ChangeNotifier {
 
   void selectVariation(String variationType, dynamic variationValue) {
   _selectedVariations[variationType] = variationValue;
-  notifyListeners(); // Notify listeners to rebuild dependent widgets
+  notifyListeners();
   }
 }

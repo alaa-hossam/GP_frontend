@@ -22,7 +22,7 @@ class _productDetailsState extends State<productDetails> {
   wishList wishListObj = wishList();
   bool isExpanded = false;
   int maxLength = 50;
-  List<dynamic> remainingVariations = [];
+  List<dynamic> remainingVariations = [] ,remainingFinalProducts = [];
   Map<String, dynamic> selectedVariations = {}; // Track selected variations
 
 
@@ -55,6 +55,22 @@ class _productDetailsState extends State<productDetails> {
   }
 
 
+  List<dynamic> getRemainingFinalProducts(productModel myProduct, Map<String, dynamic> selectedVariations) {
+    print("remaining final");
+    print(myProduct.finalProducts);
+    print(selectedVariations);
+    if (selectedVariations.isEmpty) {
+      return myProduct.finalProducts ?? [];
+    }
+    return myProduct.finalProducts?.where((finalProduct) {
+      return selectedVariations.entries.every((entry) {
+        final variationType = entry.key;
+        final selectedValue = entry.value;
+        return finalProduct[variationType] == selectedValue;
+      });
+    }).toList() ?? [];
+  }
+
 
 
   void onVariationSelected(String variationType, dynamic variationValue) {
@@ -65,8 +81,11 @@ class _productDetailsState extends State<productDetails> {
 
   // Function to filter final products based on selected variations
   List<dynamic> getFilteredFinalProducts(productModel myProduct) {
+    print("selected variations");
+    print(selectedVariations);
     if (selectedVariations.isEmpty) {
       return myProduct.finalProducts ?? [];
+
     }
 
     return myProduct.finalProducts?.where((finalProduct) {
@@ -77,7 +96,9 @@ class _productDetailsState extends State<productDetails> {
           });
         }).toList() ??
         [];
+
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +117,7 @@ class _productDetailsState extends State<productDetails> {
                 return Center(child: Text("Error loading product details"));
               } else {
                 productModel myProduct = productDetails.productDetails;
-                final filteredFinalProducts =
-                    getFilteredFinalProducts(myProduct);
+                final remainingFinalProducts = getRemainingFinalProducts(myProduct, selectedVariations);
 
                 return ListView(
                   children: [
@@ -105,8 +125,7 @@ class _productDetailsState extends State<productDetails> {
                     Column(
                       children: [
                         Padding(
-                          padding:
-                              EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                          padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                           child: Stack(
                             children: [
                               Container(
@@ -114,13 +133,11 @@ class _productDetailsState extends State<productDetails> {
                                 width: 361 * SizeConfig.horizontalBlock,
                                 decoration: BoxDecoration(
                                   color: SizeConfig.iconColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
                                 ),
                                 child: Center(
                                   child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15)),
+                                    borderRadius: BorderRadius.all(Radius.circular(15)),
                                     child: Image.network(
                                       myProduct.imageURL,
                                       width: 359 * SizeConfig.horizontalBlock,
@@ -144,15 +161,11 @@ class _productDetailsState extends State<productDetails> {
                                         icon: Icon(
                                           Icons.favorite,
                                           size: 25 * SizeConfig.textRatio,
-                                          color: exists
-                                              ? Colors.red
-                                              : SizeConfig.fontColor,
+                                          color: exists ? Colors.red : SizeConfig.fontColor,
                                         ),
                                         onPressed: () {
                                           toggleFavourite(
-                                            exists
-                                                ? "red"
-                                                : "${SizeConfig.fontColor}",
+                                            exists ? "red" : "${SizeConfig.fontColor}",
                                             myProduct.id,
                                           );
                                         },
@@ -186,38 +199,30 @@ class _productDetailsState extends State<productDetails> {
 
                         // Product Details Section
                         Padding(
-                          padding:
-                              EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                          padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                           child: Container(
-                            width:
-                                361 * SizeConfig.horizontalBlock, // Fixed width
+                            width: 361 * SizeConfig.horizontalBlock, // Fixed width
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(10 * SizeConfig.textRatio)),
+                              borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
                               color: Color(0X50E9E9E9),
                               border: Border.all(color: SizeConfig.iconColor),
                             ),
                             child: Padding(
-                              padding:
-                                  EdgeInsets.all(10.0 * SizeConfig.textRatio),
+                              padding: EdgeInsets.all(10.0 * SizeConfig.textRatio),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Row(
                                         children: [
                                           Icon(Icons.person_outline),
-                                          SizedBox(
-                                              width: 5 *
-                                                  SizeConfig.horizontalBlock),
+                                          SizedBox(width: 5 * SizeConfig.horizontalBlock),
                                           Text(
                                             '${myProduct.handcrafterName}',
                                             style: GoogleFonts.roboto(
-                                              fontSize:
-                                                  12 * SizeConfig.textRatio,
+                                              fontSize: 12 * SizeConfig.textRatio,
                                               color: Color(0x703C3C3C),
                                             ),
                                           ),
@@ -230,16 +235,13 @@ class _productDetailsState extends State<productDetails> {
                                             color: Color(0xFFD4931C),
                                             size: 21 * SizeConfig.textRatio,
                                           ),
-                                          SizedBox(
-                                              width: 5 *
-                                                  SizeConfig.horizontalBlock),
+                                          SizedBox(width: 5 * SizeConfig.horizontalBlock),
                                           Text("${myProduct.rate}"),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
-                                      height: 10 * SizeConfig.verticalBlock),
+                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
                                   Text(
                                     "${myProduct.name}",
                                     style: GoogleFonts.rubik(
@@ -248,8 +250,7 @@ class _productDetailsState extends State<productDetails> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(
-                                      height: 10 * SizeConfig.verticalBlock),
+                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
                                   Text(
                                     '${myProduct.description}',
                                     style: GoogleFonts.roboto(
@@ -258,8 +259,7 @@ class _productDetailsState extends State<productDetails> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(
-                                      height: 10 * SizeConfig.verticalBlock),
+                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -267,8 +267,7 @@ class _productDetailsState extends State<productDetails> {
                                         Icons.chat,
                                         color: SizeConfig.iconColor,
                                       ),
-                                      SizedBox(
-                                          width: 5 * SizeConfig.verticalBlock),
+                                      SizedBox(width: 5 * SizeConfig.verticalBlock),
                                       Text(
                                         '${myProduct.ratingCount} Reviews',
                                         style: GoogleFonts.roboto(
@@ -285,22 +284,19 @@ class _productDetailsState extends State<productDetails> {
                         ),
                         SizedBox(height: 10 * SizeConfig.verticalBlock),
 
+                        // Variations Section
                         if (myProduct.variations != null)
                           Column(
-
                             children: [
                               Container(
                                 width: 361 * SizeConfig.horizontalBlock, // Fixed width
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10 * SizeConfig.textRatio),
-                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
                                   color: Color(0X50E9E9E9),
                                   border: Border.all(color: SizeConfig.iconColor),
                                 ),
-                                child:
-                                Padding(
-                                  padding:  EdgeInsets.all(15.0 * SizeConfig.verticalBlock),
+                                child: Padding(
+                                  padding: EdgeInsets.all(15.0 * SizeConfig.verticalBlock),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -332,8 +328,11 @@ class _productDetailsState extends State<productDetails> {
                                                       .where((v) => v['variationType'] == variationType)
                                                       .toList()[index];
                                                   final variationValue = variation['variationValue'];
+                                                  final isSelected = selectedVariations[variationType] == variationValue;
+
                                                   return GestureDetector(
                                                     onTap: () {
+                                                      print('Variation selected: $variationValue');
                                                       onVariationSelected(
                                                         variation['variationType'],
                                                         variationValue,
@@ -351,11 +350,9 @@ class _productDetailsState extends State<productDetails> {
                                                         borderRadius: BorderRadius.all(
                                                           Radius.circular(10 * SizeConfig.textRatio),
                                                         ),
-                                                        color: selectedVariations[variationType] ==
-                                                            variationValue
-                                                            ? Colors.blue // Highlight selected variation
-                                                            : Color(0X50E9E9E9),
+                                                        color: Color(0X50E9E9E9),
                                                         border: Border.all(
+                                                          width: isSelected ? 4 : 1, // Thicker border if selected
                                                           color: SizeConfig.iconColor,
                                                         ),
                                                       ),
@@ -384,20 +381,16 @@ class _productDetailsState extends State<productDetails> {
                             ],
                           ),
 
-
-                        if (myProduct.finalProducts != null)
+                        // Remaining Final Products Section
+                        if (remainingFinalProducts.isNotEmpty)
                           Column(
                             children: [
                               Container(
-                                width: 361 *
-                                    SizeConfig.horizontalBlock, // Fixed width
+                                width: 361 * SizeConfig.horizontalBlock, // Fixed width
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10 * SizeConfig.textRatio),
-                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
                                   color: Color(0X50E9E9E9),
-                                  border:
-                                      Border.all(color: SizeConfig.iconColor),
+                                  border: Border.all(color: SizeConfig.iconColor),
                                 ),
                                 child: SizedBox(
                                   height: 100,
@@ -405,26 +398,18 @@ class _productDetailsState extends State<productDetails> {
                                     scrollDirection: Axis.horizontal,
                                     shrinkWrap: true,
                                     physics: ClampingScrollPhysics(),
-                                    itemCount: myProduct.finalProducts?.length ??0,
+                                    itemCount: remainingFinalProducts.length,
                                     itemBuilder: (context, index) {
-
                                       return Padding(
-                                        padding: EdgeInsets.all(
-                                            8.0 * SizeConfig.horizontalBlock),
+                                        padding: EdgeInsets.all(8.0 * SizeConfig.horizontalBlock),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15)),
+                                          borderRadius: BorderRadius.all(Radius.circular(15)),
                                           child: SizedBox(
-                                            width: 80 *
-                                                SizeConfig
-                                                    .horizontalBlock, // Constrain image width
-                                            height: 80 *
-                                                SizeConfig
-                                                    .verticalBlock, // Constrain image height
+                                            width: 80 * SizeConfig.horizontalBlock, // Constrain image width
+                                            height: 80 * SizeConfig.verticalBlock, // Constrain image height
                                             child: Image.network(
-                                              myProduct.finalProducts?[index]['imageUrl'],
-                                              fit: BoxFit
-                                                  .cover, // Use BoxFit.cover to maintain aspect ratio
+                                              remainingFinalProducts[index]['imageUrl'],
+                                              fit: BoxFit.cover, // Use BoxFit.cover to maintain aspect ratio
                                             ),
                                           ),
                                         ),
@@ -435,7 +420,7 @@ class _productDetailsState extends State<productDetails> {
                               ),
                               SizedBox(height: 10 * SizeConfig.verticalBlock),
                             ],
-                          )
+                          ),
                       ],
                     ),
                   ],
