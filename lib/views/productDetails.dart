@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
+import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/variationsDetails.dart';
 import 'package:provider/provider.dart';
 
@@ -265,11 +266,17 @@ class _productDetailsState extends State<productDetails> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Icon(
-                                        Icons.chat,
-                                        color: SizeConfig.iconColor,
+                                      IconButton(
+                                        onPressed: () {
+                                          Navigator.pushNamed(context, Productreviews.id);
+                                        },
+                                        icon: Icon(
+                                          Icons.chat, // Wrap Icons.chat in an Icon widget
+                                          color: SizeConfig.iconColor, // Set the icon color
+                                        ),
                                       ),
                                       SizedBox(width: 5 * SizeConfig.verticalBlock),
+
                                       Text(
                                         '${myProduct.ratingCount} Reviews',
                                         style: GoogleFonts.roboto(

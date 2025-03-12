@@ -423,6 +423,8 @@ class productService {
             handcrafterName: handcrafterName,
             reviews: reviews
           );
+
+
           return myProduct;
         } else {
           print('getProduct is null');
