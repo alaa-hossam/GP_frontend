@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
         compareScreen.id:(BuildContext context) => compareScreen(),
         productDetails.id:(BuildContext context) => productDetails(),
         Productreviews.id:(BuildContext context) => Productreviews(),
+        HandcrafterRequest.id:(BuildContext context) => HandcrafterRequest(),
       },
     );
   }

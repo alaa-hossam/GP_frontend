@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
@@ -183,7 +184,7 @@ class _HomeState extends State<Home> {
                           "Join as Handcrafter",
                           Icons.shopping_bag_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, HandcrafterRequest.id);
                       }),
                     ],
                   ),
