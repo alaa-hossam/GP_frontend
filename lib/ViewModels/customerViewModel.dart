@@ -9,44 +9,12 @@ class customerViewModel {
   Future<String> addUser({required birthDate,required email,required gender,required name,
     required password,required phone,required username})async{
 
-    CustomerModel customer = CustomerModel(name, username, password, email, phone, gender, birthDate);
+    CustomerModel customer = CustomerModel(name: name, userName: username, password: password, email: email,phone:phone, gender: gender, birthDate: birthDate);
     return customerProcesses.addCustomer(customer);
   }
 
-  Future fetchUser(String id) async {
-    final request = {
-      'query': '''
-        query {
-          user(id: "$id") {
-            birthDate
-            createdAt
-            email
-            gender
-            id
-            isActive
-            username
-          }
-        }
-      '''
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(request),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
+  Future<CustomerModel?> fetchUser(String id) async {
+    return customerProcesses.getUser(id);
   }
 
   Future<String> verifyCustomer(String code , String email){

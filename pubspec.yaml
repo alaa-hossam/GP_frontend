@@ -40,6 +40,7 @@ dependencies:
   graphql_flutter: ^5.0.0
   google_fonts: ^4.0.3
   firebase_messaging: ^15.2.4
+  intl: ^0.19.0
 
 
   # The following adds the Cupertino Icons font to your application.

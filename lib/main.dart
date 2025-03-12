@@ -11,6 +11,7 @@ import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/productDetails.dart';
+import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
         wishListView.id:(BuildContext context) => wishListView(),
         compareScreen.id:(BuildContext context) => compareScreen(),
         productDetails.id:(BuildContext context) => productDetails(),
+        Productreviews.id:(BuildContext context) => Productreviews(),
       },
     );
   }

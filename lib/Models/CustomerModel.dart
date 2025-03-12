@@ -7,21 +7,24 @@ import '../SqfliteCodes/Token.dart';
 import '../fireBaseNotification.dart';
 
 class CustomerModel {
-  String userName;
-  String name;
-  String password;
-  String email;
-  String phone;
-  String role = "Client";
-  bool isActive = false;
-  bool isVerified = false;
-  String gender;
+  String? userName;
+  String? name;
+  String? password;
+  String? email;
+  String? phone;
+  String? role = "Client";
+  bool? isActive = false;
+  bool? isVerified = false;
+  String? gender;
   String? deviceToken;
-  String birthDate;
+  String? birthDate;
   DateTime? lastActive;
+  String ? profileImage;
 
-  CustomerModel(this.name, this.userName, this.password, this.email, this.phone,
-      this.gender, this.birthDate);
+  CustomerModel(
+      {this.name, this.userName, this.password, this.email, this.phone,
+      this.gender, this.birthDate, this.profileImage
+  });
 
   // Get the hashed device token
   Future<String?> getDeviceToken() async {
@@ -189,7 +192,7 @@ class customerServices {
     String? deviceToken = "";
     try {
       deviceToken =
-          await CustomerModel("", "", "", "", "", "", "").getDeviceToken();
+          await CustomerModel().getDeviceToken();
     } catch (e) {
       print("Error retrieving device token: $e");
     }
@@ -336,8 +339,7 @@ class customerServices {
     }
   }
 
-  Future<String> ResetPass(
-      String email, String newPass, String confirmPass) async {
+  Future<String> ResetPass(String email, String newPass, String confirmPass) async {
     final request = {
       'query': '''
       mutation ResetPassword {
@@ -379,4 +381,49 @@ class customerServices {
       return e.toString();
     }
   }
+
+  Future<CustomerModel?> getUser(String id) async {
+    Token token = Token();
+    CustomerModel? customer;
+    String query = '''
+    query User {
+    user(id: "${id}") {
+        clientProfile {
+            imageUrl
+            name
+        }
+    }
+} 
+    ''';
+    final request = {
+      'query': query,
+      'variables': {
+        'id': id,
+      },
+    };
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        // Access getProduct safely
+        final getCustomer = data['data']['user']['clientProfile'];
+        customer =  CustomerModel(name: getCustomer['name'], profileImage: getCustomer['imageUrl']);
+          return customer;
+      }
+    } catch (e) {
+      print('Error fetching user: $e');
+      return customer;
+    }
+  }
+
 }

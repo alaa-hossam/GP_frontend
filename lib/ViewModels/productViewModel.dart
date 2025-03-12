@@ -18,18 +18,7 @@ class productViewModel  extends ChangeNotifier{
       notifyListeners();
     }
   }
-  // Future<void> fetchProductsByCategory(String categoryId) async{
-  //   try {
-  //     print("Fetching products category from API...");
-  //     _productsCategory = await apiServices.getAllProductsByCategory(categoryId);
-  //     print("products category fetched successfully: $_productsCategory");
-  //     notifyListeners();
-  //   } catch (e) {
-  //     debugPrint("Error fetching products category in VM: $e");
-  //     notifyListeners();
-  //   }
-  // }
-  //
+
   searchProduct(String word){
     return apiServices.searchProduct(word);
   }

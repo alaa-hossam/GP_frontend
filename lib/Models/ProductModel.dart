@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:gp_frontend/Models/productReviewModel.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
@@ -10,6 +11,7 @@ class productModel {
   double _price, _rate;
   int? stock, ratingCount;
   List<dynamic>? finalProducts, variations;
+  List<productReviewModel>? reviews;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
       this.stock,
@@ -18,7 +20,8 @@ class productModel {
       this.category,
       this.finalProducts,
       this.variations,
-      this.handcrafterImage});
+      this.handcrafterImage,
+      this.reviews});
 
   get rate => _rate;
 
@@ -173,74 +176,7 @@ class productService {
       return []; // Return an empty list in case of error
     }
   }
-  // Future<List<productModel>> getAllProductsByCategory(String categoryId) async {
-  //   List<productModel> productsCtegory = [];
-  //
-  //   print("Fetching products category from API...");
-  //
-  //   final request = {
-  //     'query': '''
-  //         query GetAllProducts {
-  //             query GetAllProducts {
-  //                 getAllProducts(
-  //                     categoryId: "$categoryId")
-  //                 {
-  //                     data {
-  //                         averageRating
-  //                         category {
-  //                             name
-  //                         }
-  //                         id
-  //                         imageUrl
-  //                         lowestCustomPrice
-  //                         name
-  //                 }
-  //             }
-  //         }
-  //     ''',
-  //   };
-  //
-  //   try {
-  //     final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-  //     print("Token retrieved: $myToken");
-  //
-  //     final response = await http.post(
-  //       Uri.parse(apiUrl),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $myToken',
-  //       },
-  //       body: jsonEncode(request),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       List<dynamic> prods = data['data']['getAllProducts']['data'];
-  //       print(data);
-  //
-  //       productsCtegory.clear();
-  //
-  //       for (var product in prods) {
-  //         productsCtegory.add(productModel(
-  //           product['id'],
-  //           product['imageUrl'],
-  //           product['name'],
-  //           product['category']['name'],
-  //           product['lowestCustomPrice'].toDouble(),
-  //           product['averageRating'].toDouble(),
-  //         ));
-  //       }
-  //
-  //       print("Products category fetched successfully: $products");
-  //       return productsCtegory;
-  //     } else {
-  //       throw Exception('Failed to load products category: ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching products category: $e");
-  //     return []; // Return an empty list in case of error
-  //   }
-  // }
+
 
   Future<List<dynamic>> searchProduct(String word) async {
     List<dynamic> products;
@@ -400,7 +336,12 @@ class productService {
             username
             
         }
-        
+        reviews {
+            comment
+            createdAt
+            rating
+            userId
+        }
         
     }
 }
@@ -468,6 +409,7 @@ class productService {
 
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
+          final List<productReviewModel> reviews = getProduct['reviews'];
 
           productModel myProduct = productModel(
             id,
@@ -479,7 +421,8 @@ class productService {
             ratingCount: ratingCount,
             description: description,
             variations: variations,
-            handcrafterName: handcrafterName
+            handcrafterName: handcrafterName,
+            reviews: reviews
           );
           return myProduct;
         } else {
