@@ -11,7 +11,7 @@ class productModel {
   double _price, _rate;
   int? stock, ratingCount;
   List<dynamic>? finalProducts, variations;
-  List<productReviewModel>? reviews;
+  List<dynamic>? reviews;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
       this.stock,
@@ -371,7 +371,6 @@ class productService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Access getProduct safely
         final Map<String, dynamic>? getProduct = data['data']?['getProduct'];
         if (getProduct != null) {
           // Access fields in getProduct
@@ -409,7 +408,7 @@ class productService {
 
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
-          final List<productReviewModel> reviews = getProduct['reviews'];
+          final List<dynamic> reviews = getProduct['reviews'];
 
           productModel myProduct = productModel(
             id,
