@@ -6,7 +6,7 @@ import '../SqfliteCodes/Token.dart';
 
 class productModel {
   String _imageURL, _name, _id;
-  String? description, handcrafterName, category;
+  String? description, handcrafterName, category , handcrafterImage;
   double _price, _rate;
   int? stock, ratingCount;
   List<dynamic>? finalProducts, variations;
@@ -17,7 +17,8 @@ class productModel {
       this.ratingCount,
       this.category,
       this.finalProducts,
-      this.variations,});
+      this.variations,
+      this.handcrafterImage});
 
   get rate => _rate;
 
@@ -394,6 +395,11 @@ class productService {
                 id
             }
         }
+        handicrafter {
+            id
+            username
+            
+        }
         
         
     }
@@ -440,6 +446,9 @@ class productService {
           final int ratingCount = getProduct['ratingCount'] ?? 0;
 
           final String id = getProduct['id'] ?? 'No ID';
+          final String handcrafterName= getProduct['handicrafter']['username'] ?? 'No Name';
+          print(handcrafterName);
+          // final String handcrafterImage = getProduct['handicrafter']['handicrafterProfile']['imageUrl'] ?? imageUrl;
 
           // Access variations
           final List<dynamic>? variations = getProduct['variations'];
@@ -469,7 +478,8 @@ class productService {
             averageRating,
             ratingCount: ratingCount,
             description: description,
-            variations: variations
+            variations: variations,
+            handcrafterName: handcrafterName
           );
           return myProduct;
         } else {

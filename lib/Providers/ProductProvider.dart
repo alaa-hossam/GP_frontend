@@ -10,6 +10,9 @@ class productProvider extends ChangeNotifier {
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
+  Map<String, dynamic> _selectedVariations = {};
+  Map<String, dynamic> get selectedVariations => _selectedVariations;
+
 
   productProvider() {
     print("ProductProvider initialized");
@@ -62,5 +65,11 @@ class productProvider extends ChangeNotifier {
     print("in get product details provider");
     productDetails =await productVM.productDetails(productId);
     return productDetails;
+  }
+
+
+  void selectVariation(String variationType, dynamic variationValue) {
+  _selectedVariations[variationType] = variationValue;
+  notifyListeners(); // Notify listeners to rebuild dependent widgets
   }
 }
