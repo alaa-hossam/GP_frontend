@@ -24,19 +24,6 @@ class _productDetailsState extends State<productDetails> {
   wishList wishListObj = wishList();
   bool isExpanded = false;
   int maxLength = 50;
-  // List<dynamic> remainingVariations = [] ,remainingFinalProducts = [];
-  // Map<String, dynamic> selectedVariations = {}; // Track selected variations
-
-
-  // List<String> _getUniqueVariationTypes(List<dynamic> variations) {
-  //   final uniqueTypes = <String>[];
-  //   for (final variation in variations) {
-  //     if (!uniqueTypes.contains(variation['variationType'])) {
-  //       uniqueTypes.add(variation['variationType']);
-  //     }
-  //   }
-  //   return uniqueTypes;
-  // }
 
 
   void toggleFavourite(String color, String id) async {
@@ -55,53 +42,6 @@ class _productDetailsState extends State<productDetails> {
       }
     });
   }
-
-
-  // List<dynamic> getRemainingFinalProducts(productModel myProduct, Map<String, dynamic> selectedVariations) {
-  //   print("remaining final");
-  //   print(myProduct.finalProducts);
-  //   print(selectedVariations);
-  //   if (selectedVariations.isEmpty) {
-  //     return myProduct.finalProducts ?? [];
-  //   }else{
-  //     for (var product in pro)
-  //   }
-  //   return myProduct.finalProducts?.where((finalProduct) {
-  //     return selectedVariations.entries.every((entry) {
-  //       final variationType = entry.key;
-  //       final selectedValue = entry.value;
-  //       return finalProduct[variationType] == selectedValue;
-  //     });
-  //   }).toList() ?? [];
-  // }
-
-
-
-  // void onVariationSelected(String variationType, dynamic variationValue) {
-  //   setState(() {
-  //     selectedVariations[variationType] = variationValue;
-  //   });
-  // }
-
-  // Function to filter final products based on selected variations
-  // List<dynamic> getFilteredFinalProducts(productModel myProduct) {
-  //   print("selected variations");
-  //   print(selectedVariations);
-  //   if (selectedVariations.isEmpty) {
-  //     return myProduct.finalProducts ?? [];
-  //
-  //   }
-  //
-  //   return myProduct.finalProducts?.where((finalProduct) {
-  //         return selectedVariations.entries.every((entry) {
-  //           final variationType = entry.key;
-  //           final selectedValue = entry.value;
-  //           return finalProduct[variationType] == selectedValue;
-  //         });
-  //       }).toList() ??
-  //       [];
-  //
-  // }
 
 
   @override
@@ -293,145 +233,8 @@ class _productDetailsState extends State<productDetails> {
                         ),
                         SizedBox(height: 10 * SizeConfig.verticalBlock),
 
-                        // Variations Section
-                        // if (myProduct.variations != null)
-                        //   Column(
-                        //     children: [
-                        //       Container(
-                        //         width: 361 * SizeConfig.horizontalBlock, // Fixed width
-                        //         decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
-                        //           color: Color(0X50E9E9E9),
-                        //           border: Border.all(color: SizeConfig.iconColor),
-                        //         ),
-                        //         child: Padding(
-                        //           padding: EdgeInsets.all(15.0 * SizeConfig.verticalBlock),
-                        //           child: Column(
-                        //             crossAxisAlignment: CrossAxisAlignment.start,
-                        //             children: [
-                        //               // Group variations by variationType
-                        //               for (final variationType in _getUniqueVariationTypes(myProduct.variations!))
-                        //                 Column(
-                        //                   crossAxisAlignment: CrossAxisAlignment.start,
-                        //                   children: [
-                        //                     Text(
-                        //                       '$variationType',
-                        //                       style: GoogleFonts.roboto(
-                        //                         fontSize: 16 * SizeConfig.textRatio,
-                        //                         fontWeight: FontWeight.bold,
-                        //                       ),
-                        //                     ),
-                        //                     SizedBox(height: 5 * SizeConfig.verticalBlock),
-                        //                     // Display variation values horizontally
-                        //                     SizedBox(
-                        //                       height: 50, // Fixed height for the horizontal ListView
-                        //                       child: ListView.builder(
-                        //                         scrollDirection: Axis.horizontal,
-                        //                         shrinkWrap: true,
-                        //                         physics: ClampingScrollPhysics(),
-                        //                         itemCount: myProduct.variations!
-                        //                             .where((v) => v['variationType'] == variationType)
-                        //                             .length,
-                        //                         itemBuilder: (context, index) {
-                        //                           final variation = myProduct.variations!
-                        //                               .where((v) => v['variationType'] == variationType)
-                        //                               .toList()[index];
-                        //                           final variationValue = variation['variationValue'];
-                        //                           final isSelected = selectedVariations[variationType] == variationValue;
-
-                        //                           return GestureDetector(
-                        //                             onTap: () {
-                        //                               print('Variation selected: $variationValue');
-                        //                               onVariationSelected(
-                        //                                 variation['variationType'],
-                        //                                 variationValue,
-                        //                               );
-                        //                             },
-                        //                             child: Container(
-                        //                               margin: EdgeInsets.only(
-                        //                                 right: 8.0 * SizeConfig.horizontalBlock,
-                        //                               ),
-                        //                               padding: EdgeInsets.symmetric(
-                        //                                 horizontal: 12 * SizeConfig.horizontalBlock,
-                        //                                 vertical: 6 * SizeConfig.verticalBlock,
-                        //                               ),
-                        //                               decoration: BoxDecoration(
-                        //                                 borderRadius: BorderRadius.all(
-                        //                                   Radius.circular(10 * SizeConfig.textRatio),
-                        //                                 ),
-                        //                                 color: Color(0X50E9E9E9),
-                        //                                 border: Border.all(
-                        //                                   width: isSelected ? 4 : 1, // Thicker border if selected
-                        //                                   color: SizeConfig.iconColor,
-                        //                                 ),
-                        //                               ),
-                        //                               child: Center(
-                        //                                 child: Text(
-                        //                                   '$variationValue',
-                        //                                   style: GoogleFonts.rubik(
-                        //                                     fontSize: 14 * SizeConfig.textRatio,
-                        //                                     fontWeight: FontWeight.bold,
-                        //                                     color: Color(0X80000000),
-                        //                                   ),
-                        //                                 ),
-                        //                               ),
-                        //                             ),
-                        //                           );
-                        //                         },
-                        //                       ),
-                        //                     ),
-                        //                   ],
-                        //                 ),
-                        //             ],
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       SizedBox(height: 10 * SizeConfig.verticalBlock),
-                        //     ],
-                        //   ),
-                        //
-                        // // Remaining Final Products Section
-                        // if (remainingFinalProducts.isNotEmpty)
-                        //   Column(
-                        //     children: [
-                        //       Container(
-                        //         width: 361 * SizeConfig.horizontalBlock, // Fixed width
-                        //         decoration: BoxDecoration(
-                        //           borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
-                        //           color: Color(0X50E9E9E9),
-                        //           border: Border.all(color: SizeConfig.iconColor),
-                        //         ),
-                        //         child: SizedBox(
-                        //           height: 100,
-                        //           child: ListView.builder(
-                        //             scrollDirection: Axis.horizontal,
-                        //             shrinkWrap: true,
-                        //             physics: ClampingScrollPhysics(),
-                        //             itemCount: remainingFinalProducts.length,
-                        //             itemBuilder: (context, index) {
-                        //               return Padding(
-                        //                 padding: EdgeInsets.all(8.0 * SizeConfig.horizontalBlock),
-                        //                 child: ClipRRect(
-                        //                   borderRadius: BorderRadius.all(Radius.circular(15)),
-                        //                   child: SizedBox(
-                        //                     width: 80 * SizeConfig.horizontalBlock, // Constrain image width
-                        //                     height: 80 * SizeConfig.verticalBlock, // Constrain image height
-                        //                     child: Image.network(
-                        //                       remainingFinalProducts[index]['imageUrl'],
-                        //                       fit: BoxFit.cover, // Use BoxFit.cover to maintain aspect ratio
-                        //                     ),
-                        //                   ),
-                        //                 ),
-                        //               );
-                        //             },
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       SizedBox(height: 10 * SizeConfig.verticalBlock),
-                        //     ],
-                        //   ),
                         SizedBox(height: 10 * SizeConfig.verticalBlock,),
-                        // Text('${myProduct.variations}'),
+                        // Text('${myProduct.finalProducts}'),
                         variationScreen(myProduct.variations, myProduct.finalProducts)
                       ],
                     ),

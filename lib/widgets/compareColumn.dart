@@ -41,12 +41,17 @@ class compareColumn extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              product.name,
-              style: GoogleFonts.roboto(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Color(0x80000000)),
+            SizedBox(
+              width: 150 * SizeConfig.horizontalBlock,
+              child: Center(
+                child: Text(
+                  product.name,
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Color(0x80000000)),
+                ),
+              ),
             ),
             SizedBox(
               height: 20 * SizeConfig.verticalBlock,

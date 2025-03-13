@@ -327,8 +327,12 @@ class productService {
             duration
             customPrice
             stockQuantity
-            finalProductVariation {
-                id
+            id
+           finalProductVariation {
+                productVariation {
+                    variationType
+                    variationValue
+                }
             }
         }
         handicrafter {
