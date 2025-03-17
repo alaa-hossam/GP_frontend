@@ -235,7 +235,7 @@ class _productDetailsState extends State<productDetails> {
 
                         SizedBox(height: 10 * SizeConfig.verticalBlock,),
                         // Text('${myProduct.finalProducts}'),
-                        variationScreen(myProduct.variations, myProduct.finalProducts)
+                        variationScreen(myProduct)
                       ],
                     ),
                   ],

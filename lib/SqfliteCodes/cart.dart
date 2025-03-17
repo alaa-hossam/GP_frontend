@@ -1,63 +1,88 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class cart {
+class Cart {
   static Database? _db;
 
   Future<Database?> get db async {
     if (_db == null) {
       _db = await initialDB();
-      return _db;
-    } else {
-      return _db;
     }
+    return _db;
   }
 
-  initialDB() async {
+  Future<Database> initialDB() async {
+    print("initialize cart");
     String databasePath = await getDatabasesPath();
-    String path = join(databasePath, 'token.db');
-    Database myToken = await openDatabase(path, onCreate: _createDB);
-    return myToken;
+    String path = join(databasePath, 'cart.db');
+    Database myCart = await openDatabase(
+      path,
+      version: 1,
+      onCreate: _createDB,
+    );
+    return myCart;
   }
 
-  _createDB(Database db, int version) async {
+  Future<void> _createDB(Database db, int version) async {
+    print('Creating database tables...'); // Debug log
+
+    // Create the products table
     await db.execute('''
-      CREATE TABLE "cart"(
-      ID INTEGER AUTOINCREMENT NOT NULL PRIMARY KEY,
-      IMAGEURL TEXT NOT NULL,
-      NAME TEXT NOT NULL,
-      CATEGORY TEXT NOT NULL,
-      PRICE REAL NOT NULL,
-      RATE REAL NOT NULL,
-      SIZE,
-      VOLUME,
-      COLOR,
-      MATERIAL,
-      OTHER,
-      COUNT REAL NOT NULL,   
+      CREATE TABLE IF NOT EXISTS products(
+        id TEXT,
+        finalId TEXT
       )
-        ''');
+    ''');
+    //
+    // // Create the variations table
+    // await db.execute('''
+    //   CREATE TABLE IF NOT EXISTS variations(
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     product_id TEXT,
+    //     variationType TEXT,
+    //     variationValue TEXT
+    //   )
+    // ''');
+    //
+    // // Create the finalProducts table
+    // await db.execute('''
+    //   CREATE TABLE IF NOT EXISTS finalProducts(
+    //     id TEXT PRIMARY KEY,
+    //     product_id TEXT,
+    //     customPrice REAL,
+    //     ImageUrl TEXT
+    //   )
+    // ''');
+
+    print('Database tables created successfully'); // Debug log
   }
 
-  addToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawInsert(query);
+  Future<int> addProduct(String id, String finalId) async {
+    Database? myCart = await db;
+
+    int response = await myCart!.rawInsert('''
+      INSERT INTO products(id, finalId) 
+      VALUES (?, ?)
+    ''', [id , finalId]);
+
     return response;
   }
-  getToken(String query) async{
-    Database? myToken = await db;
-    List<Map> response = await myToken!.rawQuery(query);
+
+  Future<List<Map>> getProduct(String query, [List<dynamic>? arguments]) async {
+    Database? myCart = await db;
+    List<Map> response = await myCart!.rawQuery(query, arguments);
     return response;
   }
-  updateToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawUpdate(query);
-    return response;
-  }
-  deleteToken(String query) async{
-    Database? myToken;
-    int response = await myToken!.rawDelete(query);
-    return response;
+
+  Future<void> recreateProductsTable() async {
+    Database? product = await db; // Initialize the database
+
+    // Drop the table if it exists
+    await product!.execute('DROP TABLE IF EXISTS products');
+    print("products table dropped successfully");
+
+    // Recreate the table
+    await _createDB(product, 1);
+    print("products table recreated successfully");
   }
 }
-

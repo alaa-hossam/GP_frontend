@@ -28,6 +28,12 @@ class productViewModel  extends ChangeNotifier{
 
   }
 
+
+  cartProducts(){
+    return apiServices.getCartProducts();
+
+  }
+
   productDetails(String productId){
     return apiServices.getProductDetails(productId);
   }

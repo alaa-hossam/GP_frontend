@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:gp_frontend/Models/productReviewModel.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:http/http.dart' as http;
+import 'package:sqflite/sqflite.dart';
 import '../SqfliteCodes/Token.dart';
+import '../SqfliteCodes/cart.dart';
 
 class productModel {
   String _imageURL, _name, _id;
@@ -12,6 +14,7 @@ class productModel {
   int? stock, ratingCount;
   List<dynamic>? finalProducts, variations;
   List<dynamic>? reviews;
+  List<String>? galleryImg;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
       this.stock,
@@ -21,7 +24,8 @@ class productModel {
       this.finalProducts,
       this.variations,
       this.handcrafterImage,
-      this.reviews});
+      this.reviews,
+      this.galleryImg});
 
   get rate => _rate;
 
@@ -39,6 +43,7 @@ class productService {
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
   wishList wish = wishList();
+  Cart myCart = Cart();
   List<productModel> products = [];
 
   Future<String> addProduct(productModel product) async {
@@ -301,15 +306,139 @@ class productService {
     }
   }
 
+
+
+
+
+  Future<Map<String, dynamic>> getCartProducts() async {
+    // Step 1: Fetch product IDs and final IDs from SQLite
+    myCart.db;
+    List<String> ids =
+    await myCart.getProduct("SELECT * FROM products").then((result) {
+      return result.map<String>((row) => row['id'].toString()).toList();
+    });
+    List<String> finalIds =
+    await myCart.getProduct("SELECT * FROM products").then((result) {
+      return result.map<String>((row) => row['finalId'].toString()).toList();
+    });
+    //
+    print("Product IDs: $ids");
+    // print("Final IDs: $finalIds");
+
+    // Step 2: Prepare the GraphQL query
+    const String query = '''
+    query GetProductsByIds(\$productIds: [String!]!) {
+      getProductsByIds(productIds: \$productIds) {
+        averageRating
+        category {
+          name
+        }
+        finalProducts {
+          customPrice
+          imageUrl
+          id
+        }
+        imageUrl
+        name
+        id
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'productIds': ids,
+      },
+    };
+
+    try {
+      // Step 3: Get the authentication token
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token in getCartProducts: $myToken");
+
+      // Step 4: Send the request to the API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      // Step 5: Handle the response
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getProductsByIds'];
+        print("response");
+        print(data);
+        // print("Products fetched successfully: $prods");
+
+        // Create a map to store the count of each final product
+        Map<String, int> finalProductCounts = {};
+
+        // List to store cart products
+        List<Map<String, dynamic>> cartProducts = [];
+
+        print("final Products");
+        print(prods);
+
+        for (var product in prods) {
+          // Find all corresponding final products using finalId
+          var matchingFinalProducts = product['finalProducts']
+              .where((fp) => finalIds.contains(fp['id'].toString()))
+              .toList();
+          print("matching Products");
+          print(matchingFinalProducts);
+
+          // If there are matching final products, add them to cartProducts
+          if (matchingFinalProducts.isNotEmpty) {
+            // print()
+            for (var finalProduct in matchingFinalProducts) {
+              cartProducts.add({
+                'id': product['id'],
+                'name': product['name'],
+                'imageUrl': product['imageUrl'],
+                'category': product['category']['name'],
+                'averageRating': product['averageRating'],
+                'finalProduct': finalProduct, // Add each matching final product
+              });
+
+              // Update the count for this final product
+              finalProductCounts[finalProduct['id'].toString()] =
+                  (finalProductCounts[finalProduct['id'].toString()] ?? 0) + 1;
+              print(finalProduct['id']);
+              print(finalProductCounts[finalProduct['id']]);
+            }
+          }
+        }
+
+        // Return both cartProducts and finalProductCounts
+        return {
+          'cartProducts': cartProducts,
+          'finalProductCounts': finalProductCounts,
+        };
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      return {
+        'cartProducts': [],
+        'finalProductCounts': {},
+        'error': 'Failed to fetch products: $e',
+      };
+    }
+  }
   Future<productModel> getProductDetails(String productId) async {
     final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
 
     String query = '''
     query GetProduct {
-    getProduct(
-        productId:  "${productId}"
-        viewerId:  "${viewerId}"
-    ) {
+      getProduct(
+        productId:  "$productId"
+        viewerId:  "$viewerId"
+      ) {
         description
         imageUrl
         name
@@ -317,39 +446,43 @@ class productService {
         averageRating
         id
         variations {
-            variationType
-            variationValue
-            sizeUnit
+          variationType
+          variationValue
+          sizeUnit
         }
         finalProducts {
-            imageUrl
-            isCustomMade
-            duration
-            customPrice
-            stockQuantity
-            id
-           finalProductVariation {
-                productVariation {
-                    variationType
-                    variationValue
-                }
+          imageUrl
+          isCustomMade
+          duration
+          customPrice
+          stockQuantity
+          id
+        
+          finalProductVariation {
+            productVariation {
+              variationType
+              variationValue
             }
+          }
+          galleryImages {
+            imageUrl
+          }
         }
         handicrafter {
-            id
-            username
-            
+          id
+          username
         }
         reviews {
-            comment
-            createdAt
-            rating
-            userId
+          comment
+          createdAt
+          rating
+          userId
         }
-        
+        category {
+          name
+        }
+      }
     }
-}
-
   ''';
 
     final request = {
@@ -379,31 +512,23 @@ class productService {
         if (getProduct != null) {
           // Access fields in getProduct
           final String name = getProduct['name'] ?? 'No Name';
-          final String description =
-              getProduct['description'] ?? 'No Description';
-          final String imageUrl =
-              getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
-          final double averageRating =
-              getProduct['averageRating']?.toDouble() ?? 0.0;
-          final double lowestCustomPrice =
-              getProduct['lowestCustomPrice']?.toDouble() ?? 0.0;
+          final String description = getProduct['description'] ?? 'No Description';
+          final String imageUrl = getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
+          final double averageRating = getProduct['averageRating']?.toDouble() ?? 0.0;
+          final double lowestCustomPrice = getProduct['lowestCustomPrice']?.toDouble() ?? 0.0;
           final int ratingCount = getProduct['ratingCount'] ?? 0;
-
           final String id = getProduct['id'] ?? 'No ID';
-          final String handcrafterName= getProduct['handicrafter']['username'] ?? 'No Name';
-          print(handcrafterName);
-          // final String handcrafterImage = getProduct['handicrafter']['handicrafterProfile']['imageUrl'] ?? imageUrl;
+          final String handcrafterName = getProduct['handicrafter']['username'] ?? 'No Name';
+          final String categoryName = getProduct['category']['name'] ?? 'No category';
 
           // Access variations
           final List<dynamic>? variations = getProduct['variations'];
-          print("before variations" + '${variations}');
+          print("before variations: ${variations}");
 
           if (variations != null && variations.isNotEmpty) {
             for (final variation in variations) {
-              final String variationType =
-                  variation['variationType'] ?? 'No Type';
-              final String variationValue =
-                  variation['variationValue'] ?? 'No Value';
+              final String variationType = variation['variationType'] ?? 'No Type';
+              final String variationValue = variation['variationValue'] ?? 'No Value';
               final String sizeUnit = variation['sizeUnit'] ?? 'No Unit';
             }
           } else {
@@ -413,6 +538,18 @@ class productService {
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
           final List<dynamic> reviews = getProduct['reviews'];
+
+          // Extract gallery images
+          List<String> galleryImages = [];
+          for (var finalProduct in finalProducts) {
+            if (finalProduct['galleryImages'] != null) {
+              for (var galleryImage in finalProduct['galleryImages']) {
+                galleryImages.add(galleryImage['imageUrl']);
+              }
+            }
+          }
+
+          print("Gallery Images: $galleryImages");
 
           productModel myProduct = productModel(
             id,
@@ -425,9 +562,10 @@ class productService {
             description: description,
             variations: variations,
             handcrafterName: handcrafterName,
-            reviews: reviews
+            reviews: reviews,
+            category: categoryName,
+            galleryImg: galleryImages,
           );
-
 
           return myProduct;
         } else {
@@ -436,7 +574,6 @@ class productService {
         }
       } else {
         print('Failed to load product: ${response.statusCode}');
-
         return productModel(" ", " ", " ", 0, 0);
       }
     } catch (e) {

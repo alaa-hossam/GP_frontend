@@ -6,6 +6,7 @@ import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/signUpView.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import '../SqfliteCodes/Token.dart';
+import '../SqfliteCodes/cart.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 
@@ -22,8 +23,7 @@ class _logInState extends State<logIn> {
   bool obscureText = true;
   customerViewModel cvm= customerViewModel();
   bool _isLoading = false;
-  Token token = Token();
-  wishList wish = wishList();
+
 
   togglePasswordVisibility() {
     setState(() {
@@ -34,9 +34,6 @@ class _logInState extends State<logIn> {
 
   Future<String> logInCustomer() async {
     try {
-
-      token.initialDB();
-      wish.initialDB();
 
       return await cvm.logIn(
           email: email.text,

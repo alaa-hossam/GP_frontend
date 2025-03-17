@@ -7,6 +7,7 @@ import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
+import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
@@ -18,35 +19,48 @@ import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
+import 'Providers/cartProvider.dart';
 import 'Providers/detailsProvider.dart';
+import 'SqfliteCodes/cart.dart';
 import 'SqfliteCodes/wishList.dart';
 import 'firebase_options.dart';
 import 'views/signUpView.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'fireBaseNotification.dart';
 
-void main() async{
-  // wishList w = wishList();
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize databases
+  Token token = Token();
+  wishList wish = wishList();
+  Cart myCart = Cart();
+
+  await token.db; // Initialize Token database
+  await wish.db; // Initialize Wishlist database
+  await myCart.db; // Initialize Cart database
+
   runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => imageProvider()),
-          ChangeNotifierProvider(create: (_) => CategoryProvider()),
-          ChangeNotifierProvider(create: (_) => buttonProvider()),
-          ChangeNotifierProvider(create: (_) => productProvider()),
-          ChangeNotifierProvider(create: (_) => detailsProvider()),
-        ],
-        child: DevicePreview(
-          builder: (context) => MyApp(),
-        ),
-        // child: MyApp(),
-
-  ));
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => imageProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => buttonProvider()),
+        ChangeNotifierProvider(create: (_) => productProvider()),
+        ChangeNotifierProvider(create: (_) => detailsProvider()),
+        ChangeNotifierProvider(create: (_) => cartProvider()),
+        ChangeNotifierProvider(create: (_) => galleryImageProvider()),
+      ],
+      child: DevicePreview(
+        builder: (context) => MyApp(),
+      ),
+    ),
+  );
 }
-
-
 
 
 class MyApp extends StatelessWidget {
@@ -76,6 +90,7 @@ class MyApp extends StatelessWidget {
         productDetails.id:(BuildContext context) => productDetails(),
         Productreviews.id:(BuildContext context) => Productreviews(),
         HandcrafterRequest.id:(BuildContext context) => HandcrafterRequest(),
+        cartScreen.id:(BuildContext context) => cartScreen(),
       },
     );
   }

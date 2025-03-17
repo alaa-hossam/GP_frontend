@@ -14,6 +14,7 @@ class Token {
   }
 
   initialDB() async {
+    print("initialize token");
     String databasePath = await getDatabasesPath();
     String path = join(databasePath, 'token.db');
     Database myToken = await openDatabase(path, version: 1, onCreate: _createDB);
