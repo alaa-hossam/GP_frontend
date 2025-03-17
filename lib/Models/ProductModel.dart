@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:gp_frontend/Models/productReviewModel.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
@@ -430,6 +429,7 @@ class productService {
       };
     }
   }
+
   Future<productModel> getProductDetails(String productId) async {
     final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
 
@@ -538,7 +538,9 @@ class productService {
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
           final List<dynamic> reviews = getProduct['reviews'];
-
+          print("reviewwwws");
+          print(reviews.length);
+          print(id);
           // Extract gallery images
           List<String> galleryImages = [];
           for (var finalProduct in finalProducts) {

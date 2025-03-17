@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,29 +21,36 @@ class HandcrafterRequest extends StatefulWidget {
 class _HandcrafterRequestState extends State<HandcrafterRequest> {
   final TextEditingController _profileName = TextEditingController();
   final TextEditingController BIO = TextEditingController();
-
-  File? _image;
-  List<String> specializations = [
-    "Wood",
-    "Pottery",
-    "Jewelry",
-    "Textile",
-    "Metal",
-    "Glass",
-  ];
+  CategoryViewModel CVM = CategoryViewModel();
+  File? _profileImage;
+  File? _nationalIdImage;
   List<String> selectedSpecializations = [];
 
-  Future<void> _pickImage(ImageSource source) async {
+  bool _isLoading = false; // To manage the loading state
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _pickImage(ImageSource source, bool isProfileImage) async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: source);
     if (pickedImage != null) {
       setState(() {
-        _image = File(pickedImage.path);
+        if (isProfileImage) {
+          _profileImage = File(pickedImage.path);
+        } else {
+          _nationalIdImage = File(pickedImage.path);
+        }
       });
     }
   }
 
   void _openSpecializationsBottomSheet(BuildContext context) {
+    // Temporary list to hold selected specializations
+    List<String> tempSelectedSpecializations = [];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -67,22 +75,42 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: specializations.length,
-                  itemBuilder: (context, index) {
-                    final specialization = specializations[index];
-                    return CheckboxListTile(
-                      title: Text(specialization),
-                      value: selectedSpecializations.contains(specialization),
-                      onChanged: (value) {
-                        setState(() {
-                          if (value == true) {
-                            selectedSpecializations.add(specialization);
-                          } else {
-                            selectedSpecializations.remove(specialization);
-                          }
-                        });
+                child: FutureBuilder<List<dynamic>>(
+                  future: _fetchSpecializations(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text("Error fetching specializations"));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text("No specializations found"));
+                    }
+
+                    final specializations = snapshot.data!;
+                    return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: specializations.length,
+                      itemBuilder: (context, index) {
+                        final specialization = specializations[index];
+                        final isSelected = tempSelectedSpecializations.contains(specialization.name); // Check if selected
+
+                        return CheckboxListTile(
+                          title: Text(specialization.name),
+                          value: isSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value == true) {
+                                // If checked, add to the temp list
+                                if (!tempSelectedSpecializations.contains(specialization.name)) {
+                                  tempSelectedSpecializations.add(specialization.name);
+                                }
+                              } else {
+                                // If unchecked, remove from the temp list
+                                tempSelectedSpecializations.remove(specialization.name);
+                              }
+                            });
+                          },
+                        );
                       },
                     );
                   },
@@ -93,6 +121,10 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                 buttonColor: Color(0xFF5095B0),
                 fontColor: const Color(0xFFF5F5F5),
                 onClickButton: () {
+                  // Update the main list with the temporary selections
+                  setState(() {
+                    selectedSpecializations = List.from(tempSelectedSpecializations); // Save selected specializations
+                  });
                   Navigator.pop(context); // Close the bottom sheet
                 },
               ),
@@ -101,6 +133,49 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
         );
       },
     );
+  }
+// Function to fetch specializations
+  Future<List<dynamic>> _fetchSpecializations() async {
+    await CVM.fetchSpecialization();
+    return CVM.specialization; // Return the list of specializations
+  }
+
+
+
+  void _saveData() async {
+    // Validate if all fields are filled
+    if (_profileName.text.isEmpty ||
+        BIO.text.isEmpty ||
+        _profileImage == null ||
+        _nationalIdImage == null ||
+        selectedSpecializations.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please fill all fields and select at least one specialization."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Save images to files (example: save to app's local storage)
+    final profileImagePath = _profileImage!.path;
+    final nationalIdImagePath = _nationalIdImage!.path;
+
+    // TODO: Save the data (e.g., send to backend or local database)
+    print("Profile Name: ${_profileName.text}");
+    print("BIO: ${BIO.text}");
+    print("Profile Image Path: $profileImagePath");
+    print("National ID Image Path: $nationalIdImagePath");
+    print("Selected Specializations: $selectedSpecializations");
+
+    // Show success message
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text("Done!")),
+    // );
+
+    // Navigate back or reset the form
+    Navigator.pop(context);
   }
 
   @override
@@ -161,24 +236,28 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
             children: [
               // Profile Photo Section
               Center(
-                child: Container(
-                  margin: EdgeInsets.only(top: 50 * SizeConfig.verticalBlock),
-                  height: 100 * SizeConfig.horizontalBlock,
-                  width: 100 * SizeConfig.horizontalBlock,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(width: 1, color: SizeConfig.iconColor),
-                    color: const Color(0x80E9E9E9),
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      _pickImage(
-                          ImageSource.gallery); // Open gallery to pick image
-                    },
-                    icon: Icon(
+                child: GestureDetector(
+                  onTap: () {
+                    _pickImage(ImageSource.gallery, true); // Open gallery to pick profile image
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(top: 50 * SizeConfig.verticalBlock),
+                    height: 100 * SizeConfig.horizontalBlock,
+                    width: 100 * SizeConfig.horizontalBlock,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      border: Border.all(width: 1, color: SizeConfig.iconColor),
+                      color: const Color(0x80E9E9E9),
+                    ),
+                    child: _profileImage == null
+                        ? Icon(
                       Icons.file_upload_outlined,
-                      color: SizeConfig.iconColor,
-                      size: 30 * SizeConfig.textRatio,
+                        color: SizeConfig.iconColor,
+                        size: 30 * SizeConfig.textRatio
+                    )
+                        : Image.file(
+                      File(_profileImage!.path),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -235,11 +314,10 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                           scrollDirection: Axis.horizontal,
                           itemCount: selectedSpecializations.length,
                           itemBuilder: (context, index) {
-                            final specialization =
-                                selectedSpecializations[index];
+                            final specialization = selectedSpecializations[index];
                             return Padding(
                               padding: EdgeInsets.only(
-                                  right: 8 * SizeConfig.horizontalBlock,),
+                                right: 8 * SizeConfig.horizontalBlock,),
                               child: customizeButton(
                                 buttonName: specialization,
                                 buttonColor: Color(0xFF5095B0),
@@ -280,23 +358,27 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                 ),
               ),
               SizedBox(height: 8 * SizeConfig.verticalBlock), // Add spacing
-              Container(
-                height: 60 * SizeConfig.horizontalBlock,
-                width: 361 * SizeConfig.horizontalBlock,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(width: 1, color: SizeConfig.iconColor),
-                  color: const Color(0x80E9E9E9),
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    _pickImage(
-                        ImageSource.gallery); // Open gallery to pick image
-                  },
-                  icon: Icon(
-                    Icons.file_upload_outlined,
-                    color: SizeConfig.iconColor,
-                    size: 30 * SizeConfig.textRatio,
+              GestureDetector(
+                onTap: () {
+                  _pickImage(ImageSource.gallery, false); // Open gallery to pick national ID image
+                },
+                child: Container(
+                  height: 60 * SizeConfig.horizontalBlock,
+                  width: 361 * SizeConfig.horizontalBlock,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    border: Border.all(width: 1, color: SizeConfig.iconColor),
+                    color: const Color(0x80E9E9E9),
+                  ),
+                  child: _nationalIdImage == null
+                      ? Icon(
+                      Icons.file_upload_outlined,
+                      color: SizeConfig.iconColor,
+                      size: 30 * SizeConfig.textRatio
+                  )
+                      : Image.file(
+                    File(_nationalIdImage!.path),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -310,6 +392,7 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                   fontColor: const Color(0xFFF5F5F5),
                   width: 200 * SizeConfig.horizontalBlock,
                   height: 50 * SizeConfig.verticalBlock,
+                  onClickButton: _saveData,
                 ),
               ),
             ],

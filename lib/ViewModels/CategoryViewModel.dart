@@ -6,6 +6,8 @@ class CategoryViewModel extends ChangeNotifier {
   final CategoryService apiServices = CategoryService();
   List<CategoryModel> _categories = [CategoryModel("0", "All")];
   List<CategoryModel> get categories => _categories;
+  List<CategoryModel> _specialization = [];
+  List<CategoryModel> get specialization => _specialization;
   List<CategoryModel> _categoryCildren = [];
   List<CategoryModel> get categoryCildren => _categoryCildren;
 
@@ -16,6 +18,18 @@ class CategoryViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint("Error fetching categories: $e");
       _categories = [CategoryModel("0", "All")]; // Fallback to default category
+      notifyListeners();
+    }
+  }
+  Future<void> fetchSpecialization() async {
+    try {
+      _specialization = await apiServices.getAllSpcialization();
+      print("in VM");
+      print(specialization.length);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching Specialization: $e");
+      _specialization = [];
       notifyListeners();
     }
   }

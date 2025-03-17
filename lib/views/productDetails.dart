@@ -208,8 +208,13 @@ class _productDetailsState extends State<productDetails> {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          Navigator.pushNamed(context, Productreviews.id);
-                                        },
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => Productreviews(reviews: myProduct.reviews!),
+                                            ),
+                                          );
+                                          },
                                         icon:const Icon(
                                           Icons.chat,
                                           color: SizeConfig.iconColor,

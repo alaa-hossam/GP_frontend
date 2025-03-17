@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
         wishListView.id:(BuildContext context) => wishListView(),
         compareScreen.id:(BuildContext context) => compareScreen(),
         productDetails.id:(BuildContext context) => productDetails(),
-        Productreviews.id:(BuildContext context) => Productreviews(),
+        Productreviews.id:(BuildContext context) => Productreviews(reviews: [],),
         HandcrafterRequest.id:(BuildContext context) => HandcrafterRequest(),
         cartScreen.id:(BuildContext context) => cartScreen(),
       },

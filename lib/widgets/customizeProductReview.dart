@@ -1,20 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/CustomerModel.dart';
-import 'package:gp_frontend/Models/productReviewModel.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+import 'package:intl/intl.dart';
 
 class CustomizeProductReview extends StatelessWidget {
-  final productReviewModel review;
+  final String userId;
+  final String comment;
+  final double rate;
+  final String createAt;
   late customerViewModel CVM;
 
-  CustomizeProductReview({required this.review});
+  CustomizeProductReview({required this.userId,required this.comment,required this.rate,required this.createAt});
 
+  get _createAt {
+    DateTime dateTime = DateTime.parse(this.createAt);
+    String formattedDate = DateFormat('dd MMM').format(dateTime);
+    print(formattedDate);
+    return formattedDate;
+  }
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CustomerModel?>(
-      future: CVM.fetchUser(review.userId), // Fetch the customer data (may return null)
+      future: CVM.fetchUser(userId), // Fetch the customer data (may return null)
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
@@ -62,7 +71,7 @@ class CustomizeProductReview extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  review.createAt,
+                  _createAt,
                   style: TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 12 * SizeConfig.textRatio,
@@ -72,7 +81,7 @@ class CustomizeProductReview extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(5, (index) {
                     // Fill stars based on review.rate
-                    if (index < review.rate) {
+                    if (index < rate) {
                       return Icon(
                         Icons.star,
                         color: Color(0xFFD4931C), // Gold color for filled stars

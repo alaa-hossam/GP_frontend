@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 
+import '../widgets/customizeProductReview.dart';
+
 class Productreviews extends StatefulWidget {
   static String id = "ProductReviewScreen";
-  const Productreviews({super.key});
+  final List<dynamic> reviews;
+
+  Productreviews({super.key, required this.reviews});
 
   @override
   State<Productreviews> createState() => _ProductreviewsState();
@@ -17,20 +21,20 @@ class _ProductreviewsState extends State<Productreviews> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        toolbarHeight: 146 * SizeConfig.verticalBlock, // Set the height of the AppBar
+        toolbarHeight: 146 * SizeConfig.verticalBlock,
         flexibleSpace: Container(
-          decoration:const BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
+                Color(0xFF223F4A),
+                Color(0xFF5095B0),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15), // Rounded bottom-left corner
-              bottomRight: Radius.circular(15), // Rounded bottom-right corner
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(15),
             ),
           ),
         ),
@@ -53,9 +57,25 @@ class _ProductreviewsState extends State<Productreviews> {
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(15), // Rounded bottom-left corner
-            bottomRight: Radius.circular(15), // Rounded bottom-right corner
+            bottomLeft: Radius.circular(15),
+            bottomRight: Radius.circular(15),
           ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: widget.reviews.asMap().entries.map((entry) {
+            int index = entry.key;
+            var review = entry.value; // Assuming each review is a dynamic type
+
+            // Extract necessary fields from the review, e.g., userId, comment, rate, createAt
+            return CustomizeProductReview(
+              userId: review['userId'], // Adjust based on your review structure
+              comment: review['comment'], // Adjust based on your review structure
+              rate: review['rate'], // Assuming rate is a double
+              createAt: review['createdAt'], // Adjust based on your review structure
+            );
+          }).toList(),
         ),
       ),
     );

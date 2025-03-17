@@ -8,6 +8,8 @@ class CategoryProvider extends ChangeNotifier {
   List<CategoryModel> get categories => _categories;
   List<CategoryModel> _categoryCildren = [];
   List<CategoryModel> get categoryCildren => _categoryCildren;
+  List<CategoryModel> _specialization = [];
+  List<CategoryModel> get specialization => _specialization;
 
   CategoryProvider() {
     print("CategoryProvider initialized");
@@ -18,6 +20,13 @@ class CategoryProvider extends ChangeNotifier {
     await categoryVM.fetchCats();
     _categories = categoryVM.categories.map((cat) => cat).toList();
     print("Categories fetched: $_categories");
+    notifyListeners();
+  }
+  Future<void> fetchSpecializations() async {
+    print("Fetching categories...");
+    await categoryVM.fetchSpecialization();
+    _specialization = categoryVM.specialization.map((spec) => spec).toList();
+    print("Specialization fetched: $_specialization");
     notifyListeners();
   }
   Future<void> fetchCategoryChildren(String parentId) async {

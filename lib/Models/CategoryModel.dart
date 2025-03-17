@@ -61,6 +61,51 @@ class CategoryService {
       return myCategories;
     }
   }
+  Future<List<CategoryModel>> getAllSpcialization() async {
+    List<CategoryModel> myCategories = [];
+    final request = {
+      'query': '''
+      query GetAllSpecializations {
+        getAllSpecializations {
+        id
+        name
+    }
+}
+      ''',
+    };
+    try {
+
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> categories = data['data']['getAllSpecializations'];
+        print(categories);
+        myCategories.clear();
+
+        for (var category in categories) {
+          myCategories.add(CategoryModel(category['id'], category['name']));
+        }
+
+        print("Specializations fetched successfully: ${myCategories}");
+        return myCategories;
+      } else {
+        throw Exception('Failed to load Specializations: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching Specializations: $e");
+      return myCategories;
+    }
+  }
 
 
 
