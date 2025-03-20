@@ -10,30 +10,45 @@ class CustomizeProductReview extends StatelessWidget {
   final String comment;
   final double rate;
   final String createAt;
-  late customerViewModel CVM;
+  final customerViewModel CVM = customerViewModel(); // Initialize the ViewModel
 
-  CustomizeProductReview({required this.userId,required this.comment,required this.rate,required this.createAt});
+  CustomizeProductReview({
+    required this.userId,
+    required this.comment,
+    required this.rate,
+    required this.createAt,
+  });
 
-  get _createAt {
-    DateTime dateTime = DateTime.parse(this.createAt);
-    String formattedDate = DateFormat('dd MMM').format(dateTime);
-    print(formattedDate);
-    return formattedDate;
+  // Format the createdAt date
+  String get _formattedDate {
+    try {
+      DateTime dateTime = DateTime.parse(createAt);
+      return DateFormat('dd MMM').format(dateTime);
+    } catch (e) {
+      return "Invalid Date";
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CustomerModel?>(
-      future: CVM.fetchUser(userId), // Fetch the customer data (may return null)
+      future: CVM.fetchUser(userId), // Fetch the customer data
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
           // Show an error message if something went wrong
-          return Center(child: Text("Error: ${snapshot.error}"));
+          return Center(
+            child: Text("Error: ${snapshot.error}"),
+          );
         } else if (!snapshot.hasData || snapshot.data == null) {
           // Handle the case where no data is returned
-          return Center(child: Text("No user data found"));
+          return Center(
+            child: Text("No user data found"),
+          );
         }
 
         // Once the data is fetched, use it to build the UI
@@ -41,13 +56,13 @@ class CustomizeProductReview extends StatelessWidget {
         return Container(
           margin: EdgeInsets.only(right: 10),
           padding: EdgeInsets.all(5),
-          height: SizeConfig.verticalBlock * 135,
           width: SizeConfig.horizontalBlock * 360,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(5)),
             border: Border.all(width: 1, color: SizeConfig.iconColor),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
                 leading: ClipRRect(
@@ -58,7 +73,11 @@ class CustomizeProductReview extends StatelessWidget {
                     height: 40 * SizeConfig.verticalBlock,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.person, size: 50);
+                      return Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Colors.grey,
+                      );
                     },
                   ),
                 ),
@@ -71,7 +90,7 @@ class CustomizeProductReview extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  _createAt,
+                  _formattedDate,
                   style: TextStyle(
                     fontFamily: "Roboto",
                     fontSize: 12 * SizeConfig.textRatio,
@@ -85,19 +104,44 @@ class CustomizeProductReview extends StatelessWidget {
                       return Icon(
                         Icons.star,
                         color: Color(0xFFD4931C), // Gold color for filled stars
-                        size: 16 * SizeConfig.textRatio,
+                        size: 20 * SizeConfig.textRatio,
                       );
                     } else {
                       return Icon(
                         Icons.star_border,
                         color: Color(0xFFD4931C), // Gold color for outlined stars
-                        size: 16 * SizeConfig.textRatio,
+                        size: 20 * SizeConfig.textRatio,
                       );
                     }
                   }),
                 ),
               ),
-              // Add more widgets to display other review details
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16 * SizeConfig.horizontalBlock,
+                  vertical: 8 * SizeConfig.verticalBlock,
+                ),
+                child: Container(
+                  width: double.infinity, // Take up full width
+                  padding: EdgeInsets.all(10 * SizeConfig.horizontalBlock),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE9E9E9).withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      width: 1 * SizeConfig.horizontalBlock,
+                      color: SizeConfig.iconColor,
+                    ),
+                  ),
+                  child: Text(
+                    comment,
+                    style: TextStyle(
+                      fontFamily: "Roboto",
+                      fontSize: 16 * SizeConfig.textRatio,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         );

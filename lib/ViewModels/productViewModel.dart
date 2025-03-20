@@ -39,7 +39,9 @@ class productViewModel  extends ChangeNotifier{
     }
   }
 
-
+  Future<String> addProductReview(String comment,String productId,double rate)async{
+    return await apiServices.addProductReview(comment, productId, rate);
+  }
   cartProducts()async{
     return await  apiServices.getCartProducts();
 

@@ -8,37 +8,39 @@ import '../SqfliteCodes/cart.dart';
 
 class productModel {
   String _imageURL, _name, _id;
-  String? description, handcrafterName, category , handcrafterImage;
+  String? description, handcrafterName, category, handcrafterImage;
   double _price, _rate;
   double? stock;
-  int? ratingCount , Quantity;
+  int? ratingCount, Quantity;
   List<dynamic>? finalProducts, variations;
   List<dynamic>? reviews;
   List<String>? galleryImg;
-  productModel(this._id, this._imageURL, this._name, this._price, this._rate,
-      {this.description,
-      this.stock,
-      this.handcrafterName,
-      this.ratingCount,
-      this.category,
-      this.finalProducts,
-      this.variations,
-      this.handcrafterImage,
-      this.reviews,
-      this.galleryImg,
-      this.Quantity});
 
-  get rate => _rate;
+  productModel(
+      this._id,
+      this._imageURL,
+      this._name,
+      this._price,
+      this._rate, {
+        this.description,
+        this.stock,
+        this.handcrafterName,
+        this.ratingCount,
+        this.category,
+        this.finalProducts,
+        this.variations,
+        this.handcrafterImage,
+        this.reviews,
+        this.galleryImg,
+        this.Quantity,
+      });
 
-  get price => _price;
-
-  get name => _name;
-
+  double get rate => _rate;
+  double get price => _price;
+  String get name => _name;
   String get imageURL => _imageURL;
-
-  get id => _id;
+  String get id => _id;
 }
-
 class productService {
   final String apiUrl =
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
@@ -183,7 +185,6 @@ class productService {
     }
   }
 
-
   Future<List<productModel>> getGifRecommendationProducts(Map<String, String> answers) async {
     print("Fetching products from API...");
     List<productModel> giftProducts = [];
@@ -252,6 +253,61 @@ class productService {
     } catch (e) {
       print("Error fetching products: $e");
       return []; // Return an empty list in case of error
+    }
+  }
+  Future<String> addProductReview(String comment, String productId, double rate) async {
+    print("Fetching products from API...");
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    final query = '''
+    mutation CreateProductReview {
+      createProductReview(
+        createProductReviewDto: { 
+          comment: "$comment", 
+          productId: "$productId", 
+          rating: $rate, 
+          userId: "$userId" 
+        }
+      ) {
+        createdAt
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+
+        if (data['data'] != null && data['data']['createProductReview'] != null) {
+          print("Review sent successfully");
+          return "review sent successfully";
+        } else if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        } else {
+          return "Unknown error occurred";
+        }
+      } else {
+        return "Failed to send review: ${response.body}";
+      }
+    } catch (e) {
+      print("Error sending review: $e");
+      return "Error sending review: $e";
     }
   }
   Future<List<dynamic>> searchProduct(String word) async {
@@ -376,10 +432,6 @@ class productService {
       return products;
     }
   }
-
-
-
-
 
   Future<List<productModel>> getCartProducts() async {
     // Step 1: Fetch product IDs and final IDs from SQLite
@@ -514,7 +566,6 @@ class productService {
           customPrice
           stockQuantity
           id
-        
           finalProductVariation {
             productVariation {
               variationType
@@ -571,8 +622,8 @@ class productService {
           final String name = getProduct['name'] ?? 'No Name';
           final String description = getProduct['description'] ?? 'No Description';
           final String imageUrl = getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
-          final double averageRating = getProduct['averageRating']?.toDouble() ?? 0.0;
-          final double lowestCustomPrice = getProduct['lowestCustomPrice']?.toDouble() ?? 0.0;
+          final double averageRating = getProduct['averageRating'].toDouble() ; // Handle null
+          final double lowestCustomPrice = getProduct['lowestCustomPrice']?.toDouble() ?? 0.0; // Handle null
           final int ratingCount = getProduct['ratingCount'] ?? 0;
           final String id = getProduct['id'] ?? 'No ID';
           final String handcrafterName = getProduct['handicrafter']['username'] ?? 'No Name';
@@ -597,6 +648,7 @@ class productService {
           final List<dynamic> reviews = getProduct['reviews'];
           print("reviewwwws");
           print(reviews.length);
+          print(averageRating);
           print(id);
           // Extract gallery images
           List<String> galleryImages = [];
@@ -614,9 +666,9 @@ class productService {
             id,
             imageUrl,
             name,
+            lowestCustomPrice, // Pass the nullable double
+            averageRating.toDouble(), // Pass the nullable double
             finalProducts: finalProducts,
-            lowestCustomPrice,
-            averageRating,
             ratingCount: ratingCount,
             description: description,
             variations: variations,
@@ -629,15 +681,14 @@ class productService {
           return myProduct;
         } else {
           print('getProduct is null');
-          return productModel(" ", " ", " ", 0, 0);
+          return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
         }
       } else {
         print('Failed to load product: ${response.statusCode}');
-        return productModel(" ", " ", " ", 0, 0);
+        return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
       }
     } catch (e) {
       print('Error fetching product: $e');
-      return productModel(" ", " ", " ", 0, 0);
+      return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
     }
-  }
-}
+  }}
