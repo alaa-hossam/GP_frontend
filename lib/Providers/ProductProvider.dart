@@ -7,6 +7,8 @@ class productProvider extends ChangeNotifier {
   productViewModel productVM = productViewModel();
   List<productModel> _products = [];
   List<productModel> get products => _products;
+  List<productModel> _giftRecommendProducts = [];
+  List<productModel> get giftRecommendProducts => _giftRecommendProducts;
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
@@ -26,13 +28,18 @@ class productProvider extends ChangeNotifier {
     // print("Products fetched: $_products");
     notifyListeners();
   }
-  // Future<void> fetchProductsCategory(String categoryId) async {
-  //   print("Fetching products category...");
-  //   await productVM.fetchProductsByCategory(categoryId);
-  //   _productsCategory = productVM.productsCategory.map((product) => product).toList();
-  //   print("products fetched allllllllll: $_productsCategory");
-  //   notifyListeners();
-  // }
+
+  Future<void> fetchGiftRecommendProducts(Map<String, String> answers) async {
+    try {
+      print("Fetching gift recommendations...");
+      _giftRecommendProducts = await productVM.giftRecommendedProducts(answers);
+      print("Gift recommendations fetched: $_giftRecommendProducts");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching gift recommendations: $e");
+      notifyListeners();
+    }
+  }
 
   getSearchProducts(String word) {
     productVM.searchProduct(word);

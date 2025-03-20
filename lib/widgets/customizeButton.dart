@@ -7,10 +7,11 @@ class customizeButton extends StatelessWidget {
   final Color buttonColor;
   Color? IconColor;
   final IconData? buttonIcon;
+  final IconData? sufixIcon;
   final Color fontColor;
   final Border? buttonBorder;
   final Function? onClickButton;
-  double? width, height , textSize;
+  double? width, height , textSize , rad;
   customizeButton(
       {
         required this.buttonName,
@@ -23,6 +24,8 @@ class customizeButton extends StatelessWidget {
         this.height,
         this.IconColor,
         this.textSize,
+        this.sufixIcon,
+        this.rad,
       });
 
   @override
@@ -32,6 +35,7 @@ class customizeButton extends StatelessWidget {
     height ??= SizeConfig.horizontalBlock * 55;
     textSize ??= SizeConfig.textRatio * 20;
     IconColor ??= SizeConfig.iconColor;
+    rad ??= 5 ;
     return GestureDetector(
       onTap: (){if (onClickButton != null) {
         onClickButton!();
@@ -41,7 +45,7 @@ class customizeButton extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: buttonColor,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(rad!),
           border: buttonBorder
         ),
         child:  Row(
@@ -63,6 +67,13 @@ class customizeButton extends StatelessWidget {
                 ),
               ),
             ),
+            if (sufixIcon != null) SizedBox(width: 5 * SizeConfig.horizontalBlock),
+            if(sufixIcon != null)
+              Icon(
+                sufixIcon,
+                color: fontColor,
+                size: textSize,
+              ),
           ],
         ),
 

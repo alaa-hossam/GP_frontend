@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
+import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/logInView.dart';
@@ -169,7 +170,7 @@ class _HomeState extends State<Home> {
                           "Recommend Gifts",
                           Icons.card_giftcard_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, RecommendGift.id);
                       }),
                       sideButton(
                           "Event reminder",

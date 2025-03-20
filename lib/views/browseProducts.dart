@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
+import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
@@ -186,7 +187,7 @@ class _BrowseProductsState extends State<browseProducts> {
                           "Recommend Gifts",
                           Icons.card_giftcard_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, RecommendGift.id);
                       }),
                       sideButton(
                           "Event reminder",

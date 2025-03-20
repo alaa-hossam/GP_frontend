@@ -1,13 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/ViewModels/CategoryViewModel.dart';
+import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../widgets/customizeButton.dart';
+import 'Home.dart';
 
 class HandcrafterRequest extends StatefulWidget {
   static String id = "HandcrafterRequestScreen";
@@ -22,21 +22,25 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
   final TextEditingController _profileName = TextEditingController();
   final TextEditingController BIO = TextEditingController();
   CategoryViewModel CVM = CategoryViewModel();
+  handcrafterViewModel HVM = handcrafterViewModel();
   File? _profileImage;
   File? _nationalIdImage;
   List<String> selectedSpecializations = [];
+  List<String> selectedSpecializationsID = [];
 
-  bool _isLoading = false; // To manage the loading state
+  bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _profileName.dispose();
+    BIO.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage(ImageSource source, bool isProfileImage) async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: source);
-    if (pickedImage != null) {
+    if (pickedImage != null && mounted) {
       setState(() {
         if (isProfileImage) {
           _profileImage = File(pickedImage.path);
@@ -48,8 +52,8 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
   }
 
   void _openSpecializationsBottomSheet(BuildContext context) {
-    // Temporary list to hold selected specializations
     List<String> tempSelectedSpecializations = [];
+    List<String> tempSelectedSpecializationsID = [];
 
     showModalBottomSheet(
       context: context,
@@ -92,7 +96,7 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                       itemCount: specializations.length,
                       itemBuilder: (context, index) {
                         final specialization = specializations[index];
-                        final isSelected = tempSelectedSpecializations.contains(specialization.name); // Check if selected
+                        final isSelected = tempSelectedSpecializations.contains(specialization.name);
 
                         return CheckboxListTile(
                           title: Text(specialization.name),
@@ -100,13 +104,13 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                           onChanged: (value) {
                             setState(() {
                               if (value == true) {
-                                // If checked, add to the temp list
                                 if (!tempSelectedSpecializations.contains(specialization.name)) {
                                   tempSelectedSpecializations.add(specialization.name);
+                                  tempSelectedSpecializationsID.add(specialization.id);
                                 }
                               } else {
-                                // If unchecked, remove from the temp list
                                 tempSelectedSpecializations.remove(specialization.name);
+                                tempSelectedSpecializationsID.remove(specialization.id);
                               }
                             });
                           },
@@ -121,11 +125,13 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                 buttonColor: Color(0xFF5095B0),
                 fontColor: const Color(0xFFF5F5F5),
                 onClickButton: () {
-                  // Update the main list with the temporary selections
-                  setState(() {
-                    selectedSpecializations = List.from(tempSelectedSpecializations); // Save selected specializations
-                  });
-                  Navigator.pop(context); // Close the bottom sheet
+                  if (mounted) {
+                    setState(() {
+                      selectedSpecializations = List.from(tempSelectedSpecializations);
+                      selectedSpecializationsID = List.from(tempSelectedSpecializationsID);
+                    });
+                  }
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -134,48 +140,32 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
       },
     );
   }
-// Function to fetch specializations
+
   Future<List<dynamic>> _fetchSpecializations() async {
     await CVM.fetchSpecialization();
-    return CVM.specialization; // Return the list of specializations
+    return CVM.specialization;
   }
 
-
-
-  void _saveData() async {
-    // Validate if all fields are filled
+  Future<String> _saveData() async {
     if (_profileName.text.isEmpty ||
         BIO.text.isEmpty ||
         _profileImage == null ||
         _nationalIdImage == null ||
         selectedSpecializations.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please fill all fields and select at least one specialization."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
+      return "Please fill all fields";
     }
 
-    // Save images to files (example: save to app's local storage)
-    final profileImagePath = _profileImage!.path;
-    final nationalIdImagePath = _nationalIdImage!.path;
-
-    // TODO: Save the data (e.g., send to backend or local database)
-    print("Profile Name: ${_profileName.text}");
-    print("BIO: ${BIO.text}");
-    print("Profile Image Path: $profileImagePath");
-    print("National ID Image Path: $nationalIdImagePath");
-    print("Selected Specializations: $selectedSpecializations");
-
-    // Show success message
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text("Done!")),
-    // );
-
-    // Navigate back or reset the form
-    Navigator.pop(context);
+    try {
+      return await HVM.addHandcrafter(
+        profileImage: _profileImage,
+        name: _profileName.text,
+        BIO: BIO.text,
+        nationalIdImage: _nationalIdImage,
+        specializationsId: selectedSpecializationsID,
+      );
+    } catch (e) {
+      return "An error occurred: $e";
+    }
   }
 
   @override
@@ -189,8 +179,8 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
+                Color(0xFF223F4A),
+                Color(0xFF5095B0),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -225,179 +215,210 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 16 * SizeConfig.horizontalBlock,
-            vertical: 16 * SizeConfig.verticalBlock,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Photo Section
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    _pickImage(ImageSource.gallery, true); // Open gallery to pick profile image
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(top: 50 * SizeConfig.verticalBlock),
-                    height: 100 * SizeConfig.horizontalBlock,
-                    width: 100 * SizeConfig.horizontalBlock,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16 * SizeConfig.horizontalBlock,
+                vertical: 16 * SizeConfig.verticalBlock,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile Photo Section
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        _pickImage(ImageSource.gallery, true);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 50 * SizeConfig.verticalBlock),
+                        height: 100 * SizeConfig.horizontalBlock,
+                        width: 100 * SizeConfig.horizontalBlock,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          border: Border.all(width: 1, color: SizeConfig.iconColor),
+                          color: const Color(0x80E9E9E9),
+                        ),
+                        child: _profileImage == null
+                            ? Icon(Icons.file_upload_outlined,
+                            color: SizeConfig.iconColor,
+                            size: 30 * SizeConfig.textRatio)
+                            : Image.file(
+                          File(_profileImage!.path),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      "Profile Photo",
+                      style: TextStyle(
+                        fontSize: 20 * SizeConfig.textRatio,
+                        fontFamily: "Roboto",
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24 * SizeConfig.verticalBlock),
+                  MyTextFormField(
+                    controller: _profileName,
+                    labelText: "Profile Name",
+                    width: 361 * SizeConfig.horizontalBlock,
+                    maxLines: 1,
+                  ),
+                  SizedBox(height: 16 * SizeConfig.verticalBlock),
+                  MyTextFormField(
+                    controller: BIO,
+                    labelText: "BIO",
+                    width: 361 * SizeConfig.horizontalBlock,
+                    maxLines: 5,
+                  ),
+                  SizedBox(height: 16 * SizeConfig.verticalBlock),
+                  Text(
+                    "Specializations",
+                    style: TextStyle(
+                      fontSize: 20 * SizeConfig.textRatio,
+                      fontFamily: "Roboto",
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10 * SizeConfig.horizontalBlock),
+                    height: 60 * SizeConfig.verticalBlock,
+                    width: 361 * SizeConfig.horizontalBlock,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       border: Border.all(width: 1, color: SizeConfig.iconColor),
                       color: const Color(0x80E9E9E9),
                     ),
-                    child: _profileImage == null
-                        ? Icon(
-                      Icons.file_upload_outlined,
-                        color: SizeConfig.iconColor,
-                        size: 30 * SizeConfig.textRatio
-                    )
-                        : Image.file(
-                      File(_profileImage!.path),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: Text(
-                  "Profile Photo",
-                  style: TextStyle(
-                    fontSize: 20 * SizeConfig.textRatio,
-                    fontFamily: "Roboto",
-                  ),
-                ),
-              ),
-              SizedBox(height: 24 * SizeConfig.verticalBlock), // Add spacing
-
-              // Profile Name Field
-              MyTextFormField(
-                controller: _profileName,
-                labelText: "Profile Name",
-                width: 361 * SizeConfig.horizontalBlock,
-                maxLines: 1, // Single-line input
-              ),
-              SizedBox(height: 16 * SizeConfig.verticalBlock), // Add spacing
-
-              // BIO Field
-              MyTextFormField(
-                controller: BIO,
-                labelText: "BIO",
-                width: 361 * SizeConfig.horizontalBlock,
-                maxLines: 5, // Allow multiple lines for BIO
-              ),
-              SizedBox(height: 16 * SizeConfig.verticalBlock), // Add spacing
-              Text(
-                "Specializations",
-                style: TextStyle(
-                  fontSize: 20 * SizeConfig.textRatio,
-                  fontFamily: "Roboto",
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10 * SizeConfig.horizontalBlock),
-                height: 60 * SizeConfig.verticalBlock,
-                width: 361 * SizeConfig.horizontalBlock,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  border: Border.all(width: 1, color: SizeConfig.iconColor),
-                  color: const Color(0x80E9E9E9),
-                ),
-                child: Row(
-                  children: [
-                    if (selectedSpecializations.isNotEmpty)
-                      Expanded(
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: selectedSpecializations.length,
-                          itemBuilder: (context, index) {
-                            final specialization = selectedSpecializations[index];
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                right: 8 * SizeConfig.horizontalBlock,),
-                              child: customizeButton(
-                                buttonName: specialization,
-                                buttonColor: Color(0xFF5095B0),
-                                fontColor: Color(0xFFFFFFFF),
-                                textSize: 14 * SizeConfig.textRatio,
-                                width: 60 * SizeConfig.horizontalBlock,
-                                height: 25 * SizeConfig.verticalBlock,
-                              ),
-                            );
+                    child: Row(
+                      children: [
+                        if (selectedSpecializations.isNotEmpty)
+                          Expanded(
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: selectedSpecializations.length,
+                              itemBuilder: (context, index) {
+                                final specialization = selectedSpecializations[index];
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    right: 8 * SizeConfig.horizontalBlock,
+                                  ),
+                                  child: customizeButton(
+                                    buttonName: specialization,
+                                    buttonColor: Color(0xFF5095B0),
+                                    fontColor: Color(0xFFFFFFFF),
+                                    textSize: 14 * SizeConfig.textRatio,
+                                    width: 60 * SizeConfig.horizontalBlock,
+                                    height: 25 * SizeConfig.verticalBlock,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        customizeButton(
+                          buttonColor: Color(0xFFB36995),
+                          buttonName: "Add",
+                          fontColor: Color(0xFFFFFFFF),
+                          buttonIcon: Icons.add,
+                          IconColor: Color(0xFFFFFFFF),
+                          textSize: 14 * SizeConfig.textRatio,
+                          width: 60 * SizeConfig.horizontalBlock,
+                          height: 25 * SizeConfig.verticalBlock,
+                          onClickButton: () {
+                            _openSpecializationsBottomSheet(context);
                           },
                         ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16 * SizeConfig.verticalBlock),
+                  Text(
+                    "National ID",
+                    style: TextStyle(
+                      fontSize: 20 * SizeConfig.textRatio,
+                      fontFamily: "Roboto",
+                    ),
+                  ),
+                  SizedBox(height: 8 * SizeConfig.verticalBlock),
+                  GestureDetector(
+                    onTap: () {
+                      _pickImage(ImageSource.gallery, false);
+                    },
+                    child: Container(
+                      height: 60 * SizeConfig.horizontalBlock,
+                      width: 361 * SizeConfig.horizontalBlock,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        border: Border.all(width: 1, color: SizeConfig.iconColor),
+                        color: const Color(0x80E9E9E9),
                       ),
-                    // Add Button
-                    customizeButton(
-                      buttonColor: Color(0xFFB36995),
-                      buttonName: "Add",
-                      fontColor: Color(0xFFFFFFFF),
-                      buttonIcon: Icons.add,
-                      IconColor: Color(0xFFFFFFFF),
-                      textSize: 14 * SizeConfig.textRatio,
-                      width: 60 * SizeConfig.horizontalBlock,
-                      height: 25 * SizeConfig.verticalBlock,
-                      onClickButton: () {
-                        _openSpecializationsBottomSheet(context);
+                      child: _nationalIdImage == null
+                          ? Icon(Icons.file_upload_outlined,
+                          color: SizeConfig.iconColor,
+                          size: 30 * SizeConfig.textRatio)
+                          : Image.file(
+                        File(_nationalIdImage!.path),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24 * SizeConfig.verticalBlock),
+                  Center(
+                    child: customizeButton(
+                      buttonName: 'Finish',
+                      buttonColor: Color(0xFF5095B0),
+                      fontColor: const Color(0xFFF5F5F5),
+                      width: 200 * SizeConfig.horizontalBlock,
+                      height: 50 * SizeConfig.verticalBlock,
+                      onClickButton: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        String response = await _saveData();
+
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          if (response == "Please fill all fields") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Please fill all fields and select at least one specialization."),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else if (response == "Handcrafter added successfully") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Your Request Sent successfully!")),
+                            );
+                            Navigator.pushReplacementNamed(context, Home.id);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response)),
+                            );
+                          }
+                        }
                       },
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16 * SizeConfig.verticalBlock), // Add spacing
-
-              // National ID Section
-              Text(
-                "National ID",
-                style: TextStyle(
-                  fontSize: 20 * SizeConfig.textRatio,
-                  fontFamily: "Roboto",
-                ),
-              ),
-              SizedBox(height: 8 * SizeConfig.verticalBlock), // Add spacing
-              GestureDetector(
-                onTap: () {
-                  _pickImage(ImageSource.gallery, false); // Open gallery to pick national ID image
-                },
-                child: Container(
-                  height: 60 * SizeConfig.horizontalBlock,
-                  width: 361 * SizeConfig.horizontalBlock,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(width: 1, color: SizeConfig.iconColor),
-                    color: const Color(0x80E9E9E9),
                   ),
-                  child: _nationalIdImage == null
-                      ? Icon(
-                      Icons.file_upload_outlined,
-                      color: SizeConfig.iconColor,
-                      size: 30 * SizeConfig.textRatio
-                  )
-                      : Image.file(
-                    File(_nationalIdImage!.path),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                ],
               ),
-              SizedBox(height: 24 * SizeConfig.verticalBlock), // Add spacing
-
-              // Finish Button
-              Center(
-                child: customizeButton(
-                  buttonName: 'Finish',
-                  buttonColor: Color(0xFF5095B0),
-                  fontColor: const Color(0xFFF5F5F5),
-                  width: 200 * SizeConfig.horizontalBlock,
-                  height: 50 * SizeConfig.verticalBlock,
-                  onClickButton: _saveData,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: CircularProgressIndicator(color: SizeConfig.iconColor,),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

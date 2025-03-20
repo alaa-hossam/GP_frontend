@@ -184,6 +184,76 @@ class productService {
   }
 
 
+  Future<List<productModel>> getGifRecommendationProducts(Map<String, String> answers) async {
+    print("Fetching products from API...");
+    List<productModel> giftProducts = [];
+
+    // Convert the answers map into the required qaPairs format
+    List<String> qaPairs = [];
+    answers.forEach((key, value) {
+      qaPairs.add('{ question: "$key", answer: "$value" }');
+    });
+
+    // Construct the GraphQL query string
+    final query = '''
+    query GiftRecommendations {
+      giftRecommendations(
+        input: { qaPairs: [${qaPairs.join(', ')}] }
+      ) {
+        id
+        imageUrl
+        category {
+          name
+        }
+        name
+        averageRating
+        lowestCustomPrice
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['giftRecommendations'];
+        print(data);
+
+        for (var product in prods) {
+          giftProducts.add(productModel(
+            product['id'],
+            product['imageUrl'],
+            product['name'],
+            category: product['category']['name'],
+            product['lowestCustomPrice'].toDouble(),
+            product['averageRating'].toDouble(),
+          ));
+        }
+
+        print("Products fetched successfully: $giftProducts");
+        return giftProducts;
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return []; // Return an empty list in case of error
+    }
+  }
   Future<List<dynamic>> searchProduct(String word) async {
     List<dynamic> products;
     print("before");

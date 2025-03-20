@@ -27,6 +27,17 @@ class productViewModel  extends ChangeNotifier{
     return apiServices.getWishProducts();
 
   }
+  Future<List<productModel>> giftRecommendedProducts(Map<String, String> answers) async {
+    try {
+      print("Fetching gift recommendations from API...");
+      final products = await apiServices.getGifRecommendationProducts(answers);
+      print("Gift recommendations fetched successfully: $products");
+      return products;
+    } catch (e) {
+      debugPrint("Error fetching gift recommendations in VM: $e");
+      return [];
+    }
+  }
 
 
   cartProducts()async{

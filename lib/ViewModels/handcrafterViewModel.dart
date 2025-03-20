@@ -9,7 +9,9 @@ class handcrafterViewModel {
 
 
   Future<String> addHandcrafter({required profileImage,required name,required BIO,required nationalIdImage, required specializationsId})async{
+    print("in HVMMMMMMMMMMMM");
     handcrafterModel handcrafter = handcrafterModel(name,profileImage,BIO, specializationsId, nationalIdImage);
+    print("in HVMMMMMMMMMMMM22222222222222222");
     return handcrafterSer.addHandcrafter(handcrafter);
   }
 
