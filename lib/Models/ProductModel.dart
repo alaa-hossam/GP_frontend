@@ -10,7 +10,8 @@ class productModel {
   String _imageURL, _name, _id;
   String? description, handcrafterName, category , handcrafterImage;
   double _price, _rate;
-  int? stock, ratingCount;
+  double? stock;
+  int? ratingCount , Quantity;
   List<dynamic>? finalProducts, variations;
   List<dynamic>? reviews;
   List<String>? galleryImg;
@@ -24,7 +25,8 @@ class productModel {
       this.variations,
       this.handcrafterImage,
       this.reviews,
-      this.galleryImg});
+      this.galleryImg,
+      this.Quantity});
 
   get rate => _rate;
 
@@ -309,7 +311,7 @@ class productService {
 
 
 
-  Future<Map<String, dynamic>> getCartProducts() async {
+  Future<List<productModel>> getCartProducts() async {
     // Step 1: Fetch product IDs and final IDs from SQLite
     myCart.db;
     List<String> ids =
@@ -320,34 +322,46 @@ class productService {
     await myCart.getProduct("SELECT * FROM products").then((result) {
       return result.map<String>((row) => row['finalId'].toString()).toList();
     });
-    //
-    print("Product IDs: $ids");
-    // print("Final IDs: $finalIds");
+    Map<String , int> numOfIds = {};
 
-    // Step 2: Prepare the GraphQL query
+    for(var id in finalIds){
+      if (numOfIds.containsKey(id)) {
+        numOfIds[id] = numOfIds[id]! + 1;
+      } else {
+        numOfIds[id] = 1;
+      }
+    }
+
+
+    print("Product IDs: $finalIds");
+
     const String query = '''
-    query GetProductsByIds(\$productIds: [String!]!) {
-      getProductsByIds(productIds: \$productIds) {
-        averageRating
+  query GetFinalProductsByIds(\$finalProductIds: [String!]!) {
+    getFinalProductsByIds(finalProductIds: \$finalProductIds) {
+      customPrice
+      imageUrl
+      product {
+        name
         category {
           name
         }
-        finalProducts {
-          customPrice
-          imageUrl
-          id
-        }
-        imageUrl
-        name
         id
+        averageRating
+      }
+      id
+      finalProductVariation {
+        productVariation {
+          variationType
+          variationValue
+        }
       }
     }
-  ''';
-
+  }
+''';
     final request = {
       'query': query,
       'variables': {
-        'productIds': ids,
+        'finalProductIds': finalIds,
       },
     };
 
@@ -365,68 +379,41 @@ class productService {
         },
         body: jsonEncode(request),
       );
-
       // Step 5: Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        List<dynamic> prods = data['data']['getProductsByIds'];
-        print("response");
-        print(data);
-        // print("Products fetched successfully: $prods");
+        List<dynamic> prods = data['data']['getFinalProductsByIds'];
 
-        // Create a map to store the count of each final product
-        Map<String, int> finalProductCounts = {};
 
-        // List to store cart products
-        List<Map<String, dynamic>> cartProducts = [];
+        List<productModel> finalProducts = [];
 
-        print("final Products");
-        print(prods);
 
         for (var product in prods) {
-          // Find all corresponding final products using finalId
-          var matchingFinalProducts = product['finalProducts']
-              .where((fp) => finalIds.contains(fp['id'].toString()))
-              .toList();
-          print("matching Products");
-          print(matchingFinalProducts);
+          try {
+            finalProducts.add(productModel(
+              product['product']['id'],
+              product['imageUrl'],
+              product['product']['name'],
+              product['customPrice'].toDouble(),
+              product['product']['averageRating'].toDouble(),
+              category: product['product']['category']['name'],
+              variations: product['finalProductVariation'],
+              Quantity: numOfIds[product['id']]
+            ));
 
-          // If there are matching final products, add them to cartProducts
-          if (matchingFinalProducts.isNotEmpty) {
-            // print()
-            for (var finalProduct in matchingFinalProducts) {
-              cartProducts.add({
-                'id': product['id'],
-                'name': product['name'],
-                'imageUrl': product['imageUrl'],
-                'category': product['category']['name'],
-                'averageRating': product['averageRating'],
-                'finalProduct': finalProduct, // Add each matching final product
-              });
-
-              // Update the count for this final product
-              finalProductCounts[finalProduct['id'].toString()] =
-                  (finalProductCounts[finalProduct['id'].toString()] ?? 0) + 1;
-              print(finalProduct['id']);
-              print(finalProductCounts[finalProduct['id']]);
-            }
+            print("Product added successfully"); // Debugging
+          } catch (e) {
+            print("Error adding product: $e"); // Log the error
+            print("Problematic product: $product"); // Log the problematic product
           }
         }
+        return finalProducts;
 
-        // Return both cartProducts and finalProductCounts
-        return {
-          'cartProducts': cartProducts,
-          'finalProductCounts': finalProductCounts,
-        };
       } else {
         throw Exception('Failed to load products: ${response.body}');
       }
     } catch (e) {
-      return {
-        'cartProducts': [],
-        'finalProductCounts': {},
-        'error': 'Failed to fetch products: $e',
-      };
+      return [];
     }
   }
 

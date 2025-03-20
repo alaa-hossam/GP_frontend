@@ -1,39 +1,25 @@
 import 'package:flutter/cupertino.dart';
+import '../Models/ProductModel.dart';
 import '../ViewModels/productViewModel.dart';
 
 class cartProvider with ChangeNotifier {
-  List<dynamic> _cartProducts = [];
-  Map<dynamic, int> _finalProductCounts = {}; // To store counts of final products
+  List<productModel> _cartProducts = [];
+  Map<dynamic, int> _finalProductCounts = {};
   productViewModel productVM = productViewModel();
 
-  List<dynamic> get cartProducts => _cartProducts;
+  List<productModel> get cartProducts => _cartProducts;
   Map<dynamic, int> get finalProductCounts => _finalProductCounts;
 
-  Future<Map<String, dynamic>> getCartProduct() async {
-    print("in Provider");
+   getCartProduct() async {
     try {
-      // Fetch cart products from the ViewModel
-      var result = await productVM.cartProducts();
-
-      // Update the internal state
-      _cartProducts = result['cartProducts'];
-      _finalProductCounts = result['finalProductCounts'];
-
-      // Notify listeners to update the UI
+       _cartProducts = await productVM.cartProducts();
+      print("in provider");
+     print(cartProducts);
       notifyListeners();
 
-      // Return the result
-      return {
-        'cartProducts': _cartProducts,
-        'finalProductCounts': _finalProductCounts,
-      };
+
     } catch (e) {
       print("Error fetching cart products: $e");
-      // Return an empty structure in case of error
-      return {
-        'cartProducts': [],
-        'finalProductCounts': {},
-      };
     }
   }
 }

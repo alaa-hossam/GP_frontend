@@ -68,11 +68,12 @@ class Cart {
     return response;
   }
 
-  Future<List<Map>> getProduct(String query, [List<dynamic>? arguments]) async {
-    Database? myCart = await db;
-    List<Map> response = await myCart!.rawQuery(query, arguments);
+  Future<List<Map>> getProduct(String query) async {
+    Database? myCart = await db; // Initialize the database
+    List<Map> response = await myCart!.rawQuery(query);
     return response;
   }
+
 
   Future<void> recreateProductsTable() async {
     Database? product = await db; // Initialize the database

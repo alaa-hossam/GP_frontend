@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
+import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -217,9 +218,14 @@ class _HomeState extends State<Home> {
                   size: 24 * SizeConfig.textRatio,
                 ),
               ),
-              Icon(
-                Icons.shopping_cart_outlined,
-                size: 24 * SizeConfig.textRatio,
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, cartScreen.id);
+                },
+                icon: Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 24 * SizeConfig.textRatio,
+                ),
               ),
               IconButton(
                 onPressed: () {

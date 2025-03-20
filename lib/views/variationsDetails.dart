@@ -56,6 +56,7 @@ class _variationScreenState extends State<variationScreen> {
     print("insert product in cart");
     await myCart.addProduct(id, finalId);
     print('Product data inserted!');
+
   }
 
   void _showGalleryPopup(BuildContext context, List<dynamic> galleryImages) {

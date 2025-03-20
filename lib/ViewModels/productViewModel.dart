@@ -29,8 +29,8 @@ class productViewModel  extends ChangeNotifier{
   }
 
 
-  cartProducts(){
-    return apiServices.getCartProducts();
+  cartProducts()async{
+    return await  apiServices.getCartProducts();
 
   }
 
