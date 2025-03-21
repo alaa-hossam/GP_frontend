@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
 
 import '../Models/ProductModel.dart';
 
@@ -6,6 +7,7 @@ class productViewModel  extends ChangeNotifier{
   final productService apiServices = productService();
   List<productModel> _products = [];
   List<productModel> get products => _products;
+  Cart myCart = Cart();
 
   Future<void> fetchProducts(String categoryId) async {
     try {
@@ -45,6 +47,10 @@ class productViewModel  extends ChangeNotifier{
   cartProducts()async{
     return await  apiServices.getCartProducts();
 
+  }
+
+  deleteCartProduct(String finalId) async{
+    return await myCart.deleteProduct(finalId);
   }
 
   productDetails(String productId){

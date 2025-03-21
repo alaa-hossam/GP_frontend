@@ -14,7 +14,7 @@ class cartProvider with ChangeNotifier {
     try {
        _cartProducts = await productVM.cartProducts();
       print("in provider");
-     print(cartProducts);
+     print(_cartProducts);
       notifyListeners();
 
 
@@ -22,4 +22,12 @@ class cartProvider with ChangeNotifier {
       print("Error fetching cart products: $e");
     }
   }
+
+  deleteCartProduct(String finalId) async{
+     print("......................");
+     await productVM.deleteCartProduct(finalId);
+     print("in delete");
+     print(productVM.cartProducts());
+getCartProduct();
+   }
 }

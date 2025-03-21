@@ -42,6 +42,7 @@ class _HomeState extends State<Home> {
     super.initState();
     catProvider = Provider.of<CategoryProvider>(context, listen: false);
     catProvider.fetchCategories();
+
   }
   Token token = Token();
 

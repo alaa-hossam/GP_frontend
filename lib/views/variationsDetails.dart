@@ -378,12 +378,7 @@ class _variationScreenState extends State<variationScreen> {
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                // if (!showCartIcon) {
-                                //   showCartIcon = !showCartIcon;
-                                // }
-                                // if (detailsProvider.finalPrice != 0) {
-                                //   count++;
-                                // }
+
                               });
                               if (detailsProvider.finalPrice == 0) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -429,29 +424,6 @@ class _variationScreenState extends State<variationScreen> {
                             ),
                           ),
 
-
-                          // Spacing
-                          // if (showCartIcon) // Show cart icon conditionally
-                          //   Stack(children: [
-                          //     IconButton(
-                          //         icon: Icon(
-                          //           Icons.shopping_cart,
-                          //           size: 40 * SizeConfig.textRatio,
-                          //           color: SizeConfig.iconColor,
-                          //         ),
-                          //         onPressed: () {
-                          //           Navigator.pushNamed(context, cartScreen.id,
-                          //               arguments: widget.myProduct.id);
-                          //         }),
-                          //     Positioned(
-                          //         bottom: 3 * SizeConfig.verticalBlock,
-                          //         right: 2 * SizeConfig.horizontalBlock,
-                          //         child: CircleAvatar(
-                          //           radius: 10,
-                          //           backgroundColor: Colors.white,
-                          //           child: Text("${count}"),
-                          //         ))
-                          //   ]),
                         ],
                       ),
                       SizedBox(

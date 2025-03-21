@@ -86,4 +86,28 @@ class Cart {
     await _createDB(product, 1);
     print("products table recreated successfully");
   }
+
+  Future<int> deleteProduct(String finalId) async {
+    final myCart = await db;
+    return await myCart!.rawDelete(
+      '''
+    DELETE FROM products
+    WHERE ROWID = (
+      SELECT ROWID FROM products
+      WHERE finalId = ?
+      LIMIT 1
+    )
+    ''',
+      [finalId], // Arguments for the WHERE clause
+    );
+  }
+  Future<int> deleteAllProduct(String finalId) async {
+
+    final myCart = await db;
+    return await myCart!.delete(
+      'products', // Table name
+      where: 'finalId = ?', // WHERE clause
+      whereArgs: [finalId], // Arguments for the WHERE clause
+    );
+  }
 }

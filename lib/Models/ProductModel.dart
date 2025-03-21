@@ -8,32 +8,29 @@ import '../SqfliteCodes/cart.dart';
 
 class productModel {
   String _imageURL, _name, _id;
-  String? description, handcrafterName, category, handcrafterImage;
+  String? description, handcrafterName, category , handcrafterImage, finalId;
   double _price, _rate;
-  double? stock;
+  double? stock , duration;
   int? ratingCount, Quantity;
   List<dynamic>? finalProducts, variations;
   List<dynamic>? reviews;
   List<String>? galleryImg;
+  productModel(this._id, this._imageURL, this._name, this._price, this._rate,
+      {this.description,
+      this.stock,
+      this.handcrafterName,
+      this.ratingCount,
+      this.category,
+      this.finalProducts,
+      this.variations,
+      this.handcrafterImage,
+      this.reviews,
+      this.galleryImg,
+      this.Quantity,
+      this.finalId,
+      this.duration});
 
-  productModel(
-      this._id,
-      this._imageURL,
-      this._name,
-      this._price,
-      this._rate, {
-        this.description,
-        this.stock,
-        this.handcrafterName,
-        this.ratingCount,
-        this.category,
-        this.finalProducts,
-        this.variations,
-        this.handcrafterImage,
-        this.reviews,
-        this.galleryImg,
-        this.Quantity,
-      });
+
 
   double get rate => _rate;
   double get price => _price;
@@ -471,12 +468,13 @@ class productService {
         averageRating
       }
       id
-      finalProductVariation {
-        productVariation {
-          variationType
-          variationValue
+       finalProductVariation {
+            productVariation {
+                variationType
+                variationValue
+            }
         }
-      }
+
     }
   }
 ''';
@@ -520,10 +518,10 @@ class productService {
               product['product']['averageRating'].toDouble(),
               category: product['product']['category']['name'],
               variations: product['finalProductVariation'],
+                finalId: product['id'],
               Quantity: numOfIds[product['id']]
             ));
 
-            print("Product added successfully"); // Debugging
           } catch (e) {
             print("Error adding product: $e"); // Log the error
             print("Problematic product: $product"); // Log the problematic product
@@ -646,10 +644,7 @@ class productService {
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
           final List<dynamic> reviews = getProduct['reviews'];
-          print("reviewwwws");
-          print(reviews.length);
-          print(averageRating);
-          print(id);
+
           // Extract gallery images
           List<String> galleryImages = [];
           for (var finalProduct in finalProducts) {

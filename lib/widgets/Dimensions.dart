@@ -12,6 +12,8 @@ class SizeConfig {
   static late double textRatio;
   static const Color fontColor = Color(0x803C3C3C);
   static const Color iconColor = Color(0xFF5095B0);
+  static const Color secondColor = Color(0xFFB36995);
+
 
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
