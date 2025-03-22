@@ -11,12 +11,12 @@ class customProduct extends StatefulWidget {
   double Price, rate;
   bool showCompare;
   int? comparedNum;
-  String? Category;
+  String? Category , comapreName;
   final Function(productModel)? onComparePressed;
 
   customProduct(this.imageURL, this.Name, this.Price, this.rate,
       this.id, this.showCompare,
-      {this.onComparePressed, this.comparedNum , this.Category});
+      {this.onComparePressed, this.comparedNum , this.Category , this.comapreName});
 
   @override
   State<customProduct> createState() => _customProductState(
@@ -28,7 +28,8 @@ class customProduct extends StatefulWidget {
       this.showCompare,
       onComparePressed: this.onComparePressed,
       comparNum: this.comparedNum,
-  Category:this.Category,);
+  Category:this.Category,
+  compareName:this.comapreName);
 }
 
 class _customProductState extends State<customProduct> {
@@ -37,13 +38,13 @@ class _customProductState extends State<customProduct> {
   wishList wishListObj = wishList();
   bool showCompare;
   int? comparNum;
-  String? Category;
+  String? Category,compareName;
   final Function(productModel)? onComparePressed;
   bool isTapped = true;
 
   _customProductState(this.imageURL, this.Name, this.Price,
       this.rate, this.id, this.showCompare,
-      {this.onComparePressed, this.comparNum , this.Category});
+      {this.onComparePressed, this.comparNum , this.Category , this.compareName});
 
 
 
@@ -71,7 +72,6 @@ class _customProductState extends State<customProduct> {
   Tapping() {
 
     if (widget.comparedNum == 2 && isTapped) {
-      print("iam in");
 
       if (widget.onComparePressed != null) {
 
@@ -186,7 +186,7 @@ class _customProductState extends State<customProduct> {
                                   : Color(0x50E9E9E9),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
-                          child: Center(child: Text("Compare")),
+                          child: Center(child: Text('${compareName}')),
                         ),
                         onTap: () {
                           Tapping();

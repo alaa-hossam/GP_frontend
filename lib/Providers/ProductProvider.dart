@@ -5,7 +5,7 @@ import '../ViewModels/productViewModel.dart';
 
 class productProvider extends ChangeNotifier {
   productViewModel productVM = productViewModel();
-  List<productModel> _products = [];
+  List<productModel> _products = [] , handCrafterProducts = [];
   List<productModel> get products => _products;
   List<productModel> _giftRecommendProducts = [];
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
@@ -74,6 +74,15 @@ class productProvider extends ChangeNotifier {
   }
 
 
+  Future<void> fetchHandCrafter() async {
+
+    handCrafterProducts = await productVM.handCrafterProducts();
+    notifyListeners();
+  }
+
+  Future<List<productModel>> productVariation(List<String> productIds)async{
+    return await productVM.productVariation(productIds);
+  }
 
 
 

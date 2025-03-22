@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/views/BazarProductsReview.dart';
 import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/Home.dart';
@@ -13,6 +14,7 @@ import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
+import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/productReviews.dart';
@@ -29,6 +31,7 @@ import 'firebase_options.dart';
 import 'views/signUpView.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'fireBaseNotification.dart';
+import 'views/BazarVariations.dart';
 
 
 void main() async {
@@ -94,6 +97,10 @@ class MyApp extends StatelessWidget {
         cartScreen.id:(BuildContext context) => cartScreen(),
         RecommendGift.id : (BuildContext context) => RecommendGift(),
         GiftRecommendationProducts.id : (BuildContext context) => GiftRecommendationProducts(),
+        JoinBazar.id : (BuildContext context) => JoinBazar(),
+        BazarVariations.id : (BuildContext context) => BazarVariations(),
+        BazarReview.id : (BuildContext context) => BazarReview(),
+
       },
     );
   }

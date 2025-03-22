@@ -3,6 +3,7 @@ import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
+import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -153,7 +154,7 @@ class _HomeState extends State<Home> {
                       }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, JoinBazar.id);
                       }),
                       sideButton("History", Icons.history_outlined,
                           SizeConfig.iconColor, () {

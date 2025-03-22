@@ -72,6 +72,7 @@ class _logInState extends State<logIn> {
                         hintName: "Password",
                         icon: Icons.lock,
                         isObscureText: obscureText,
+                        maxLines: obscureText ? 1 : null, // Set maxLines to 1 if obscureText is true
                         suffixIcon: IconButton(
                           icon: Icon(
                             obscureText ? Icons.visibility_off : Icons.visibility,

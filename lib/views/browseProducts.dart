@@ -82,6 +82,7 @@ class _BrowseProductsState extends State<browseProducts> {
     });
   }
 
+
   Future<void> _handleCategorySelection(CategoryModel category) async {
     setState(() {
       selectedIndex = catProvider.categories.indexOf(category);
@@ -266,7 +267,8 @@ class _BrowseProductsState extends State<browseProducts> {
           ],
         ),
       ),
-      body: Stack(
+      body:
+      Stack(
         children: [
           SingleChildScrollView(
             child: Column(

@@ -26,7 +26,8 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
     final wishProvider = Provider.of<productProvider>(context, listen: false);
 
     return GestureDetector(
-      child: Padding(
+      child:
+      Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 15.0 * SizeConfig.horizontalBlock,
           vertical: 5 * SizeConfig.verticalBlock,

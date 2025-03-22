@@ -310,235 +310,229 @@ class _cartScreenState extends State<cartScreen> {
       body: Consumer<cartProvider>(
         builder: (context, myCart, child) {
           if (myCart.cartProducts.isEmpty) {
-            return Center(child: Text("your Cart Is Empty"));
+            return Center(child: Text("your Cart is Empty"));
           }
           double totalPrice = getTotalPrice(myCart);
           return ListView(
             children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: myCart.cartProducts.length,
-                itemBuilder: (context, index) {
+              SizedBox(
+                height: 400 * SizeConfig.verticalBlock,
+                child: ListView.builder(
+                  itemCount: myCart.cartProducts.length,
+                  itemBuilder: (context, index) {
 
-                  if (myCart.cartProducts[index].Quantity == null) {
-                    myCart.cartProducts[index].Quantity = 0;
-                  }
-                  print(myCart.cartProducts[index].Quantity);
-                  return Padding(
-                    padding: EdgeInsets.only(
-                        top: 5 * SizeConfig.verticalBlock,
-                        left: 5 * SizeConfig.horizontalBlock,
-                        right: 5 * SizeConfig.horizontalBlock),
-                    child: Container(
-                      width: 358 * SizeConfig.horizontalBlock,
-                      height: 150 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        color: Color(0x50E9E9E9),
-                        border: Border.all(width: 2, color: SizeConfig.iconColor),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(2.0 * SizeConfig.verticalBlock),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              child: Image.network(
-                                myCart.cartProducts[index].imageURL,
-                                width: 140 * SizeConfig.horizontalBlock,
-                                height: 140 * SizeConfig.verticalBlock,
-                                fit: BoxFit
-                                    .cover, // Ensures the image fills the space
+                    if (myCart.cartProducts[index].Quantity == null) {
+                      myCart.cartProducts[index].Quantity = 0;
+                    }
+                    print(myCart.cartProducts[index].Quantity);
+                    return Padding(
+                      padding: EdgeInsets.only(
+                          top: 5 * SizeConfig.verticalBlock,
+                          left: 5 * SizeConfig.horizontalBlock,
+                          right: 5 * SizeConfig.horizontalBlock),
+                      child: Container(
+                        width: 358 * SizeConfig.horizontalBlock,
+                        height: 150 * SizeConfig.verticalBlock,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          color: Color(0x50E9E9E9),
+                          border: Border.all(width: 2, color: SizeConfig.iconColor),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(2.0 * SizeConfig.verticalBlock),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                child: Image.network(
+                                  myCart.cartProducts[index].imageURL,
+                                  width: 140 * SizeConfig.horizontalBlock,
+                                  height: 140 * SizeConfig.verticalBlock,
+                                  fit: BoxFit
+                                      .cover, // Ensures the image fills the space
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 100 * SizeConfig.horizontalBlock,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                top: 10 * SizeConfig.verticalBlock,
-                                bottom: 10 * SizeConfig.verticalBlock,
-                              ),
-                              child: Stack(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        myCart.cartProducts[index].name,
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 16 * SizeConfig.textRatio,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        myCart.cartProducts[index].category!,
-                                        style: GoogleFonts.rubik(
-                                          fontSize: 11 * SizeConfig.textRatio,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0x50000000),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10 * SizeConfig.verticalBlock,
-                                      ),
-                                      SizedBox(
-                                        width: 50 * SizeConfig.horizontalBlock,
-                                        child: ListView.builder(
-                                            shrinkWrap: true,
-                                            physics: NeverScrollableScrollPhysics(),
-                                            itemCount: myCart.cartProducts[index].variations?.length ?? 0,
-                                            itemBuilder: (context , index){
-                                              final product = myCart.cartProducts[index];
-                                              final variations = product.variations;
-
-                                              if (variations != null && variations.isNotEmpty && index < variations.length) {
-                                                final variation = variations[index];
-                                                final variationType = variation?['productVariation']?['variationType'] ?? 'N/A';
-                                                final variationValue = variation?['productVariation']?['variationValue'] ?? 'N/A';
-
-                                                return Column(
-                                                  children: [
-                                                    Text(variationType + ":" + variationValue  , style: GoogleFonts.roboto(color: Color(0x50000000), fontSize: 12 * SizeConfig.textRatio),),
-
-                                                  ],
-                                                );
-                                              } else {
-                                                return Text('No Variations' , );
-                                              }
-
-                                            }
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10 * SizeConfig.verticalBlock,
-                                      ),
-
-
-                                    ],
-                                  ),
-                                  Positioned(
-                                      bottom: 5 * SizeConfig.verticalBlock,
-                                      child:    Text(
-                                        '${myCart.cartProducts[index].price * myCart.cartProducts[index].Quantity!} EG',
-                                        style: GoogleFonts.roboto(
-                                            fontSize: 20 * SizeConfig.textRatio,
-                                            fontWeight: FontWeight.bold),
-                                      ))
-                                ],
-                              ),
-                            ),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFD4931C),
-                                  ),
-                                  Text(
-                                    '${myCart.cartProducts[index].rate}',
-                                    style: GoogleFonts.rubik(
-                                        color: Color(0x50000000),
-                                        fontSize: 11 * SizeConfig.textRatio),
-                                  )
-                                ],
-                              ),
-                              Padding(
+                            SizedBox(
+                              width: 100 * SizeConfig.horizontalBlock,
+                              child: Padding(
                                 padding: EdgeInsets.only(
-                                    left: 10 * SizeConfig.verticalBlock,
-                                    top: 10 * SizeConfig.verticalBlock,
-                                    bottom: 10 * SizeConfig.verticalBlock,
-                                    right: 5 * SizeConfig.verticalBlock),
-                                child: Container(
-                                    width: 110 * SizeConfig.horizontalBlock,
-                                    height: 42 * SizeConfig.verticalBlock,
-                                    decoration: BoxDecoration(
-                                        border:
-                                            Border.all(color: SizeConfig.iconColor),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(
-                                                10 * SizeConfig.textRatio))),
-                                    child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                bottom: 10.0 *
-                                                    SizeConfig.verticalBlock),
-                                            child: IconButton(
+                                  top: 10 * SizeConfig.verticalBlock,
+                                  bottom: 10 * SizeConfig.verticalBlock,
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          myCart.cartProducts[index].name,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 16 * SizeConfig.textRatio,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          myCart.cartProducts[index].category!,
+                                          style: GoogleFonts.rubik(
+                                            fontSize: 11 * SizeConfig.textRatio,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0x50000000),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10 * SizeConfig.verticalBlock,
+                                        ),
+                                        SizedBox(
+                                          width: 50 * SizeConfig.horizontalBlock,
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              physics: NeverScrollableScrollPhysics(),
+                                              itemCount: myCart.cartProducts[index].variations?.length ?? 0,
+                                              itemBuilder: (context , index){
+                                                final product = myCart.cartProducts[index];
+                                                final variations = product.variations;
+
+                                                if (variations != null && variations.isNotEmpty && index < variations.length) {
+                                                  final variation = variations[index];
+                                                  final variationType = variation?['productVariation']?['variationType'] ?? 'N/A';
+                                                  final variationValue = variation?['productVariation']?['variationValue'] ?? 'N/A';
+
+                                                  return Column(
+                                                    children: [
+                                                      Text(variationType + ":" + variationValue  , style: GoogleFonts.roboto(color: Color(0x50000000), fontSize: 12 * SizeConfig.textRatio),),
+
+                                                    ],
+                                                  );
+                                                } else {
+                                                  return Text('No Variations' , );
+                                                }
+
+                                              }
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10 * SizeConfig.verticalBlock,
+                                        ),
+
+
+                                      ],
+                                    ),
+                                    Positioned(
+                                        bottom: 5 * SizeConfig.verticalBlock,
+                                        child:    Text(
+                                          '${myCart.cartProducts[index].price * myCart.cartProducts[index].Quantity!} EG',
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 20 * SizeConfig.textRatio,
+                                              fontWeight: FontWeight.bold),
+                                        ))
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      color: Color(0xFFD4931C),
+                                    ),
+                                    Text(
+                                      '${myCart.cartProducts[index].rate}',
+                                      style: GoogleFonts.rubik(
+                                          color: Color(0x50000000),
+                                          fontSize: 11 * SizeConfig.textRatio),
+                                    )
+                                  ],
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 10 * SizeConfig.verticalBlock,
+                                      top: 10 * SizeConfig.verticalBlock,
+                                      bottom: 10 * SizeConfig.verticalBlock,
+                                      right: 5 * SizeConfig.verticalBlock),
+                                  child: Container(
+                                      width: 110 * SizeConfig.horizontalBlock,
+                                      height: 42 * SizeConfig.verticalBlock,
+                                      decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: SizeConfig.iconColor),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                  10 * SizeConfig.textRatio))),
+                                      child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  bottom: 10.0 *
+                                                      SizeConfig.verticalBlock),
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    final product = myCart.cartProducts[index];
+
+                                                    if (product.Quantity! > 1) {
+                                                      print("...");
+                                                      // Decrease the quantity if it's greater than 1
+                                                      product.Quantity = (product.Quantity ?? 0) - 1;
+                                                      myCart.deleteCartProduct(product.finalId ?? "");
+                                                      // fetchCartProducts(myCart);
+
+                                                    } else {
+                                                      cart.deleteAllProduct(product.finalId??"");
+                                                      fetchCartProducts(myCart);
+                                                      // Delete the item from the database
+                                                    }
+
+                                                    // Print the updated cart for debugging
+                                                    print(myCart.cartProducts);
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.minimize_outlined,
+                                                  size: 20 * SizeConfig.textRatio,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              "${myCart.cartProducts[index].Quantity}",
+                                              style: GoogleFonts.roboto(
+                                                  fontSize:
+                                                      16 * SizeConfig.textRatio),
+                                            ),
+                                            IconButton(
                                               onPressed: () {
                                                 setState(() {
                                                   final product = myCart.cartProducts[index];
 
-                                                  if (product.Quantity! > 1) {
-                                                    print("...");
-                                                    // Decrease the quantity if it's greater than 1
-                                                    product.Quantity = (product.Quantity ?? 0) - 1;
-                                                    myCart.deleteCartProduct(product.finalId ?? "");
-                                                    // fetchCartProducts(myCart);
-
-                                                  } else {
-                                                    cart.deleteAllProduct(product.finalId??"");
-                                                    fetchCartProducts(myCart);
-                                                    // Delete the item from the database
-                                                  }
-
-                                                  // Print the updated cart for debugging
-                                                  print(myCart.cartProducts);
+                                                  myCart.cartProducts[index].Quantity =
+                                                      (myCart.cartProducts[index].Quantity ?? 0) + 1;
+                                                  insertProductData(product.id,
+                                                      product.finalId ??"");
                                                 });
                                               },
                                               icon: Icon(
-                                                Icons.minimize_outlined,
+                                                Icons.add,
                                                 size: 20 * SizeConfig.textRatio,
                                               ),
                                             ),
-                                          ),
-                                          Text(
-                                            "${myCart.cartProducts[index].Quantity}",
-                                            style: GoogleFonts.roboto(
-                                                fontSize:
-                                                    16 * SizeConfig.textRatio),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                final product = myCart.cartProducts[index];
-
-                                                myCart.cartProducts[index].Quantity =
-                                                    (myCart.cartProducts[index].Quantity ?? 0) + 1;
-                                                insertProductData(product.id,
-                                                    product.finalId ??"");
-                                              });
-                                            },
-                                            icon: Icon(
-                                              Icons.add,
-                                              size: 20 * SizeConfig.textRatio,
-                                            ),
-                                          ),
-                                        ])),
-                              )
-                            ],
-                          )
-                        ],
+                                          ])),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
               SizedBox(
-                height: 30 * SizeConfig.verticalBlock,
-              ),
-              Container(
-                height: 2 * SizeConfig.verticalBlock,
-                width: 232 * SizeConfig.horizontalBlock,
-                color: Color(0x503C3C3C),
-              ),
-              SizedBox(
-                height: 30 * SizeConfig.verticalBlock,
+                height: 5 * SizeConfig.verticalBlock,
               ),
               Stack(
                 children: [

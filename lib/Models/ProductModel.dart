@@ -686,4 +686,139 @@ class productService {
       print('Error fetching product: $e');
       return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
     }
-  }}
+  }
+  Future<List<productModel>> getHandcrafterProduct() async{
+    List<productModel> handcrafterProducts = [];
+    final String viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    String Query = '''
+    query User {
+    user(id:"${viewerId}") {
+        products {
+            imageUrl
+            averageRating
+            category {
+                name
+            }
+            name
+            lowestCustomPrice
+            id
+        }
+    }
+}
+    ''';
+    final request = {
+      'query': Query,
+      'variables': {
+        'viewerId': viewerId,
+      },
+    };
+
+    try{
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+print(response.statusCode);
+      if(response.statusCode == 200){
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        List<dynamic> getProducts = data['data']?['user']['products'];
+        print(data);
+
+        for(var product in getProducts){
+          productModel myProduct = productModel(product['id'], product['imageUrl'],
+              product['name'], product['lowestCustomPrice'].toDouble(), product['averageRating'].toDouble(), category: product['category']['name']);
+          handcrafterProducts.add(myProduct);
+        }
+        print(handcrafterProducts);
+        return handcrafterProducts;
+
+      }else{
+        print("Error Happen During Fetching");
+        return [];
+      }
+
+
+    }catch (e) {
+      print('Error fetching product: $e');
+      return []; // Provide default values
+    }
+
+
+  }
+
+  Future<List<productModel>> getAddedProducts(List<String> productIds) async {
+    List<productModel> products= [] ;
+
+
+    const String query = '''
+    query GetProductsByIds(\$productIds: [String!]!) {
+      getProductsByIds(productIds: \$productIds) {
+         finalProducts {
+            finalProductVariation {
+                productVariation {
+                    variationValue
+                }
+            }
+        }
+        category {
+            name
+        }
+        id
+        imageUrl
+        name
+        lowestCustomPrice
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'productIds': productIds,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      // Step 5: Send the request
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      // Debug: Print the response body
+      print(response.body);
+
+      // Step 6: Handle the response
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getProductsByIds'];
+        for(var pro in prods){
+          products.add(productModel(pro['id'], pro['imageUrl'], pro['name'], pro['lowestCustomPrice'].toDouble(), 0));
+        }
+
+        print("Products fetched successfully: $prods");
+        return products;
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return products;
+    }
+  }
+
+
+
+}
