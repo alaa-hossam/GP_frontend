@@ -347,12 +347,6 @@ class _HomeState extends State<Home> {
                               throw 'Could not launch ${adsProvider.AdsVM.ads[index].link}';
                             }
                           },
-                          // child: Image.asset(
-                          //   adsProvider.AdsVM.ads[index].image,
-                          //   width: 363 * SizeConfig.horizontalBlock,
-                          //   height: 160 * SizeConfig.verticalBlock,
-                          //   fit: BoxFit.fill,
-                          // ),
                         );
                       },
                     ),

@@ -132,6 +132,7 @@ class _cartScreenState extends State<cartScreen> {
                       )),
                 ],
               ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
