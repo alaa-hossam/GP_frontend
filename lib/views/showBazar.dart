@@ -1,11 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gp_frontend/Models/ProductModel.dart';
-import 'package:gp_frontend/views/HandcrafterRequest.dart';
-import 'package:gp_frontend/views/RecommendGiftView.dart';
-import 'package:gp_frontend/views/compareView.dart';
 import 'package:provider/provider.dart';
+
 import '../Models/CategoryModel.dart';
+import '../Models/ProductModel.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
 import '../widgets/BottomBar.dart';
@@ -14,28 +13,29 @@ import '../widgets/SideButton.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
+import 'HandcrafterRequest.dart';
 import 'ProfileView.dart';
+import 'RecommendGiftView.dart';
 import 'logInView.dart';
 
-class browseProducts extends StatefulWidget {
-  static String id = "browseProductsScreen";
+class showBazar extends StatefulWidget {
+  static String id = "showBazar";
+  const showBazar({super.key});
 
-  const browseProducts({super.key});
   @override
-  State<browseProducts> createState() => _BrowseProductsState();
+  State<showBazar> createState() => _showBazarState();
 }
 
-class _BrowseProductsState extends State<browseProducts> {
+class _showBazarState extends State<showBazar> {
   TextEditingController search = TextEditingController();
   int selectedIndex = 0;
   int selectedChildIndex = 0;
-  bool showCompare = false;
-  bool isLoading = false; // Track loading state
   List<productModel> comparedProducts = [];
   late productProvider prodProvider;
   late CategoryProvider catProvider;
-  String? selectedCategoryId; // Track the selected category ID
-  List<CategoryModel> categoryChildren = []; // Track children of the selected category
+  String? selectedCategoryId;
+  List<CategoryModel> categoryChildren = [];
+  bool isLoading = false; // Track loading state
 
   @override
   void initState() {
@@ -43,43 +43,12 @@ class _BrowseProductsState extends State<browseProducts> {
     prodProvider = Provider.of<productProvider>(context, listen: false);
     catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-    prodProvider.products.clear();
-    prodProvider.fetchProducts('0');
+    // Fetch all products on initialization
+    prodProvider.bazarProducts.clear();
+    prodProvider.getBazarProducts();
+    // Fetch categories only when the widget is initialized
     catProvider.fetchCategories();
   }
-  void _handleCompare(productModel product) {
-    bool exist = false;
-    int index = 0;
-    setState(() {
-      for (int i = 0; i < comparedProducts.length; i++) {
-        if (comparedProducts[i].id == product.id) {
-          exist = true;
-          index = i;
-          break;
-        }
-      }
-      if (!comparedProducts.isEmpty) {
-        if (comparedProducts.length == 2) {
-          if (exist) {
-            comparedProducts.remove(comparedProducts[index]);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("You can only compare 2 products.")),
-            );
-          }
-        } else if (comparedProducts.length != 2) {
-          if (exist) {
-            comparedProducts.remove(comparedProducts[index]);
-          } else {
-            comparedProducts.add(product);
-          }
-        }
-      } else {
-        comparedProducts.add(product);
-      }
-    });
-  }
-
 
   Future<void> _handleCategorySelection(CategoryModel category) async {
     setState(() {
@@ -102,9 +71,9 @@ class _BrowseProductsState extends State<browseProducts> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
     return Scaffold(
       drawer: Drawer(
         width: 223 * SizeConfig.horizontalBlock,
@@ -271,7 +240,23 @@ class _BrowseProductsState extends State<browseProducts> {
           SingleChildScrollView(
             child: Column(
               children: [
-// Search Bar and Filters
+                Container(
+                  width: 371 * SizeConfig.horizontalBlock,
+                  height: 46 * SizeConfig.verticalBlock,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF223F4A), // Start color
+                        Color(0xFF5095B0), // End color
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(5 * SizeConfig.textRatio))
+                  ),
+                  child: Center(child: Text("Welcome to our bazar" , style: GoogleFonts.rubik(fontSize: 24 , fontWeight: FontWeight.bold , color: Colors.white),)),
+                ),
+                SizedBox(height: 10 * SizeConfig.verticalBlock,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -287,13 +272,13 @@ class _BrowseProductsState extends State<browseProducts> {
                         ),
                         onPressed: () {},
                       ),
-                      width: 253 * SizeConfig.horizontalBlock,
-                      height: 45 * SizeConfig.verticalBlock,
+                      width: 263 * SizeConfig.horizontalBlock,
+                      height: 35 * SizeConfig.verticalBlock,
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                     Container(
-                      width: 48 * SizeConfig.horizontalBlock,
-                      height: 45 * SizeConfig.verticalBlock,
+                      width: 58 * SizeConfig.horizontalBlock,
+                      height: 55 * SizeConfig.verticalBlock,
                       decoration: BoxDecoration(
                         color: Color(0x80E9E9E9),
                         borderRadius: BorderRadius.circular(5),
@@ -301,29 +286,10 @@ class _BrowseProductsState extends State<browseProducts> {
                       child: Icon(Icons.tune, size: 24 * SizeConfig.textRatio),
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                    Container(
-                      width: 48 * SizeConfig.horizontalBlock,
-                      height: 45 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                        color: showCompare
-                            ? SizeConfig.iconColor
-                            : Color(0x80E9E9E9),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.compare_outlined,
-                            size: 24 * SizeConfig.textRatio),
-                        onPressed: () {
-                          setState(() {
-                            showCompare = !showCompare;
-                          });
-                        },
-                      ),
-                    ),
                   ],
                 ),
                 // Base Category List
-                  Consumer<CategoryProvider>(
+                Consumer<CategoryProvider>(
                   builder: (context, catProvider, child) {
                     if (catProvider.categories.isEmpty) {
                       return Center(child: CircularProgressIndicator());
@@ -340,7 +306,7 @@ class _BrowseProductsState extends State<browseProducts> {
                             var category = catProvider.categories[index];
                             return GestureDetector(
                               onTap: () {
-                                  _handleCategorySelection(category);
+                                _handleCategorySelection(category);
                               },
                               child: Row(
                                 children: [
@@ -398,14 +364,13 @@ class _BrowseProductsState extends State<browseProducts> {
                     },
                   ),
 
-                // Show loading indicator instead of products when loading
                 if (isLoading)
                   Center(child: CircularProgressIndicator())
                 else
                 // Products Grid
                   Consumer<productProvider>(
                     builder: (context, prodProvider, child) {
-                      if (prodProvider.products.isEmpty) {
+                      if (prodProvider.bazarProducts.isEmpty) {
                         return Center(child: CircularProgressIndicator());
                       }
                       return Padding(
@@ -419,9 +384,9 @@ class _BrowseProductsState extends State<browseProducts> {
                             mainAxisSpacing: 10.0, // Spacing between rows
                             childAspectRatio: 0.7, // Adjust based on your design
                           ),
-                          itemCount: prodProvider.products.length,
+                          itemCount: prodProvider.bazarProducts.length,
                           itemBuilder: (context, index) {
-                            var product = prodProvider.products[index];
+                            var product = prodProvider.bazarProducts[index];
                             return customProduct(
                               product.imageURL,
                               product.name,
@@ -429,10 +394,7 @@ class _BrowseProductsState extends State<browseProducts> {
                               product.price,
                               product.rate,
                               product.id,
-                              showCompare,
-                              onComparePressed: _handleCompare,
-                              comparedNum: comparedProducts.length,
-
+                              false,
                             );
                           },
                         ),
@@ -442,36 +404,9 @@ class _BrowseProductsState extends State<browseProducts> {
               ],
             ),
           ),
-          if (showCompare && !comparedProducts.isEmpty)
-            Positioned(
-              bottom: 2 * SizeConfig.verticalBlock,
-              left: 17 * SizeConfig.horizontalBlock,
-              child: GestureDetector(
-                child: Container(
-                  width: 370 * SizeConfig.verticalBlock,
-                  height: 50 * SizeConfig.horizontalBlock,
-                  decoration: BoxDecoration(
-                    color: SizeConfig.iconColor,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Compare ",
-                      style: GoogleFonts.roboto(
-                        color: Colors.white,
-                        fontSize: 20 * SizeConfig.textRatio,
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, compareScreen.id , arguments: comparedProducts);
-                },
-              ),
-            )
         ],
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: !showCompare),
+      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: false,),
     );
   }
 }

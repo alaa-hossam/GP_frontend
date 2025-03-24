@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/views/AddAdvertisement.dart';
 
 import '../Models/AdvertisementModel.dart';
 
@@ -8,9 +11,8 @@ class AdvertisementsViewModel extends ChangeNotifier {
 
   List<AdvertisementsModel> get ads => _ads;
 
-  void fetchAds() {
-    _ads = apiServices.getAds();
-    notifyListeners(); // Notify the UI about changes
+  addAdvertisement(File? image , String? Url , String? packageId , String? transactionId) {
+    return apiServices.addAdvertisement(image, Url, packageId, transactionId);
   }
 }
 

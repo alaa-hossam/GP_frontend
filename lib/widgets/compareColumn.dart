@@ -9,15 +9,16 @@ import 'Dimensions.dart';
 class compareColumn extends StatelessWidget {
   String id, imageUrl, name;
   double price, rate;
-  String? category;
+  String? category, description;
+  double? stock;
 
   compareColumn(
-      this.id, this.imageUrl, this.name, this.price, this.rate , {this.category});
+      this.id, this.imageUrl, this.name, this.price, this.rate , {this.category , this.description, this.stock});
 
   @override
   Widget build(BuildContext context) {
     productModel product =
-        productModel(id, imageUrl, name,category:  category, price, rate);
+        productModel(id, imageUrl, name,category:  category, price, rate , description: this.description , stock: this.stock);
 
     return Stack(
       children: [

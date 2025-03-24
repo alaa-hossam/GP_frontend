@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import '../Models/ProductModel.dart';
 import '../SqfliteCodes/wishList.dart';
 import '../views/productDetails.dart';
@@ -11,12 +12,12 @@ class customProduct extends StatefulWidget {
   double Price, rate;
   bool showCompare;
   int? comparedNum;
-  String? Category , comapreName;
+  String? Category ;
   final Function(productModel)? onComparePressed;
 
   customProduct(this.imageURL, this.Name, this.Price, this.rate,
       this.id, this.showCompare,
-      {this.onComparePressed, this.comparedNum , this.Category , this.comapreName});
+      {this.onComparePressed, this.comparedNum , this.Category });
 
   @override
   State<customProduct> createState() => _customProductState(
@@ -28,8 +29,7 @@ class customProduct extends StatefulWidget {
       this.showCompare,
       onComparePressed: this.onComparePressed,
       comparNum: this.comparedNum,
-  Category:this.Category,
-  compareName:this.comapreName);
+  Category:this.Category);
 }
 
 class _customProductState extends State<customProduct> {
@@ -41,6 +41,7 @@ class _customProductState extends State<customProduct> {
   String? Category,compareName;
   final Function(productModel)? onComparePressed;
   bool isTapped = true;
+  customerViewModel customer = customerViewModel();
 
   _customProductState(this.imageURL, this.Name, this.Price,
       this.rate, this.id, this.showCompare,
@@ -48,21 +49,23 @@ class _customProductState extends State<customProduct> {
 
 
 
-  toggleFavourite(String color) {
+  toggleFavourite(String color) async{
     wishListObj.isWishlistTableEmpty;
+    String email = await customer.getEmail();
     setState(() {
       if (color == "${SizeConfig.fontColor}") {
         wishListObj.addProduct('''
-            INSERT INTO WISHLIST(ID) 
+            INSERT INTO WISHLIST(ID,EMAIL) 
             VALUES (
-                "$id"
+                "$id",
+                "$email"
              
             )
 ''');
       } else {
         wishListObj.deleteProduct('''
-      DELETE FROM wishList 
-      WHERE ID = '$id'
+        DELETE FROM WISHLIST 
+        WHERE ID = "$id" AND EMAIL = "$email"
       ''');
       }
     });
@@ -186,7 +189,7 @@ class _customProductState extends State<customProduct> {
                                   : Color(0x50E9E9E9),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
-                          child: Center(child: Text('${compareName}')),
+                          child: Center(child: Text('Compare')),
                         ),
                         onTap: () {
                           Tapping();

@@ -324,7 +324,6 @@ class _cartScreenState extends State<cartScreen> {
                     if (myCart.cartProducts[index].Quantity == null) {
                       myCart.cartProducts[index].Quantity = 0;
                     }
-                    print(myCart.cartProducts[index].Quantity);
                     return Padding(
                       padding: EdgeInsets.only(
                           top: 5 * SizeConfig.verticalBlock,
@@ -359,7 +358,7 @@ class _cartScreenState extends State<cartScreen> {
                               child: Padding(
                                 padding: EdgeInsets.only(
                                   top: 10 * SizeConfig.verticalBlock,
-                                  bottom: 10 * SizeConfig.verticalBlock,
+                                  // bottom: 10 * SizeConfig.verticalBlock,
                                 ),
                                 child: Stack(
                                   children: [
@@ -380,32 +379,32 @@ class _cartScreenState extends State<cartScreen> {
                                             color: Color(0x50000000),
                                           ),
                                         ),
+
                                         SizedBox(
-                                          height: 10 * SizeConfig.verticalBlock,
-                                        ),
-                                        SizedBox(
-                                          width: 50 * SizeConfig.horizontalBlock,
+                                          width: 80 * SizeConfig.horizontalBlock,
                                           child: ListView.builder(
                                               shrinkWrap: true,
                                               physics: NeverScrollableScrollPhysics(),
                                               itemCount: myCart.cartProducts[index].variations?.length ?? 0,
-                                              itemBuilder: (context , index){
+                                              itemBuilder: (context , i){
                                                 final product = myCart.cartProducts[index];
                                                 final variations = product.variations;
+                                                print("indexxxxxxxxxxxxxxxxx");
+                                                print(index);
+                                                print(myCart.cartProducts[i].variations);
+                                                if (variations != null && variations.isNotEmpty && i < variations.length) {
+                                                  final variation = variations[i];
 
-                                                if (variations != null && variations.isNotEmpty && index < variations.length) {
-                                                  final variation = variations[index];
                                                   final variationType = variation?['productVariation']?['variationType'] ?? 'N/A';
                                                   final variationValue = variation?['productVariation']?['variationValue'] ?? 'N/A';
 
                                                   return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(variationType + ":" + variationValue  , style: GoogleFonts.roboto(color: Color(0x50000000), fontSize: 12 * SizeConfig.textRatio),),
 
                                                     ],
                                                   );
-                                                } else {
-                                                  return Text('No Variations' , );
                                                 }
 
                                               }
@@ -419,7 +418,7 @@ class _cartScreenState extends State<cartScreen> {
                                       ],
                                     ),
                                     Positioned(
-                                        bottom: 5 * SizeConfig.verticalBlock,
+                                        bottom: 0 ,
                                         child:    Text(
                                           '${myCart.cartProducts[index].price * myCart.cartProducts[index].Quantity!} EG',
                                           style: GoogleFonts.roboto(
@@ -451,7 +450,7 @@ class _cartScreenState extends State<cartScreen> {
                                   padding: EdgeInsets.only(
                                       left: 10 * SizeConfig.verticalBlock,
                                       top: 10 * SizeConfig.verticalBlock,
-                                      bottom: 10 * SizeConfig.verticalBlock,
+                                      bottom: 3 * SizeConfig.verticalBlock,
                                       right: 5 * SizeConfig.verticalBlock),
                                   child: Container(
                                       width: 110 * SizeConfig.horizontalBlock,
@@ -469,7 +468,8 @@ class _cartScreenState extends State<cartScreen> {
                                             Padding(
                                               padding: EdgeInsets.only(
                                                   bottom: 10.0 *
-                                                      SizeConfig.verticalBlock),
+                                                      SizeConfig.verticalBlock
+                                              ),
                                               child: IconButton(
                                                 onPressed: () {
                                                   setState(() {

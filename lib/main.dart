@@ -2,6 +2,8 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/views/AddAdvertisement.dart';
+import 'package:gp_frontend/views/AdvertisementsPackages.dart';
 import 'package:gp_frontend/views/BazarProductsReview.dart';
 import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
@@ -18,9 +20,11 @@ import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/productReviews.dart';
+import 'package:gp_frontend/views/showBazar.dart';
 import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
+import 'Providers/AdvertisementProvider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
 import 'Providers/cartProvider.dart';
@@ -52,7 +56,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => imageProvider()),
+        ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ChangeNotifierProvider(create: (_) => buttonProvider()),
         ChangeNotifierProvider(create: (_) => productProvider()),
@@ -100,6 +104,9 @@ class MyApp extends StatelessWidget {
         JoinBazar.id : (BuildContext context) => JoinBazar(),
         BazarVariations.id : (BuildContext context) => BazarVariations(),
         BazarReview.id : (BuildContext context) => BazarReview(),
+        showBazar.id : (BuildContext context) => showBazar(),
+        Addadvertisement.id : (BuildContext context) => Addadvertisement(),
+        Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
 
       },
     );

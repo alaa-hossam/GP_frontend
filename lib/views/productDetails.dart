@@ -49,6 +49,7 @@ class _productDetailsState extends State<productDetails> {
     final arguments = ModalRoute.of(context)!.settings.arguments as String;
     productProvider productDetails = productProvider();
 
+
     return Scaffold(
       body: Consumer<productProvider>(
         builder: (context, productProvider, child) {

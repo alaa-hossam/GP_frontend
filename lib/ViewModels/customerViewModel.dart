@@ -40,4 +40,8 @@ class customerViewModel {
   Future<String> ResetPass({required email,required newPass,required confirmPass})async{
     return customerProcesses.ResetPass(email, newPass, confirmPass);
   }
+
+  Future<String> getEmail() async {
+    return customerProcesses.getUserEmail();
+  }
 }

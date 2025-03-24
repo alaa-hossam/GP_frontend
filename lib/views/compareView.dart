@@ -65,16 +65,18 @@ class _compareScreenState extends State<compareScreen> {
       ),
       body: arguments is List
       ?
-        // padding:  EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
         ListView.builder(
           itemCount: arguments.length,
-          scrollDirection: Axis.horizontal,// Use the length of the list
+          scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
-            productModel product = arguments[index]; // Access each item in the list
+            productModel product = arguments[index];
+            print(product.stock);
+            print(product.name);
+            // Access each item in the list
             return Padding(
               padding:  EdgeInsets.all(8.0 * SizeConfig.verticalBlock),
               child: compareColumn(product.id, product.imageURL,product.name,
-                  category:product.category,product.price,product.rate),
+                  category:product.category,product.price,product.rate,description: product.description,stock: product.stock ),
             );
           },
         )

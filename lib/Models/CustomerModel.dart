@@ -427,4 +427,47 @@ class customerServices {
     }
   }
 
+  Future<String> getUserEmail() async {
+    Token token = Token();
+    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    String query = '''
+    query User {
+    user(id: "${viewerId}") {
+        email
+    }
+}
+
+    ''';
+    final request = {
+      'query': query,
+      'variables': {
+        'id': viewerId,
+      },
+    };
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        final email = data['data']['user']['email'];
+
+          return email;
+      }
+      return 'error happen';
+    } catch (e) {
+      // print('Error fetching user: $e');
+      return 'Error fetching user: $e';
+    }
+  }
+
 }

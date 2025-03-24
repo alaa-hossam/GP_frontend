@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
 import '../SqfliteCodes/Token.dart';
@@ -355,10 +356,14 @@ class productService {
   }
 
   Future<List<dynamic>> getWishProducts() async {
-    List<String> ids =
-        await wish.getProduct("SELECT * FROM WISHLIST").then((result) {
-      return result.map<String>((row) => row['ID'].toString()).toList();
-    });
+
+    customerViewModel customer = customerViewModel();
+    String email = await customer.getEmail();
+    wishList myWish = wishList();
+    // myWish.recreateWishListTable();
+
+
+    List<String> ids = await myWish.getProductIdsByEmail(email);
 
     print("ids are:");
     print(ids);
@@ -818,6 +823,74 @@ print(response.statusCode);
       return products;
     }
   }
+  Future<List<productModel>> getBazarProducts() async {
+    List<productModel> products= [] ;
+
+
+    const String query = '''
+   query GetBazzarProducts {
+    getBazzarProducts(bazarId: "550e8400-e29b-41d4-a716-446655440000") {
+        product {
+            imageUrl
+            id
+            product {
+                category {
+                    name
+                }
+                name
+                averageRating
+            }
+        }
+        bazarPrice
+    }
+}
+
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'bazarId': "550e8400-e29b-41d4-a716-446655440000",
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      // Step 5: Send the request
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      // Debug: Print the response body
+      print(response.body);
+
+      // Step 6: Handle the response
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getBazzarProducts'];
+        for(var pro in prods){
+          products.add(productModel(pro['product']['id'], pro['product']['imageUrl'],
+              pro['product']['product']['name'],pro['bazarPrice'].toDouble(), pro['product']['product']['averageRating'].toDouble(),
+              category: pro['product']['product']['category']['name']));
+        }
+
+        print("Products fetched successfully: $prods");
+        return products;
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return products;
+    }
+  }
+
 
 
 

@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import '../Models/ProductModel.dart';
+import '../ViewModels/customerViewModel.dart';
 import '../ViewModels/productViewModel.dart';
 
 class productProvider extends ChangeNotifier {
   productViewModel productVM = productViewModel();
   List<productModel> _products = [] , handCrafterProducts = [];
   List<productModel> get products => _products;
+  List<productModel>  bazarProducts = [];
   List<productModel> _giftRecommendProducts = [];
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
   wishList wishListSql = wishList();
@@ -56,9 +58,13 @@ class productProvider extends ChangeNotifier {
   }
   Future<void> deleteProduct(String id) async {
     // Delete the product from the database
+    customerViewModel customer = customerViewModel();
+    String email = await customer.getEmail();
+
+
     await wishList().deleteProduct('''
-      DELETE FROM wishList 
-      WHERE ID = '$id'
+      DELETE FROM WISHLIST 
+        WHERE ID = "$id" AND EMAIL = "$email"
     ''');
 
     // Remove the product from the wishListProducts list
@@ -82,6 +88,12 @@ class productProvider extends ChangeNotifier {
 
   Future<List<productModel>> productVariation(List<String> productIds)async{
     return await productVM.productVariation(productIds);
+  }
+
+  getBazarProducts()async{
+    print("in bazar");
+     bazarProducts = await productVM.getBazarProducts();
+     notifyListeners();
   }
 
 

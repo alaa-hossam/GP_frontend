@@ -1,3 +1,4 @@
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -23,10 +24,31 @@ class wishList {
   _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE "WISHLIST"(
-        ID TEXT PRIMARY KEY
+        ID TEXT,
+        EMAIL TEXT
        
       )
     ''');
+  }
+
+  Future<List<String>> getProductIdsByEmail(String email) async {
+    // Get the database instance
+
+    Database? myWishlist = await db; // Initialize the database
+
+    // Query the WISHLIST table for rows where email matches
+    List<Map<String, dynamic>> result = await myWishlist!.query(
+      'WISHLIST',
+      where: 'EMAIL = ?',
+      whereArgs: [email],
+    );
+
+    // Extract the IDs from the result
+    List<String> productIds = result.map<String>((row) => row['ID'].toString()).toList();
+
+    // Close the database connection
+
+    return productIds;
   }
 
   //
@@ -60,6 +82,7 @@ class wishList {
   // Corrected method: Initialize myWishlist using the db getter
   deleteProduct(String query) async {
     Database? myWishlist = await db; // Initialize the database
+    // print(myWishlist!.rawQuery("SELECT COUNT(*) as count FROM WISHLIST where EMAIL =  'maryamsakr625@gmail.com'"));
     int response = await myWishlist!.rawDelete(query);
     print("delete in wish");
     print(await myWishlist.rawQuery('SELECT COUNT(*) as count FROM WISHLIST'));
@@ -93,9 +116,11 @@ class wishList {
 
   Future<bool> doesIdExist(String id) async {
     Database? myWishlist = await db;
+    customerViewModel customer =customerViewModel();
+    String email = await customer.getEmail();
 
     List<Map> result = await myWishlist!.rawQuery(
-      'SELECT 1 FROM WISHLIST WHERE ID = ?',
+      'SELECT 1 FROM WISHLIST WHERE ID = ? AND EMAIL = "$email"',
       [id],
     );
 

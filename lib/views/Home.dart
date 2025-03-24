@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
+import 'package:gp_frontend/views/showBazar.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +23,7 @@ import '../widgets/customizeTextFormField.dart';
 import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
 import '../widgets/SideButton.dart';
+import 'AddAdvertisement.dart';
 import 'SearchView.dart';
 
 class Home extends StatefulWidget {
@@ -43,6 +47,7 @@ class _HomeState extends State<Home> {
     super.initState();
     catProvider = Provider.of<CategoryProvider>(context, listen: false);
     catProvider.fetchCategories();
+
 
   }
   Token token = Token();
@@ -150,6 +155,7 @@ class _HomeState extends State<Home> {
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
                           SizeConfig.iconColor, () {
+
                         Navigator.pushNamed(context, Profile.id);
                       }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
@@ -162,7 +168,7 @@ class _HomeState extends State<Home> {
                       }),
                       sideButton(
                           "My posts", Icons.post_add, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, showBazar.id);
                       }),
                       sideButton("compare Products", Icons.compare_outlined,
                           SizeConfig.iconColor, () {
@@ -182,7 +188,7 @@ class _HomeState extends State<Home> {
                       }),
                       sideButton("Add Advertisement",
                           Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, Addadvertisement.id);
                       }),
                       sideButton(
                           "Join as Handcrafter",
@@ -283,10 +289,10 @@ class _HomeState extends State<Home> {
                       // Handle camera icon press
                     },
                   ),
-                  width: 253 * SizeConfig.horizontalBlock,
+                  width: 243 * SizeConfig.horizontalBlock,
                   height: 45 * SizeConfig.verticalBlock,
                   onClickFunction: navigate),
-              SizedBox(width: 20 * SizeConfig.horizontalBlock),
+              SizedBox(width: 10 * SizeConfig.horizontalBlock),
               Container(
                 width: 48 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
@@ -298,6 +304,8 @@ class _HomeState extends State<Home> {
                   size: 24 * SizeConfig.textRatio,
                 ),
               ),
+              SizedBox(width: 10 * SizeConfig.horizontalBlock),
+
               Container(
                 width: 48 * SizeConfig.horizontalBlock,
                 height: 45 * SizeConfig.verticalBlock,
@@ -314,37 +322,37 @@ class _HomeState extends State<Home> {
           SizedBox(
             height: 10 * SizeConfig.verticalBlock,
           ),
-          Consumer<imageProvider>(
-            builder: (context, imageProvider, child) {
+          Consumer<AdvertisementProvider>(
+            builder: (context, adsProvider, child) {
               return Column(
                 children: [
                   SizedBox(
                     height: 160 * SizeConfig.verticalBlock,
                     child: PageView.builder(
-                      controller: imageProvider.pageController,
-                      itemCount: imageProvider.AdsVM.ads.length,
+                      controller: adsProvider.pageController,
+                      itemCount: adsProvider.AdsVM.ads.length,
                       onPageChanged: (index) {
-                        imageProvider
+                        adsProvider
                             .updateCurrentIndex(index); // Sync current index
                       },
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () async {
                             final Uri url =
-                                Uri.parse(imageProvider.AdsVM.ads[index].link);
+                                Uri.parse(adsProvider.AdsVM.ads[index].link!);
                             if (await canLaunchUrl(url)) {
                               await launchUrl(url,
                                   mode: LaunchMode.inAppWebView);
                             } else {
-                              throw 'Could not launch ${imageProvider.AdsVM.ads[index].link}';
+                              throw 'Could not launch ${adsProvider.AdsVM.ads[index].link}';
                             }
                           },
-                          child: Image.asset(
-                            imageProvider.AdsVM.ads[index].image,
-                            width: 363 * SizeConfig.horizontalBlock,
-                            height: 160 * SizeConfig.verticalBlock,
-                            fit: BoxFit.fill,
-                          ),
+                          // child: Image.asset(
+                          //   adsProvider.AdsVM.ads[index].image,
+                          //   width: 363 * SizeConfig.horizontalBlock,
+                          //   height: 160 * SizeConfig.verticalBlock,
+                          //   fit: BoxFit.fill,
+                          // ),
                         );
                       },
                     ),
@@ -353,14 +361,14 @@ class _HomeState extends State<Home> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      imageProvider.AdsVM.ads.length,
+                      adsProvider.AdsVM.ads.length,
                       (index) => Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: index == imageProvider._currentIndex
+                          color: index == adsProvider.currentIndex
                               ? Color(0xFFB36995)
                               : Colors.grey,
                         ),
@@ -532,54 +540,5 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: BottomBar(selectedIndex: 0 , isVisible: true),
     );
-  }
-}
-
-class imageProvider extends ChangeNotifier {
-  AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
-
-  int _currentIndex = 0;
-  Timer? _timer;
-  PageController pageController = PageController();
-
-  String get currentImage {
-    return AdsVM.ads.isNotEmpty
-        ? AdsVM.ads[_currentIndex % AdsVM.ads.length].image
-        : 'assets/images/BPM.png'; // Default image
-  }
-
-  String get currentLink {
-    return AdsVM.ads.isNotEmpty
-        ? AdsVM.ads[_currentIndex % AdsVM.ads.length].link
-        : 'https://google.com'; // Default link
-  }
-
-  imageProvider() {
-    AdsVM.fetchAds();
-    _startImageRotation();
-  }
-
-  void _startImageRotation() {
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      _currentIndex = (_currentIndex + 1) % AdsVM.ads.length;
-      pageController.animateToPage(
-        _currentIndex,
-        duration: Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-      );
-      notifyListeners();
-    });
-  }
-
-  void updateCurrentIndex(int index) {
-    _currentIndex = index;
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    pageController.dispose();
-    super.dispose();
   }
 }
