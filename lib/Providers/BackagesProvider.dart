@@ -6,8 +6,8 @@ import '../Models/BackageModel.dart';
 class BackagesProvider extends ChangeNotifier{
   BackagesViewModel BackVM = BackagesViewModel();
   List<Backages> myBackages =[] ;
-  getAllBackages(){
-    myBackages = BackVM.getAllBackages();
+  getAllBackages()async{
+    myBackages =await BackVM.getAllBackages();
     notifyListeners();
   }
 }

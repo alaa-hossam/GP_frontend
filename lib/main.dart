@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/Providers/BackagesProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
 import 'package:gp_frontend/views/AdvertisementsPackages.dart';
@@ -63,6 +64,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => detailsProvider()),
         ChangeNotifierProvider(create: (_) => cartProvider()),
         ChangeNotifierProvider(create: (_) => galleryImageProvider()),
+        ChangeNotifierProvider(create: (_) => BackagesProvider()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),
