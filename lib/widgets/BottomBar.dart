@@ -36,7 +36,6 @@ class BottomBarState extends State<BottomBar> {
         return Visibility(
           visible: widget.isVisible,
           child: BottomNavigationBar(
-
             currentIndex: buttonProvider.selectedIndex,
             selectedItemColor: SizeConfig.iconColor,
             unselectedItemColor: SizeConfig.fontColor,
@@ -55,10 +54,6 @@ class BottomBarState extends State<BottomBar> {
                 icon: Icon(Icons.chat),
                 label: '',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle_outlined),
-                label: '',
-              ),
             ],
           ),
         );
@@ -74,7 +69,6 @@ class buttonProvider extends ChangeNotifier {
   static List<Widget> _widgetOptions = <Widget>[
     Home(),
     AIChat(),
-    Profile(),
   ];
   int get selectedIndex => _selectedIndex;
 
