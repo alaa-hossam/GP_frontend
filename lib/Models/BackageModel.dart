@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http ;
 
 class Backages{
   double price , duration;
-  String name , description;
+  String name , description ,id;
 
-  Backages(this.price, this.duration, this.name, this.description);
+  Backages(this.price, this.duration, this.name, this.description , this.id);
 
 }
 
@@ -25,6 +25,7 @@ class BackagesServices{
         description
         duration
         name
+        id
     }
 }
 
@@ -46,7 +47,7 @@ class BackagesServices{
       List<dynamic> myBackages = jsonDecode(respone.body)['data']['getAdvertisementPackages'];
       for(var backage in myBackages){
         returnedBackages.add(Backages(backage['actualPrice'].toDouble() ,
-            backage['duration'].toDouble() , backage['name'] , backage['description']));
+            backage['duration'].toDouble() , backage['name'] , backage['description'] , backage['id']));
       }
       return returnedBackages;
     }catch(e){

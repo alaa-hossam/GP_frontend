@@ -210,6 +210,7 @@ class customerServices {
         }
         user {
             id
+            role
         }
     }
 }
@@ -235,15 +236,17 @@ class customerServices {
         final createdAt = data['data']['login']['token']['createdAt'];
         final expireAt = data['data']['login']['token']['expireAt'];
         final UUID = data['data']['login']['user']['id'];
+        final Role = data['data']['login']['user']['role'];
         String insertQuery = '''
-                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
-                              VALUES ("$UUID", "$accessToken", "$expireAt")
+                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED , ROLE)
+                              VALUES ("$UUID", "$accessToken", "$expireAt" , "$Role")
                              ''';
         String updateQuery = '''
                                 UPDATE TOKENS
                                 SET TOKEN = "$accessToken", 
                                  EXPIRED = "$expireAt",
-                                 UUID = "$UUID"
+                                 UUID = "$UUID",
+                                 ROLE = "$Role"
                         
                        ''';
 

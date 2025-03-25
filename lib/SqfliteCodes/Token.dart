@@ -26,7 +26,8 @@ class Token {
       CREATE TABLE TOKENS(
       UUID TEXT ,
       TOKEN TEXT ,
-      EXPIRED TEXT
+      EXPIRED TEXT,
+      ROLE TEXT
       )
         ''');
   }
@@ -49,6 +50,12 @@ class Token {
     Database? myToken = await db; // Initialize the database
     List<Map> response = await myToken!.rawQuery(query);
     return response[0]['UUID'];
+  }
+
+  Future<String> getRole(String query) async {
+    Database? myToken = await db; // Initialize the database
+    List<Map> response = await myToken!.rawQuery(query);
+    return response[0]['ROLE'];
   }
 
 
