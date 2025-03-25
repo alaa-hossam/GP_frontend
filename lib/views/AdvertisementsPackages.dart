@@ -7,6 +7,7 @@ import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/Dimensions.dart';
+import '../widgets/customizeButton.dart';
 
 class Advertisementspackages extends StatefulWidget {
   static String id = "AdvertisementPackages";
@@ -24,7 +25,6 @@ class _AdvertisementspackagesState extends State<Advertisementspackages> {
     super.initState();
     BackagesProvider BackProvider = Provider.of<BackagesProvider>(context, listen: false);
     BackProvider.getAllBackages();
-
   }
 
 
@@ -137,8 +137,24 @@ class _AdvertisementspackagesState extends State<Advertisementspackages> {
                                 PackageId = packageProvider.myBackages[index].id;
                               },
                             ),
-                            SizedBox(height: 10 * SizeConfig.verticalBlock,)
+                            SizedBox(height: 10 * SizeConfig.verticalBlock,),
+                            Padding(
+                              padding: EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
+                              child: customizeButton(
+                                buttonName: 'Add',
+                                buttonColor: Color(0xFF5095B0),
+                                fontColor: const Color(0xFFF5F5F5),
+                                width: 200 * SizeConfig.horizontalBlock,
+                                height: 50 * SizeConfig.verticalBlock,
+                                  onClickButton: () async {
+                                    Navigator.pop(context, packageProvider.myBackages[index].name);
+                                  }
+                              ),
+                            ),
+
                           ],
+
+
                         );
                       }
                   )

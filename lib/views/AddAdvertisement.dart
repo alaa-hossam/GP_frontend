@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
+import 'package:gp_frontend/views/PaymentScreen.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../widgets/Dimensions.dart';
@@ -24,7 +25,7 @@ class Addadvertisement extends StatefulWidget {
 class _AddadvertisementState extends State<Addadvertisement> {
   File? AdvertisementImage;
   final TextEditingController AdvertisementURL = TextEditingController();
-  final TextEditingController Package = TextEditingController();
+   String Package = "";
   AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
   bool tapped = false;
   bool _isLoading = false;
@@ -43,7 +44,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
     print(tapped);
     if (AdvertisementURL.text.isEmpty ||
         AdvertisementImage == null ||
-        Package.text.isEmpty ||
+        Package.isEmpty ||
         Transaction.isEmpty ||
         !tapped) {
       return "Please fill all fields";
@@ -51,7 +52,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
 
     try {
       await AdsVM.addAdvertisement(
-          AdvertisementImage, AdvertisementURL.text, Package.text, Transaction);
+          AdvertisementImage, AdvertisementURL.text, Package, Transaction);
       return "Data Added Successfully";
     } catch (e) {
       return "An error occurred: $e";
@@ -184,7 +185,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Select Package",
+                                  Package.isEmpty ? "SelectPackage": Package,
                                   style: GoogleFonts.roboto(
                                       fontSize: 14 * SizeConfig.textRatio , color: SizeConfig.fontColor),
                                 ),
@@ -193,9 +194,17 @@ class _AddadvertisementState extends State<Addadvertisement> {
                             ),
                           ),
                         ),
-                        onTap: () {
-                          Navigator.pushNamed(
-                              context, Advertisementspackages.id);
+                        onTap: () async {
+                          final result = await Navigator.pushNamed(
+                              context,
+                              Advertisementspackages.id
+                          );
+
+                          if (result != null && result is String) {
+                            setState(() {
+                              Package = result;
+                            });
+                          }
                         },
                       ),
                       SizedBox(height: 8 * SizeConfig.verticalBlock),
@@ -232,7 +241,8 @@ class _AddadvertisementState extends State<Addadvertisement> {
                   Positioned(
                     bottom: 0,
                     left: 65 * SizeConfig.horizontalBlock,
-                    child: Padding(
+                    child:
+                    Padding(
                       padding: EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
                       child: customizeButton(
                         buttonName: 'Submit',
@@ -265,7 +275,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
                                     content: Text(
                                         "Your Request Sent successfully!")),
                               );
-                              // Navigator.pushReplacementNamed(context, Home.id);
+                              Navigator.pushReplacementNamed(context, PaymentScreen.id);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(response)),

@@ -9,6 +9,7 @@ import 'package:gp_frontend/views/BazarProductsReview.dart';
 import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/Home.dart';
+import 'package:gp_frontend/views/PaymentScreen.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
@@ -37,6 +38,7 @@ import 'views/signUpView.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'fireBaseNotification.dart';
 import 'views/BazarVariations.dart';
+import 'views/PaymentScreen.dart';
 
 
 void main() async {
@@ -109,6 +111,7 @@ class MyApp extends StatelessWidget {
         showBazar.id : (BuildContext context) => showBazar(),
         Addadvertisement.id : (BuildContext context) => Addadvertisement(),
         Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
+        PaymentScreen.id : (BuildContext context) => PaymentScreen(),
 
       },
     );
