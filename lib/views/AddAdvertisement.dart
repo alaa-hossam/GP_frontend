@@ -29,15 +29,12 @@ class _AddadvertisementState extends State<Addadvertisement> {
   bool tapped = false;
   bool _isLoading = false;
 
-
-
   Future<void> _pickImage(ImageSource source, bool isProfileImage) async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: source);
     if (pickedImage != null && mounted) {
       setState(() {
-          AdvertisementImage = File(pickedImage.path);
-
+        AdvertisementImage = File(pickedImage.path);
       });
     }
   }
@@ -45,12 +42,16 @@ class _AddadvertisementState extends State<Addadvertisement> {
   Future<String> _saveData(String Transaction) async {
     print(tapped);
     if (AdvertisementURL.text.isEmpty ||
-        AdvertisementImage == null || Package.text.isEmpty || Transaction.isEmpty || !tapped) {
+        AdvertisementImage == null ||
+        Package.text.isEmpty ||
+        Transaction.isEmpty ||
+        !tapped) {
       return "Please fill all fields";
     }
 
     try {
-      await AdsVM.addAdvertisement(AdvertisementImage,AdvertisementURL.text ,Package.text , Transaction);
+      await AdsVM.addAdvertisement(
+          AdvertisementImage, AdvertisementURL.text, Package.text, Transaction);
       return "Data Added Successfully";
     } catch (e) {
       return "An error occurred: $e";
@@ -62,9 +63,10 @@ class _AddadvertisementState extends State<Addadvertisement> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        toolbarHeight: 85 * SizeConfig.verticalBlock, // Set the height of the AppBar
+        toolbarHeight:
+            85 * SizeConfig.verticalBlock, // Set the height of the AppBar
         flexibleSpace: Container(
-          decoration:const BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
                 Color(0xFF223F4A), // Start color
@@ -105,86 +107,123 @@ class _AddadvertisementState extends State<Addadvertisement> {
         ),
       ),
       body: Padding(
-        padding:  EdgeInsets.only(top: 30 * SizeConfig.verticalBlock , right: 20 * SizeConfig.horizontalBlock , left: 20 * SizeConfig.horizontalBlock),
+        padding: EdgeInsets.only(
+            top: 30 * SizeConfig.verticalBlock,
+            right: 20 * SizeConfig.horizontalBlock,
+            left: 20 * SizeConfig.horizontalBlock),
         child: ListView(
           children: [
             SizedBox(
-              height: SizeConfig.screenHeight - (200 * SizeConfig.horizontalBlock),
+              height:
+                  SizeConfig.screenHeight - (200 * SizeConfig.horizontalBlock),
               child: Stack(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Upload Ad Image (Max 5MB, JPG, PNG) " , style: TextStyle(fontWeight: FontWeight.bold),),
-
+                      Text(
+                        "Upload Ad Image (Max 5MB, JPG, PNG) ",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       Center(
                         child: GestureDetector(
                           onTap: () {
                             _pickImage(ImageSource.gallery, true);
                           },
                           child: Container(
-                            margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
+                            margin: EdgeInsets.only(
+                                top: 10 * SizeConfig.verticalBlock),
                             height: 100 * SizeConfig.horizontalBlock,
                             width: 100 * SizeConfig.horizontalBlock,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                              border: Border.all(width: 1, color: SizeConfig.iconColor),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                              border: Border.all(
+                                  width: 1, color: SizeConfig.iconColor),
                               color: const Color(0x80E9E9E9),
                             ),
                             child: AdvertisementImage == null
                                 ? Icon(Icons.file_upload_outlined,
-                                color: SizeConfig.iconColor,
-                                size: 30 * SizeConfig.textRatio)
+                                    color: SizeConfig.iconColor,
+                                    size: 30 * SizeConfig.textRatio)
                                 : Image.file(
-                              File(AdvertisementImage!.path),
-                              fit: BoxFit.cover,
-                            ),
+                                    File(AdvertisementImage!.path),
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                       ),
                       SizedBox(height: 24 * SizeConfig.verticalBlock),
-                      Text("Advertisement URL" , style: GoogleFonts.roboto(fontSize: 18 *SizeConfig.textRatio , fontWeight: FontWeight.bold),),
+                      Text(
+                        "Advertisement URL",
+                        style: GoogleFonts.roboto(
+                            fontSize: 18 * SizeConfig.textRatio,
+                            fontWeight: FontWeight.bold),
+                      ),
                       MyTextFormField(
                         controller: AdvertisementURL,
                         width: 361 * SizeConfig.horizontalBlock,
                         maxLines: 1,
-
                         hintName: "Enter Advertisement destination URL",
                       ),
                       SizedBox(height: 16 * SizeConfig.verticalBlock),
-                      Text("Advertisement Package" , style: GoogleFonts.roboto(fontSize: 18 *SizeConfig.textRatio , fontWeight: FontWeight.bold),),
+                      Text(
+                        "Advertisement Package",
+                        style: GoogleFonts.roboto(
+                            fontSize: 18 * SizeConfig.textRatio,
+                            fontWeight: FontWeight.bold),
+                      ),
                       GestureDetector(
-                        child: MyTextFormField(
-                          controller: Package,
-                          width: 361 * SizeConfig.horizontalBlock,
-                          maxLines: 5,
-                          hintName: "Select Package",
-                          suffixIcon: Icon(Icons.arrow_forward_ios),
-                        ),
-                        onTap: (){Navigator.pushNamed(context, Advertisementspackages.id);},
-                      ),
-
-                      SizedBox(height: 8 * SizeConfig.verticalBlock),
-                      Padding(
-                        padding:  EdgeInsets.only(left: 14.0 * SizeConfig.horizontalBlock),
-                        child: Row(
-                          children: [
-                            Text("For more details, visit our" , style: GoogleFonts.roboto(fontSize: 14 * SizeConfig.textRatio),),
-                            GestureDetector(
-                              child: Text(" Packages and Pricing page." , style:GoogleFonts.roboto(fontSize: 12 * SizeConfig.textRatio , color: SizeConfig.iconColor),),
+                        child: Container(
+                          width: 363 * SizeConfig.horizontalBlock,
+                          height: 60 * SizeConfig.verticalBlock,
+                          color: Color(0x50E9E9E9),
+                          child: Padding(
+                            padding:  EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock , right: 10.0 * SizeConfig.horizontalBlock),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Select Package",
+                                  style: GoogleFonts.roboto(
+                                      fontSize: 14 * SizeConfig.textRatio , color: SizeConfig.fontColor),
+                                ),
+                                Icon(Icons.arrow_forward_ios , size: 24 * SizeConfig.textRatio,),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, Advertisementspackages.id);
+                        },
                       ),
+                      SizedBox(height: 8 * SizeConfig.verticalBlock),
                       Row(
                         children: [
-                          IconButton(onPressed: (){setState(() {
-                            tapped =!tapped;
-                          });},
-                              icon: tapped ? Icon( Icons.check_box_outlined ):Icon( Icons.check_box_outline_blank) , color: SizeConfig.iconColor,),
-                          Text("I agree to the",style: GoogleFonts.roboto(fontSize: 14 * SizeConfig.textRatio),),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                tapped = !tapped;
+                              });
+                            },
+                            icon: tapped
+                                ? Icon(Icons.check_box_outlined)
+                                : Icon(Icons.check_box_outline_blank),
+                            color: SizeConfig.iconColor,
+                          ),
+                          Text(
+                            "I agree to the",
+                            style: GoogleFonts.roboto(
+                                fontSize: 14 * SizeConfig.textRatio),
+                          ),
                           GestureDetector(
-                            child: Text(" Advertisement Terms of Service." , style:GoogleFonts.roboto(fontSize: 12 * SizeConfig.textRatio , color: SizeConfig.iconColor),),
+                            child: Text(
+                              " Advertisement Terms of Service.",
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12 * SizeConfig.textRatio,
+                                  color: SizeConfig.iconColor),
+                            ),
                           ),
                         ],
                       ),
@@ -194,7 +233,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
                     bottom: 0,
                     left: 65 * SizeConfig.horizontalBlock,
                     child: Padding(
-                      padding:  EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
+                      padding: EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
                       child: customizeButton(
                         buttonName: 'Submit',
                         buttonColor: Color(0xFF5095B0),
@@ -222,7 +261,9 @@ class _AddadvertisementState extends State<Addadvertisement> {
                               );
                             } else if (response == "Data Added Successfully") {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Your Request Sent successfully!")),
+                                SnackBar(
+                                    content: Text(
+                                        "Your Request Sent successfully!")),
                               );
                               // Navigator.pushReplacementNamed(context, Home.id);
                             } else {
@@ -240,17 +281,15 @@ class _AddadvertisementState extends State<Addadvertisement> {
                       child: Container(
                         color: Colors.black54,
                         child: Center(
-                          child: CircularProgressIndicator(color: SizeConfig.iconColor,),
+                          child: CircularProgressIndicator(
+                            color: SizeConfig.iconColor,
+                          ),
                         ),
                       ),
                     ),
-
                 ],
               ),
             ),
-
-
-
           ],
         ),
       ),
