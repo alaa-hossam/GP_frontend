@@ -10,6 +10,7 @@ import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
+import 'package:gp_frontend/views/MyHandcrafterProfile.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
@@ -112,6 +113,7 @@ class MyApp extends StatelessWidget {
         Addadvertisement.id : (BuildContext context) => Addadvertisement(),
         Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
         PaymentScreen.id : (BuildContext context) => PaymentScreen(),
+        MyHandcrafterProfile.id : (BuildContext context) => MyHandcrafterProfile(),
 
       },
     );

@@ -24,6 +24,7 @@ import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
 import '../widgets/SideButton.dart';
 import 'AddAdvertisement.dart';
+import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
 
 class Home extends StatefulWidget {
@@ -238,7 +239,7 @@ class _HomeState extends State<Home> {
               ),
               IconButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, Profile.id);
+                  Navigator.pushNamed(context, MyHandcrafterProfile.id);
                 },
                 icon: Icon(
                   Icons.account_circle_outlined,
