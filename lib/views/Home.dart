@@ -36,510 +36,368 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
-  TextEditingController filter = TextEditingController();
   int selectedIndex = 0;
-  productProvider myProductProvider = productProvider();
 
-  late CategoryProvider catProvider;
+  late Future<void> _initialization;
 
   @override
   void initState() {
     super.initState();
-    catProvider = Provider.of<CategoryProvider>(context, listen: false);
-    catProvider.fetchCategories();
-    Future.microtask(() {
-      Provider.of<AdvertisementProvider>(context, listen: false).getAdvertisement();
-    });  }
-  Token token = Token();
-
-
-
-  // Future<String> getTokens() async {
-  //   Token token = Token();
-  //
-  //   String query = '''
-  //   SELECT * FROM TOKENS
-  // ''';
-  //   String tokensTable = await token.getToken(query);
-  //
-  //   // Print the tokens
-  //   print("Expired in the TOKENS table:");
-  //   print(tokensTable);
-  //
-  //   return tokensTable;
-  // }
-
-  Future getProducts() async{
-    print("all products");
-    await myProductProvider.fetchProducts('0');
-    // print("all products");
+    _initialization = _fetchInitialData();
   }
 
+  Future<void> _fetchInitialData() async {
+    final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+    final productProv = Provider.of<productProvider>(context, listen: false);
+    final adsProvider = Provider.of<AdvertisementProvider>(context, listen: false);
 
-  Future<void> navigate(BuildContext context) async {
-    Navigator.pushNamed(context, searchView.id);
+    await Future.wait<void>([
+      catProvider.fetchCategories(),
+      productProv.fetchProducts('0'),
+      adsProvider.getAdvertisement(),
+    ]);
+
   }
-
-  // Future<int> getTokenCount() async {
-  //   // Query to count the number of rows in the TOKENS table
-  //   int result =
-  //       (await token.getToken('SELECT COUNT(*) as count FROM TOKENS')) as int;
-  //
-  //   // Get the count from the result
-  //   int count = result;
-  //   print(count);
-  //   return count;
-  // }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    print(
-        '----------------------------HOME------------------------------------');
-// wishList w = wishList();
-// w.initialDB();
+
     return Scaffold(
-      drawer: Drawer(
-        width: 223 * SizeConfig.horizontalBlock,
-        backgroundColor: Colors.white,
-        child: Stack(
-          children: [
-            ListView(
-              children: [
-                Stack(
+      drawer: _buildDrawer(),
+      appBar: _buildAppBar(context),
+      body: FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return _buildHomeContent();
+        },
+      ),
+      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: true),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      width: 223 * SizeConfig.horizontalBlock,
+      backgroundColor: Colors.white,
+      child: Stack(
+        children: [
+          ListView(
+            children: [
+              _buildDrawerHeader(),
+              Padding(
+                padding: EdgeInsets.only(left: 10, top: 10),
+                child: Column(
                   children: [
-                    Container(
-                      color: const Color(0xFFE9E9E9),
-                      height: 251 * SizeConfig.verticalBlock,
-                      width: 223 * SizeConfig.horizontalBlock,
-                    ),
-                    Positioned(
-                      left: 15, // Align to the left
-                      bottom: 15, // Align to the bottom
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start, // Align text to the left
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle, // Circular shape
-                              border: Border.all(
-                                color: Color(0xFF5095B0), // Border color
-                                width: 3, // Border width
-                              ),
-                            ),
-                            child: const CircleAvatar(
-                              radius: 50, // Size of the CircleAvatar
-                              backgroundImage:
-                                  AssetImage('assets/images/p1.jpg'), // Image
-                            ),
-                          ),
-                          Text(
-                            "my name",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20 * SizeConfig.textRatio),
-                          ),
-                          Text(
-                            "myemail.gmail.com",
-                            style:
-                                TextStyle(fontSize: 14 * SizeConfig.textRatio),
-                          ),
-                        ],
-                      ),
-                    ),
+                    sideButton("My Account", Icons.account_circle_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, Profile.id);
+                        }),
+                    sideButton("My orders", Icons.shopping_cart_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, JoinBazar.id);
+                        }),
+                    sideButton("History", Icons.history_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, Profile.id);
+                        }),
+                    sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
+                            () {
+                          Navigator.pushNamed(context, showBazar.id);
+                        }),
+                    sideButton("Compare Products", Icons.compare_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, Profile.id);
+                        }),
+                    sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, RecommendGift.id);
+                        }),
+                    sideButton("Event Reminder", Icons.event_available_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, Profile.id);
+                        }),
+                    sideButton("Add Advertisement", Icons.camera_roll_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, Addadvertisement.id);
+                        }),
+                    sideButton("Join as Handcrafter", Icons.shopping_bag_outlined,
+                        SizeConfig.iconColor, () {
+                          Navigator.pushNamed(context, HandcrafterRequest.id);
+                        }),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: 10 * SizeConfig.textRatio,
-                      top: 10 * SizeConfig.textRatio),
-                  child: Column(
-                    children: [
-                      sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor, () {
-
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
-                      sideButton("My orders", Icons.shopping_cart_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, JoinBazar.id);
-                      }),
-                      sideButton("History", Icons.history_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
-                      sideButton(
-                          "My posts", Icons.post_add, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, showBazar.id);
-                      }),
-                      sideButton("compare Products", Icons.compare_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
-                      sideButton(
-                          "Recommend Gifts",
-                          Icons.card_giftcard_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, RecommendGift.id);
-                      }),
-                      sideButton(
-                          "Event reminder",
-                          Icons.event_available_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
-                      // sideButton("Add Advertisement",
-                      //     Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                      //   Navigator.pushNamed(context, Addadvertisement.id);
-                      // }),
-                      sideButton(
-                          "Join as Handcrafter",
-                          Icons.shopping_bag_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, HandcrafterRequest.id);
-                      }),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            // Log Out Button at the Bottom-Left
-            Positioned(
-              left: 10, // Align to the left
-              bottom: 10, // Align to the bottom
-              child:
-                  sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
-                Navigator.pushReplacementNamed(context, logIn.id);
-              }),
-            ),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        // centerTitle: true,
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.notifications_none,
-                  size: 24 * SizeConfig.textRatio,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, cartScreen.id);
-                },
-                icon: Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 24 * SizeConfig.textRatio,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, MyHandcrafterProfile.id);
-                },
-                icon: Icon(
-                  Icons.account_circle_outlined,
-                  size: 24 * SizeConfig.textRatio,
-                ),
               ),
             ],
-          )
+          ),
+          Positioned(
+            left: 10,
+            bottom: 10,
+            child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+              Navigator.pushReplacementNamed(context, logIn.id);
+            }),
+          ),
         ],
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image(
-              image: AssetImage("assets/images/Frame 36920.png"),
-              width: SizeConfig.textRatio * 40,
-              height: SizeConfig.textRatio * 40,
-              fit: BoxFit.cover,
-            ),
-            Text(
-              "SAN3A",
-              style: TextStyle(
-                color: Color(0xFF073477),
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                fontFamily: 'Poppins',
-                fontSize: SizeConfig.textRatio * 24,
-              ),
-            ),
-          ],
-        ),
       ),
-      body: ListView(
+    );
+  }
+
+  Widget _buildDrawerHeader() {
+    return Stack(
+      children: [
+        Container(
+          color: const Color(0xFFE9E9E9),
+          height: 251 * SizeConfig.verticalBlock,
+        ),
+        Positioned(
+          left: 15,
+          bottom: 15,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Color(0xFF5095B0), width: 3),
+                ),
+                child: const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/images/p1.jpg'),
+                ),
+              ),
+              Text("my name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              Text("myemail@gmail.com", style: TextStyle(fontSize: 14)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.notifications_none, size: 24),
+        ),
+        IconButton(
+          onPressed: () => Navigator.pushNamed(context, cartScreen.id),
+          icon: Icon(Icons.shopping_cart_outlined, size: 24),
+        ),
+        IconButton(
+          onPressed: () => Navigator.pushNamed(context, MyHandcrafterProfile.id),
+          icon: Icon(Icons.account_circle_outlined, size: 24),
+        ),
+      ],
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MyTextFormField(
-                  controller: search,
-                  hintName: "Search",
-                  icon: Icons.search,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.camera_alt_outlined,
-                      color: SizeConfig.iconColor,
-                      size: 24 * SizeConfig.textRatio,
-                    ),
-                    onPressed: () {
-                      // Handle camera icon press
-                    },
-                  ),
-                  width: 243 * SizeConfig.horizontalBlock,
-                  height: 45 * SizeConfig.verticalBlock,
-                  onClickFunction: navigate),
-              SizedBox(width: 10 * SizeConfig.horizontalBlock),
-              Container(
-                width: 48 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-                decoration: BoxDecoration(
-                    color: Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                child: Icon(
-                  Icons.tune,
-                  size: 24 * SizeConfig.textRatio,
-                ),
-              ),
-              SizedBox(width: 10 * SizeConfig.horizontalBlock),
-
-              Container(
-                width: 48 * SizeConfig.horizontalBlock,
-                height: 45 * SizeConfig.verticalBlock,
-                decoration: BoxDecoration(
-                    color: Color(0x80E9E9E9),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                child: Icon(
-                  Icons.compare_outlined,
-                  size: 24 * SizeConfig.textRatio,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10 * SizeConfig.verticalBlock,
-          ),
-          Consumer<AdvertisementProvider>(
-            builder: (context, adsProvider, child) {
-              if (adsProvider.ads.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return Column(
-                children: [
-                  SizedBox(
-                    height: 160 * SizeConfig.verticalBlock,
-                    child: PageView.builder(
-                      controller: adsProvider.pageController,
-                      itemCount: adsProvider.ads.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            final Uri url = Uri.parse(adsProvider.ads[index].link!);
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url, mode: LaunchMode.inAppWebView);
-                            } else {
-                              throw 'Could not launch ${adsProvider.ads[index].link}';
-                            }
-                          },
-                          child: Image.network(
-                            adsProvider.ads[index].imageUrl ?? '',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                        );
-                      },
-
-                    ),
-                  ),
-                  SizedBox(height: 10 * SizeConfig.verticalBlock),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      adsProvider.ads.length,
-                          (index) => Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: index == adsProvider.currentIndex
-                              ? Color(0xFFB36995)
-                              : Colors.grey,
-                        ),
-                      ),
-                    ),
-
-                  ),
-                ],
-              );
-            },
-          ),
-          SizedBox(height: 10 * SizeConfig.verticalBlock),
-          Consumer<CategoryProvider>(
-            builder: (context, catProvider, child) {
-              if (catProvider.categories.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 43 * SizeConfig.verticalBlock,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: catProvider.categories.length,
-                    itemBuilder: (context, index) {
-                      bool isSelected = index == selectedIndex;
-                      var category = catProvider.categories[index];
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Customizecategory("${category.name}", isSelected),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-          SizedBox(
-            height: 10 * SizeConfig.verticalBlock,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock),
-            child: Text(
-              "Best Seller",
-              style: TextStyle(
-                  fontSize: 20 * SizeConfig.textRatio,
-                  fontWeight: FontWeight.bold),
+          Image.asset("assets/images/Frame 36920.png", width: 40, height: 40),
+          Text(
+            "SAN3A",
+            style: TextStyle(
+              color: Color(0xFF073477),
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              fontFamily: 'Poppins',
+              fontSize: 24,
             ),
-          ),
-          Consumer<productProvider>(
-            builder: (context, productProvider, child) {
-              if (productProvider.products.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: SizeConfig.horizontalBlock,
-                  height: 250 * SizeConfig.verticalBlock,
-                  child: FutureBuilder(
-                    future: getProducts(), // Ensure this returns a Future
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                            return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: productProvider.products.length,
-                              itemBuilder: (context, index) {
-                                var product = productProvider.products[index];
-                                return Row(
-                                  children: [
-                                    customProduct(
-                                      product.imageURL,
-                                      product.name,
-                                      product.price,
-                                      product.rate,
-                                      product.id,
-                                      Category: product.category,
-
-                                      false
-                                    ),
-                                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                                  ],
-                                );
-                              },
-                            );
-
-                      }
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 10 * SizeConfig.horizontalBlock),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Recommended For you",
-                  style: TextStyle(
-                    fontSize: 20 * SizeConfig.textRatio,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                GestureDetector(
-                  child: Text(
-                    "see more",
-                    style: TextStyle(
-                      fontSize: 16 * SizeConfig.textRatio,
-                      color: SizeConfig.iconColor,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pushNamed(context, browseProducts.id);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Consumer<productProvider>(
-            builder: (context, productProvider, child) {
-              if (productProvider.products.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: SizeConfig.horizontalBlock,
-                  height: 250 * SizeConfig.verticalBlock,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount:
-                        productProvider.products.length, // Number of items
-                    itemBuilder: (context, index) {
-                      var product = productProvider.products[index];
-                      return Row(
-                        children: [
-                          customProduct(
-                              product.imageURL,
-                              product.name,
-                              Category:product.category,
-                              product.price,
-                              product.rate,
-                              product.id,
-                          false),
-                          SizedBox(width: 10 * SizeConfig.horizontalBlock)
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
           ),
         ],
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0 , isVisible: true),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    final adsProvider = Provider.of<AdvertisementProvider>(context);
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final productProv = Provider.of<productProvider>(context);
+
+    return ListView(
+      children: [
+        _buildSearchBar(),
+        SizedBox(height: 10),
+        _buildAdsSection(adsProvider),
+        SizedBox(height: 10),
+        _buildCategories(categoryProvider),
+        SizedBox(height: 10),
+        _buildSectionTitle("Best Seller"),
+        _buildProductList(productProv.products),
+        _buildSectionHeader("Recommended For You", onTap: () {
+          Navigator.pushNamed(context, browseProducts.id);
+        }),
+        _buildProductList(productProv.products),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: MyTextFormField(
+              controller: search,
+              hintName: "Search",
+              icon: Icons.search,
+              suffixIcon: IconButton(
+                icon: Icon(Icons.camera_alt_outlined),
+                onPressed: () {Navigator.pushNamed(context, searchView.id);},
+              ),
+              // onClickFunction:(context) => _navigateToSearch(),
+            ),
+          ),
+          SizedBox(width: 10),
+          Icon(Icons.tune),
+          SizedBox(width: 10),
+          Icon(Icons.compare_outlined),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdsSection(AdvertisementProvider provider) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 160,
+          child: PageView.builder(
+            controller: provider.pageController,
+            itemCount: provider.ads.length,
+            onPageChanged: provider.updateCurrentIndex,
+            itemBuilder: (context, index) {
+              final ad = provider.ads[index];
+              if(provider.ads.isEmpty){
+                return const Center(child: CircularProgressIndicator());
+
+              }
+              return Padding(
+                padding:  EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock , right: 10* SizeConfig.horizontalBlock),
+                child: GestureDetector(
+
+                  onTap: () async {
+                    final url = Uri.parse(ad.link!);
+                    if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
+                      throw 'Could not launch ${ad.link}';
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.horizontalBlock)),
+                    child: Image.network(
+
+                        ad.imageUrl ?? '', fit: BoxFit.cover
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            provider.ads.length,
+                (index) => Container(
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: index == provider.currentIndex
+                    ? Color(0xFFB36995)
+                    : Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategories(CategoryProvider provider) {
+    return SizedBox(
+      height: 43,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: provider.categories.length,
+        itemBuilder: (context, index) {
+          final category = provider.categories[index];
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+            child: Customizecategory(category.name, index == selectedIndex),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Text(title,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, {VoidCallback? onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          if (onTap != null)
+            GestureDetector(
+              onTap: onTap,
+              child: Text("See more", style: TextStyle(color: Colors.blue)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductList(List<dynamic> products) {
+    return SizedBox(
+      height: 250,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          if(products.isEmpty){
+            return const Center(child: CircularProgressIndicator());
+
+          }
+          return Row(
+            children: [
+              customProduct(
+                product.imageURL,
+                product.name,
+                product.price,
+                product.rate,
+                product.id,
+                Category: product.category,
+                false,
+              ),
+              SizedBox(width: 10),
+            ],
+          );
+        },
+      ),
     );
   }
 }
+

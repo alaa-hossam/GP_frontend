@@ -111,7 +111,7 @@ class MyApp extends StatelessWidget {
         BazarVariations.id : (BuildContext context) => BazarVariations(),
         BazarReview.id : (BuildContext context) => BazarReview(),
         showBazar.id : (BuildContext context) => showBazar(),
-        // Addadvertisement.id : (BuildContext context) => Addadvertisement(),
+        Addadvertisement.id : (BuildContext context) => Addadvertisement(),
         Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
         PaymentScreen.id : (BuildContext context) => PaymentScreen(),
         MyHandcrafterProfile.id : (BuildContext context) => MyHandcrafterProfile(),

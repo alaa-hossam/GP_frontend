@@ -11,11 +11,13 @@ class AdvertisementsViewModel extends ChangeNotifier {
 
   List<AdvertisementsModel> get ads => _ads;
 
-  // addAdvertisement(File? image , String? Url , String? packageId , String? transactionId) {
-  //   return apiServices.addAdvertisement(image, Url, packageId, transactionId);
-  // }
+  addAdvertisement(File? image , String? Url , String? packageId , String? transactionId) {
+    return apiServices.addAdvertisement(image, Url, packageId, transactionId);
+  }
   getAdvertisement() async{
-    await apiServices.getAds();
+    _ads = await apiServices.getAds();
+    return _ads;
+
   }
 }
 

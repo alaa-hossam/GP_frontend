@@ -122,7 +122,13 @@ class _logInState extends State<logIn> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Log In Successful!")),
                             );
-                            Navigator.pushReplacementNamed(context, Home.id);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Home(),
+                              ),
+                            );
+
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(response)),

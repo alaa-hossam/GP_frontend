@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -20,9 +21,19 @@ class AdvertisementProvider with ChangeNotifier {
   final PageController pageController = PageController();
   int _currentIndex = 0;
 
-  // AdvertisementProvider({required this.AdsVM});
-
   int get currentIndex => _currentIndex;
+
+  Timer? _autoScrollTimer;
+
+  AdvertisementProvider() {
+    pageController.addListener(() {
+      int newIndex = pageController.page?.round() ?? 0;
+      if (newIndex != _currentIndex) {
+        _currentIndex = newIndex;
+        notifyListeners();
+      }
+    });
+  }
 
   void updateCurrentIndex(int index) {
     _currentIndex = index;
@@ -30,11 +41,13 @@ class AdvertisementProvider with ChangeNotifier {
   }
 
   void startAutoScroll() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (AdsVM.ads.isEmpty) return;
+    _autoScrollTimer?.cancel(); // prevent duplicates
+
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (ads.isEmpty) return;
 
       int nextPage = _currentIndex + 1;
-      if (nextPage >= AdsVM.ads.length) {
+      if (nextPage >= ads.length) {
         nextPage = 0;
       }
 
@@ -43,23 +56,22 @@ class AdvertisementProvider with ChangeNotifier {
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
-
-      startAutoScroll();
     });
   }
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
     pageController.dispose();
     super.dispose();
   }
 
+
   getAdvertisement() async {
     print("Fetching advertisements...");
     ads = await AdsVM.getAdvertisement();
+    print(ads);
     notifyListeners();
-
-    // Start auto-scrolling after loading ads
     startAutoScroll();
   }
 }
