@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/Models/AdvertisementModel.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 
 // class AdvertisementProvider extends ChangeNotifier{
@@ -14,6 +15,7 @@ import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 // }
 
 class AdvertisementProvider with ChangeNotifier {
+  List<AdvertisementsModel> ads = [];
   AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
   final PageController pageController = PageController();
   int _currentIndex = 0;
@@ -52,9 +54,12 @@ class AdvertisementProvider with ChangeNotifier {
     super.dispose();
   }
 
-  getAdvertisement(
-      File? image , String? Url , String? packageId , String? transactionId) {
-    AdsVM.addAdvertisement(image, Url, packageId, transactionId);
+  getAdvertisement() async {
+    print("Fetching advertisements...");
+    ads = await AdsVM.getAdvertisement();
     notifyListeners();
+
+    // Start auto-scrolling after loading ads
+    startAutoScroll();
   }
 }

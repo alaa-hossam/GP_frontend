@@ -43,10 +43,8 @@ class _showBazarState extends State<showBazar> {
     prodProvider = Provider.of<productProvider>(context, listen: false);
     catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-    // Fetch all products on initialization
     prodProvider.bazarProducts.clear();
     prodProvider.getBazarProducts();
-    // Fetch categories only when the widget is initialized
     catProvider.fetchCategories();
   }
 

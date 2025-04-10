@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'Dimensions.dart';
 
 class MyTextFormField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String? hintName; // Optional hint text
-  final String? labelText; // New label text
+  final String? labelText , initialValue; // New label text
   final IconData? icon; // Optional icon
   final Widget? suffixIcon;
   final bool isObscureText, enable;
@@ -16,11 +16,13 @@ class MyTextFormField extends StatelessWidget {
   final TextInputType? type;
   final int? maxLines;
   Color? fillColor;
-  final int? maxLength; // Add maxLength property
-  final FormFieldValidator<String>? validator; // Custom validator
+  final int? maxLength;
+  final TextStyle? hintStyle;
+  final FormFieldValidator<String>? validator;
+  Key? myKey;
 
   MyTextFormField({
-    required this.controller,
+    this.controller,
     this.hintName,
     this.labelText,
     this.icon,
@@ -38,6 +40,9 @@ class MyTextFormField extends StatelessWidget {
     this.fillColor,
     this.maxLength,
     this.validator,
+    this.hintStyle,
+    this.initialValue,
+    this.myKey
   });
 
   @override
@@ -68,12 +73,14 @@ class MyTextFormField extends StatelessWidget {
                 minHeight: height ?? 50, // Set a minimum height
               ),
               child: TextFormField(
+                key: myKey,
                 controller: controller,
                 obscureText: isObscureText,
                 keyboardType: type,
                 maxLines: maxLines, // Allow unlimited lines if maxLines is null
                 minLines: 1, // Set a minimum number of lines
-                maxLength: maxLength, // Set maxLength if provided
+                maxLength: maxLength,
+                initialValue: initialValue,
                 validator: validator ?? (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter ${labelText ?? hintName ?? "this field"}'; // Use labelText or hintName for validation message
@@ -109,11 +116,11 @@ class MyTextFormField extends StatelessWidget {
                   )
                       : null, // Set null if no icon is provided
                   hintText: hintName, // Optional hint text
-                  hintStyle: TextStyle(
+                  hintStyle: hintStyle == null ? TextStyle(
                     color: SizeConfig.fontColor,
                     fontSize: SizeConfig.textRatio * 20,
                     fontFamily: 'Roboto',
-                  ),
+                  ) : hintStyle,
                   fillColor: fillColor,
                   filled: true,
                   suffixIcon: suffixIcon,
@@ -130,6 +137,7 @@ class MyTextFormField extends StatelessWidget {
                 },
                 focusNode: focusNode,
                 onChanged: onChanged,
+
               ),
             ),
           ],

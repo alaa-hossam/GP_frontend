@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 import 'package:flutter/foundation.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
@@ -14,6 +15,7 @@ class productModel {
   double? stock , duration;
   int? ratingCount, Quantity;
   List<dynamic>? finalProducts, variations;
+  Map<String, List<dynamic>>? variationsWithIds;
   List<dynamic>? reviews;
   List<String>? galleryImg;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
@@ -29,7 +31,8 @@ class productModel {
       this.galleryImg,
       this.Quantity,
       this.finalId,
-      this.duration});
+      this.duration,
+      this.variationsWithIds});
 
 
 
@@ -759,12 +762,14 @@ print(response.statusCode);
 
   Future<List<productModel>> getAddedProducts(List<String> productIds) async {
     List<productModel> products= [] ;
+    Map<String, List<dynamic> > variations= {} ;
 
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {
       getProductsByIds(productIds: \$productIds) {
          finalProducts {
+         id
             finalProductVariation {
                 productVariation {
                     variationValue
@@ -803,17 +808,31 @@ print(response.statusCode);
       );
 
       // Debug: Print the response body
-      print(response.body);
+      // print(response.body);
 
       // Step 6: Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
         for(var pro in prods){
-          products.add(productModel(pro['id'], pro['imageUrl'], pro['name'], pro['lowestCustomPrice'].toDouble(), 0));
-        }
+// print(pro['finalProducts'][0]['finalProductVariation']);
+          List<String> vars = [];
+          variations = {};
 
-        print("Products fetched successfully: $prods");
+          for(var finalVariations in pro['finalProducts']){
+            vars = [];
+            for(var finalVariation in finalVariations['finalProductVariation']){
+              vars.add(finalVariation['productVariation']['variationValue']);
+            }
+            variations[finalVariations['id']] = vars;
+
+          }
+
+          products.add(productModel(pro['id'], pro['imageUrl'], pro['name'],
+              pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name'],
+              variationsWithIds: variations), );
+        }
+        print("Products fetched successfully: ${products[0].variationsWithIds}");
         return products;
       } else {
         throw Exception('Failed to load products: ${response.body}');
@@ -890,8 +909,140 @@ print(response.statusCode);
       return products;
     }
   }
+  Future<List<List<String>>> getFinalProductVariations(String productId) async {
+    List<List<String>> variations = [];
+
+    String query = '''
+    query GetProductsByIds {
+      getProductsByIds(
+        productIds:  "$productId"
+      ) {
+        finalProducts {
+            finalProductVariation {
+                productVariation {
+                    variationValue
+                }
+            }
+        }
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'productIds': productId,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      print(response.body)
+;
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        print("//////////////////////////////////////////");
+        print(productId);
+        print(data['getProductsByIds']);
+        print(data);
+        for (var variation in data['getProductsByIds']['finalProducts']['finalProductVariation']){
+            variations.add(variation['productVariation']['variationValue']);
+        }
 
 
+        return variations;
+      } else {
+        print('getProduct is null');
+        return []; // Provide default values
+      }
+    }catch (e) {
+      print('Error fetching product: $e');
+      return[];
+    }
+    }
+//   Future<List<productModel>> addProductsToBazar(List<dynamic> products) async {
+//     List<productModel> products= [] ;
+//     Map<String, List<dynamic> > variations= {} ;
+//     int offer = 0;
+//
+//
+//     const String query = '''
+//
+// mutation AssignProductsToBazar {
+//     assignProductsToBazar(
+//         data: { bazarId: "550e8400-e29b-41d4-a716-446655440000", offerPercentage: ${offer}, productId: null, quantity: null }
+//     )
+// }
+//
+//   ''';
+//
+//     final request = {
+//       'query': query,
+//       'variables': {
+//         'bazarId': "550e8400-e29b-41d4-a716-446655440000",
+//
+//       },
+//     };
+//
+//     try {
+//       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+//
+//       // Step 5: Send the request
+//       final response = await http.post(
+//         Uri.parse(apiUrl),
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $myToken',
+//         },
+//         body: jsonEncode(request),
+//       );
+//
+//       // Debug: Print the response body
+//       // print(response.body);
+//
+//       // Step 6: Handle the response
+//       if (response.statusCode == 200) {
+//         final data = jsonDecode(response.body);
+//         List<dynamic> prods = data['data']['getProductsByIds'];
+//         for(var pro in prods){
+// // print(pro['finalProducts'][0]['finalProductVariation']);
+//           List<String> vars = [];
+//           variations = {};
+//
+//           for(var finalVariations in pro['finalProducts']){
+//             vars = [];
+//             for(var finalVariation in finalVariations['finalProductVariation']){
+//               vars.add(finalVariation['productVariation']['variationValue']);
+//             }
+//             variations[finalVariations['id']] = vars;
+//
+//           }
+//
+//           products.add(productModel(pro['id'], pro['imageUrl'], pro['name'],
+//               pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name'],
+//               variationsWithIds: variations), );
+//         }
+//         print("Products fetched successfully: ${products[0].variationsWithIds}");
+//         return products;
+//       } else {
+//         throw Exception('Failed to load products: ${response.body}');
+//       }
+//     } catch (e) {
+//       print("Error fetching products: $e");
+//       return products;
+//     }
+//   }
+
+  }
 
 
-}

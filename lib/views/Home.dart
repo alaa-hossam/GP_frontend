@@ -29,7 +29,6 @@ import 'SearchView.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
-  Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -48,10 +47,12 @@ class _HomeState extends State<Home> {
     super.initState();
     catProvider = Provider.of<CategoryProvider>(context, listen: false);
     catProvider.fetchCategories();
-
-
-  }
+    Future.microtask(() {
+      Provider.of<AdvertisementProvider>(context, listen: false).getAdvertisement();
+    });  }
   Token token = Token();
+
+
 
   // Future<String> getTokens() async {
   //   Token token = Token();
@@ -73,6 +74,7 @@ class _HomeState extends State<Home> {
     await myProductProvider.fetchProducts('0');
     // print("all products");
   }
+
 
   Future<void> navigate(BuildContext context) async {
     Navigator.pushNamed(context, searchView.id);
@@ -187,10 +189,10 @@ class _HomeState extends State<Home> {
                           SizeConfig.iconColor, () {
                         Navigator.pushNamed(context, Profile.id);
                       }),
-                      sideButton("Add Advertisement",
-                          Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Addadvertisement.id);
-                      }),
+                      // sideButton("Add Advertisement",
+                      //     Icons.camera_roll_outlined, SizeConfig.iconColor, () {
+                      //   Navigator.pushNamed(context, Addadvertisement.id);
+                      // }),
                       sideButton(
                           "Join as Handcrafter",
                           Icons.shopping_bag_outlined,
@@ -325,39 +327,42 @@ class _HomeState extends State<Home> {
           ),
           Consumer<AdvertisementProvider>(
             builder: (context, adsProvider, child) {
+              if (adsProvider.ads.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
               return Column(
                 children: [
                   SizedBox(
                     height: 160 * SizeConfig.verticalBlock,
                     child: PageView.builder(
                       controller: adsProvider.pageController,
-                      itemCount: adsProvider.AdsVM.ads.length,
-                      onPageChanged: (index) {
-                        adsProvider
-                            .updateCurrentIndex(index); // Sync current index
-                      },
+                      itemCount: adsProvider.ads.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () async {
-                            final Uri url =
-                                Uri.parse(adsProvider.AdsVM.ads[index].link!);
+                            final Uri url = Uri.parse(adsProvider.ads[index].link!);
                             if (await canLaunchUrl(url)) {
-                              await launchUrl(url,
-                                  mode: LaunchMode.inAppWebView);
+                              await launchUrl(url, mode: LaunchMode.inAppWebView);
                             } else {
-                              throw 'Could not launch ${adsProvider.AdsVM.ads[index].link}';
+                              throw 'Could not launch ${adsProvider.ads[index].link}';
                             }
                           },
+                          child: Image.network(
+                            adsProvider.ads[index].imageUrl ?? '',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
                         );
                       },
+
                     ),
                   ),
                   SizedBox(height: 10 * SizeConfig.verticalBlock),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      adsProvider.AdsVM.ads.length,
-                      (index) => Container(
+                      adsProvider.ads.length,
+                          (index) => Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         width: 10,
                         height: 10,
@@ -369,6 +374,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
+
                   ),
                 ],
               );

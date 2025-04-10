@@ -1,6 +1,5 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/BackagesProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
@@ -28,6 +27,7 @@ import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
 import 'Providers/AdvertisementProvider.dart';
+import 'Providers/BazarProvider.dart';
 import 'Providers/CategoryProvider.dart';
 import 'Providers/ProductProvider.dart';
 import 'Providers/cartProvider.dart';
@@ -68,6 +68,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => cartProvider()),
         ChangeNotifierProvider(create: (_) => galleryImageProvider()),
         ChangeNotifierProvider(create: (_) => BackagesProvider()),
+        ChangeNotifierProvider(create: (_) => BazarProvider()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),
@@ -110,7 +111,7 @@ class MyApp extends StatelessWidget {
         BazarVariations.id : (BuildContext context) => BazarVariations(),
         BazarReview.id : (BuildContext context) => BazarReview(),
         showBazar.id : (BuildContext context) => showBazar(),
-        Addadvertisement.id : (BuildContext context) => Addadvertisement(),
+        // Addadvertisement.id : (BuildContext context) => Addadvertisement(),
         Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
         PaymentScreen.id : (BuildContext context) => PaymentScreen(),
         MyHandcrafterProfile.id : (BuildContext context) => MyHandcrafterProfile(),
