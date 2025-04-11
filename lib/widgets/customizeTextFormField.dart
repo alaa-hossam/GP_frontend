@@ -9,13 +9,13 @@ class MyTextFormField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool isObscureText, enable;
   final bool autofocus;
-  double? width, height;
+  double? width, height , borderwidth , borderRadius;
   final FocusNode? focusNode;
   final ValueChanged<dynamic>? onChanged;
   final Future<void> Function(BuildContext)? onClickFunction;
   final TextInputType? type;
   final int? maxLines;
-  Color? fillColor;
+  Color? fillColor , borderColor;
   final int? maxLength;
   final TextStyle? hintStyle;
   final FormFieldValidator<String>? validator;
@@ -42,7 +42,10 @@ class MyTextFormField extends StatelessWidget {
     this.validator,
     this.hintStyle,
     this.initialValue,
-    this.myKey
+    this.myKey,
+    this.borderColor,
+    this.borderwidth,
+    this.borderRadius
   });
 
   @override
@@ -70,74 +73,82 @@ class MyTextFormField extends StatelessWidget {
               ),
             ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: height ?? 50, // Set a minimum height
+                minHeight: height ?? 50,
               ),
-              child: TextFormField(
-                key: myKey,
-                controller: controller,
-                obscureText: isObscureText,
-                keyboardType: type,
-                maxLines: maxLines, // Allow unlimited lines if maxLines is null
-                minLines: 1, // Set a minimum number of lines
-                maxLength: maxLength,
-                initialValue: initialValue,
-                validator: validator ?? (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter ${labelText ?? hintName ?? "this field"}'; // Use labelText or hintName for validation message
-                  } else if (hintName == 'Password' && value.length < 8) {
-                    return 'Password should be at least 8 characters';
-                  } else if (!_emailRegex.hasMatch(value) && hintName == 'Email') {
-                    return 'Email address is not valid\n It should be an Email structure';
-                  } else if (hintName == 'Birth Date') {
-                    DateTime? parsedDate = DateTime.tryParse(value);
-                    if (parsedDate == null) {
-                      return 'Invalid date format';
-                    }
-                    if (parsedDate.year >= 2017) {
-                      return 'Birth date must be before 2017';
-                    }
-                  }
-                  return null;
-                },
-                enabled: enable,
-                autofocus: autofocus,
-                decoration: InputDecoration(
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFF5095B0)),
-                  ),
-                  prefixIcon: icon != null
-                      ? Icon(
-                    icon,
-                    size: SizeConfig.textRatio * 25,
-                    color: const Color(0xFF5095B0),
-                  )
-                      : null, // Set null if no icon is provided
-                  hintText: hintName, // Optional hint text
-                  hintStyle: hintStyle == null ? TextStyle(
-                    color: SizeConfig.fontColor,
-                    fontSize: SizeConfig.textRatio * 20,
-                    fontFamily: 'Roboto',
-                  ) : hintStyle,
-                  fillColor: fillColor,
-                  filled: true,
-                  suffixIcon: suffixIcon,
-                  counterText: '', // Hide the default character counter
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 15, // Adjust vertical padding
-                    horizontal: 10, // Adjust horizontal padding
-                  ),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(width: borderwidth ?? 0 , color: borderColor ?? Colors.transparent),
+                  borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 0))
                 ),
-                onTap: () async {
-                  if (onClickFunction != null) {
-                    await onClickFunction!(context);
-                  }
-                },
-                focusNode: focusNode,
-                onChanged: onChanged,
 
+                child: TextFormField(
+                  key: myKey,
+                  controller: controller,
+                  obscureText: isObscureText,
+                  keyboardType: type,
+                  maxLines: maxLines, // Allow unlimited lines if maxLines is null
+                  minLines: 1, // Set a minimum number of lines
+                  maxLength: maxLength,
+                  initialValue: initialValue,
+                  validator: validator ?? (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter ${labelText ?? hintName ?? "this field"}'; // Use labelText or hintName for validation message
+                    } else if (hintName == 'Password' && value.length < 8) {
+                      return 'Password should be at least 8 characters';
+                    } else if (!_emailRegex.hasMatch(value) && hintName == 'Email') {
+                      return 'Email address is not valid\n It should be an Email structure';
+                    } else if (hintName == 'Birth Date') {
+                      DateTime? parsedDate = DateTime.tryParse(value);
+                      if (parsedDate == null) {
+                        return 'Invalid date format';
+                      }
+                      if (parsedDate.year >= 2017) {
+                        return 'Birth date must be before 2017';
+                      }
+                    }
+                    return null;
+                  },
+                  enabled: enable,
+                  autofocus: autofocus,
+                  decoration: InputDecoration(
+
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF5095B0)),
+                    ),
+                    prefixIcon: icon != null
+                        ? Icon(
+                      icon,
+                      size: SizeConfig.textRatio * 25,
+                      color: const Color(0xFF5095B0),
+                    )
+                        : null, // Set null if no icon is provided
+                    hintText: hintName, // Optional hint text
+                    hintStyle: hintStyle == null ? TextStyle(
+                      color: SizeConfig.fontColor,
+                      fontSize: SizeConfig.textRatio * 20,
+                      fontFamily: 'Roboto',
+                    ) : hintStyle,
+                    fillColor: fillColor,
+                    filled: true,
+                    suffixIcon: suffixIcon,
+                    counterText: '', // Hide the default character counter
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 15, // Adjust vertical padding
+                      horizontal: 10, // Adjust horizontal padding
+                    ),
+                  ),
+                  onTap: () async {
+                    if (onClickFunction != null) {
+                      await onClickFunction!(context);
+                    }
+                  },
+                  focusNode: focusNode,
+                  onChanged: onChanged,
+
+                ),
               ),
             ),
           ],

@@ -26,9 +26,23 @@ class _AddadvertisementState extends State<Addadvertisement> {
   File? AdvertisementImage;
   final TextEditingController AdvertisementURL = TextEditingController();
    String Package = "";
+   double price = 0;
   AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
   bool tapped = false;
   bool _isLoading = false;
+
+//   @override
+//   void didChangeDependencies() {
+//     super.didChangeDependencies();
+//     final args =
+//     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+// print("................................");
+// print(args);
+//     Package = args?['packageName'] ?? '';
+//     print(Package);
+//     price = args?['packagePrice']?.toDouble() ?? 0.0;
+//
+//   }
 
   Future<void> _pickImage(ImageSource source, bool isProfileImage) async {
     final picker = ImagePicker();
@@ -200,9 +214,10 @@ class _AddadvertisementState extends State<Addadvertisement> {
                               Advertisementspackages.id
                           );
 
-                          if (result != null && result is String) {
+                          if (result != null && result is Map) {
                             setState(() {
-                              Package = result;
+                              Package = result['packageName'];
+                              price = result['packagePrice'];
                             });
                           }
                         },
@@ -276,7 +291,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
                                     content: Text(
                                         "Your Request Sent successfully!")),
                               );
-                              Navigator.pushReplacementNamed(context, PaymentScreen.id);
+                              Navigator.pushNamed(context, Paymentscreen.id , arguments: price);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(response)),

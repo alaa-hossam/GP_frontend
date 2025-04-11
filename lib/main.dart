@@ -13,10 +13,14 @@ import 'package:gp_frontend/views/MyHandcrafterProfile.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
+import 'package:gp_frontend/views/addAddress.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
+import 'package:gp_frontend/views/checkOut.dart';
+import 'package:gp_frontend/views/chooseAddress.dart';
 import 'package:gp_frontend/views/compareView.dart';
+import 'package:gp_frontend/views/confirmOrder.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
@@ -113,8 +117,12 @@ class MyApp extends StatelessWidget {
         showBazar.id : (BuildContext context) => showBazar(),
         Addadvertisement.id : (BuildContext context) => Addadvertisement(),
         Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
-        PaymentScreen.id : (BuildContext context) => PaymentScreen(),
+        Paymentscreen.id : (BuildContext context) => Paymentscreen(),
         MyHandcrafterProfile.id : (BuildContext context) => MyHandcrafterProfile(),
+        checkOut.id : (BuildContext context) => checkOut(),
+        chooseAddress.id : (BuildContext context) => chooseAddress(),
+        addAddress.id : (BuildContext context) => addAddress(),
+        confirmOrder.id : (BuildContext context) => confirmOrder(),
 
       },
     );

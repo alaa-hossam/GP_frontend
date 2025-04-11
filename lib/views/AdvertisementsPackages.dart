@@ -147,7 +147,10 @@ class _AdvertisementspackagesState extends State<Advertisementspackages> {
                                 width: 200 * SizeConfig.horizontalBlock,
                                 height: 50 * SizeConfig.verticalBlock,
                                   onClickButton: () async {
-                                    Navigator.pop(context, packageProvider.myBackages[index].name);
+                                    Navigator.pop(context, {
+                                      "packageName": packageProvider.myBackages[index].name,
+                                      "packagePrice": packageProvider.myBackages[index].price,
+                                    });
                                   }
                               ),
                             ),
