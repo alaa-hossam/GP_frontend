@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:gp_frontend/Providers/ProductProvider.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
+import 'package:provider/provider.dart';
 import '../Models/ProductModel.dart';
+import '../Providers/ProductProvider.dart';
 import '../SqfliteCodes/wishList.dart';
 import '../views/productDetails.dart';
 import 'Dimensions.dart';
+import '../Providers/ProductProvider.dart';
 
 class customProduct extends StatefulWidget {
   String imageURL, Name, id;
@@ -42,6 +47,8 @@ class _customProductState extends State<customProduct> {
   final Function(productModel)? onComparePressed;
   bool isTapped = true;
   customerViewModel customer = customerViewModel();
+  Token myToken = Token();
+
 
   _customProductState(this.imageURL, this.Name, this.Price,
       this.rate, this.id, this.showCompare,
@@ -51,8 +58,7 @@ class _customProductState extends State<customProduct> {
 
   toggleFavourite(String color) async{
     wishListObj.isWishlistTableEmpty;
-    String email = await customer.getEmail();
-    setState(() {
+    String email = await myToken.getEmail('SELECT EMAIL FROM TOKENS');
       if (color == "${SizeConfig.fontColor}") {
         wishListObj.addProduct('''
             INSERT INTO WISHLIST(ID,EMAIL) 
@@ -62,13 +68,15 @@ class _customProductState extends State<customProduct> {
              
             )
 ''');
+
       } else {
         wishListObj.deleteProduct('''
         DELETE FROM WISHLIST 
         WHERE ID = "$id" AND EMAIL = "$email"
       ''');
+
       }
-    });
+
     // wishListObj.recreateWishListTable();
   }
 
@@ -108,6 +116,7 @@ class _customProductState extends State<customProduct> {
 
   @override
   Widget build(BuildContext context) {
+    final myProductProvider = Provider.of<productProvider>(context, listen: true);
 
     return GestureDetector(
       child: Container(
@@ -135,46 +144,25 @@ class _customProductState extends State<customProduct> {
                   ),
                 ),
                 Positioned(
-                  top: 5,
-                  right: 5,
-                  child: CircleAvatar(
-                      radius: 15 * SizeConfig.verticalBlock,
-                      backgroundColor: Colors.white,
-                      child: FutureBuilder<bool>(
-                        future: wishListObj
-                            .doesIdExist(id), // Call the async function
-                        builder: (context, snapshot) {
-                          // if (snapshot.connectionState == ConnectionState.waiting) {
-                          //   // Show a loading indicator while waiting for the result
-                          //   return CircularProgressIndicator();
-                          // } else
-                          if (snapshot.hasError) {
-                            // Handle errors
-                            return Icon(
-                              Icons.favorite,
-                              size: 22 * SizeConfig.textRatio,
-                              color: SizeConfig.fontColor,
-                            );
-                          } else {
-                            // Use the result (true or false) to determine the color
-                            bool exists = snapshot.data ?? false;
-                            return IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Icon(
-                                Icons.favorite,
-                                size: 22 * SizeConfig.textRatio,
-                                color: exists ? Colors.red : SizeConfig.fontColor,
-                              ),
-                              onPressed: () {
-                                toggleFavourite(
-                                  exists ? "red" : "${SizeConfig.fontColor}",
-                                );
-                              },
-                            );
-                          }
-                        },
-                      )),
-                ),
+                    top: 5,
+                    right: 5,
+                    child: CircleAvatar(
+                        radius: 15 * SizeConfig.verticalBlock,
+                        backgroundColor: Colors.white,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            Icons.favorite,
+                            size: 22 * SizeConfig.textRatio,
+                            color: myProductProvider.isFavorite(widget.id)
+                                ? Colors.red
+                                : SizeConfig.fontColor,
+                          ),
+                          onPressed: () {
+                            myProductProvider.toggleFavorite(widget.id);
+                          },
+                        ),
+                    )),
                 if (widget.showCompare)
                   Positioned(
                       bottom: 5,

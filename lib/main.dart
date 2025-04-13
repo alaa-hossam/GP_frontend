@@ -57,7 +57,7 @@ void main() async {
   wishList wish = wishList();
   Cart myCart = Cart();
 
-  await token.db; // Initialize Token database
+  await token.db;
   await wish.db; // Initialize Wishlist database
   await myCart.db; // Initialize Cart database
 

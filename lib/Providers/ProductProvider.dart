@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import '../Models/ProductModel.dart';
+import '../SqfliteCodes/Token.dart';
 import '../ViewModels/customerViewModel.dart';
 import '../ViewModels/productViewModel.dart';
 
@@ -14,8 +15,9 @@ class productProvider extends ChangeNotifier {
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
-
-
+  final wishList _wishListObj = wishList();
+  final Token token = Token();
+  Set<String> _wishlistItems = {};
 
   productProvider() {
     print("ProductProvider initialized");
@@ -48,18 +50,49 @@ class productProvider extends ChangeNotifier {
     _products = productVM.products.map((product) => product).toList();
   }
 
+
+
+
+  WishlistProvider() {
+    _loadWishlist();
+  }
+
+  Future<void> _loadWishlist() async {
+    _wishlistItems = Set<String>.from(await wishListSql.getProductIdsByEmail('SELECT ID FROM WISHLIST'));
+  }
+
+  bool isFavorite(String productId) {
+    return _wishlistItems.contains(productId);
+  }
+
+  Future<void> toggleFavorite(String productId) async {
+    final email = await token.getEmail('SELECT EMAIL FROM TOKENS');
+
+    if (_wishlistItems.contains(productId)) {
+      await _wishListObj.deleteProduct('''
+        DELETE FROM WISHLIST 
+        WHERE ID = "$productId" AND EMAIL = "$email"
+      ''');
+      _wishlistItems.remove(productId);
+    } else {
+      await _wishListObj.addProduct('''
+        INSERT INTO WISHLIST(ID,EMAIL) 
+        VALUES ("$productId","$email")
+      ''');
+      _wishlistItems.add(productId);
+    }
+    notifyListeners();
+  }
   // Make this method async and await the result
   Future<void> getWishProducts() async {
 
     wishListProducts = await productVM.wishProducts();
-    print("inside provider");
-    print(wishListProducts);
     notifyListeners(); // Notify listeners after updating the data
   }
   Future<void> deleteProduct(String id) async {
     // Delete the product from the database
-    customerViewModel customer = customerViewModel();
-    String email = await customer.getEmail();
+    // customerViewModel customer = customerViewModel();
+    String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
 
 
     await wishList().deleteProduct('''

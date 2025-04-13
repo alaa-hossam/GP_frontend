@@ -361,7 +361,7 @@ class productService {
   Future<List<dynamic>> getWishProducts() async {
 
     customerViewModel customer = customerViewModel();
-    String email = await customer.getEmail();
+    String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
     wishList myWish = wishList();
     // myWish.recreateWishListTable();
 

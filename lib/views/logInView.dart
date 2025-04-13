@@ -23,6 +23,7 @@ class _logInState extends State<logIn> {
   bool obscureText = true;
   customerViewModel cvm= customerViewModel();
   bool _isLoading = false;
+  Token token = Token();
 
 
   togglePasswordVisibility() {

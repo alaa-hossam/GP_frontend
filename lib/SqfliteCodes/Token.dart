@@ -27,7 +27,8 @@ class Token {
       UUID TEXT ,
       TOKEN TEXT ,
       EXPIRED TEXT,
-      ROLE TEXT
+      ROLE TEXT,
+      EMAIL TEXT
       )
         ''');
   }
@@ -50,6 +51,12 @@ class Token {
     Database? myToken = await db; // Initialize the database
     List<Map> response = await myToken!.rawQuery(query);
     return response[0]['UUID'];
+  }
+
+  Future<String> getEmail(String query) async {
+    Database? myToken = await db; // Initialize the database
+    List<Map> response = await myToken!.rawQuery(query);
+    return response[0]['EMAIL'];
   }
 
   Future<String> getRole(String query) async {
