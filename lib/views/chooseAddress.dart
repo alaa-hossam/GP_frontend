@@ -2,15 +2,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:gp_frontend/Providers/AddressProvider.dart';
+import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
 import 'package:gp_frontend/views/addAddress.dart';
+import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import '../widgets/Dimensions.dart';
 
 class chooseAddress extends StatelessWidget {
   static String id = "chooseAddress";
-  const chooseAddress({super.key});
+  chooseAddress({super.key});
 
   @override
   Widget build(BuildContext context) {
+    AddressProvider myAddressProvider= Provider.of<AddressProvider>(context , listen: false);
+
     return  Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -60,8 +66,18 @@ class chooseAddress extends StatelessWidget {
       body: SizedBox(
         child: Padding(
           padding:  EdgeInsets.only(left: 10 * SizeConfig.horizontalBlock , right:  10 * SizeConfig.horizontalBlock),
-          child: ListView(
+          child: Column(
             children: [
+SizedBox(
+  height: 400,
+  child: ListView.builder(
+    itemCount: myAddressProvider.addresses.length,
+      itemBuilder:(context, index) {
+      return Container();
+      },),
+),
+
+
             Padding(
               padding:  EdgeInsets.only(top: 30 * SizeConfig.verticalBlock),
               child: Center(

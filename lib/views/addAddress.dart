@@ -16,7 +16,7 @@ class addAddress extends StatefulWidget {
 class _addAddressState extends State<addAddress> {
   final _formKey = GlobalKey<FormState>();
   List<String> labels = [
-    "Address name", "City", "State", "Street name",
+    "Address Owner", "City", "State", "Street name",
     "Building Number", "Floor Number", "Flat number",
     "Post Code", "Phone Number"
   ];

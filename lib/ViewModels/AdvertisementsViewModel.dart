@@ -1,11 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:gp_frontend/views/AddAdvertisement.dart';
-
 import '../Models/AdvertisementModel.dart';
 
-class AdvertisementsViewModel extends ChangeNotifier {
+class AdvertisementsViewModel {
   final AdvertisementApiServices apiServices = AdvertisementApiServices();
   List<AdvertisementsModel> _ads = [];
 

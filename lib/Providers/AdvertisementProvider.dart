@@ -5,16 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/Models/AdvertisementModel.dart';
 import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 
-// class AdvertisementProvider extends ChangeNotifier{
-//   AdvertisementsViewModel AVM = AdvertisementsViewModel();
-//
-//   getAdvertisement(File image , String Url , String packageId , String transactionId){
-//     AVM.fetchAds(image, Url, packageId, transactionId);
-//     notifyListeners();
-//   }
-//
-// }
-
 class AdvertisementProvider with ChangeNotifier {
   List<AdvertisementsModel> ads = [];
   AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
