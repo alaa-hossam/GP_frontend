@@ -162,6 +162,7 @@ Token token=Token();
                             size: 25 * SizeConfig.textRatio),
                         onPressed: togglePasswordVisibility,
                       ),
+                      maxLines: 1,
                     ),
                     SizedBox(height: SizeConfig.verticalBlock * 10),
 

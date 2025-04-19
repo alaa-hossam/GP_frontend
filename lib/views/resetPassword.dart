@@ -108,6 +108,7 @@ class _resetPasswordState extends State<resetPassword> {
                           ),
                           onPressed: togglePasswordVisibility,
                         ),
+                        maxLines: 1,
                       ),
                       MyTextFormField(
                         controller: confirmPasswordController,
@@ -120,6 +121,7 @@ class _resetPasswordState extends State<resetPassword> {
                           ),
                           onPressed: toggleConfirmPasswordVisibility,
                         ),
+                        maxLines: 1,
                       ),
                       customizeButton(
                         buttonName: 'Reset Password',

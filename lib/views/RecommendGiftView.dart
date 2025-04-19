@@ -22,6 +22,7 @@ class _RecommendGiftState extends State<RecommendGift> {
   String? _selectedAnswer;
   final Map<String, String> answers = {}; // To store questions and answers
   final TextEditingController _additionalInfoController = TextEditingController();
+  bool _isLoading = false;
 
   // Define the questions and their answer options
   final Map<String, List<String>> questions = {
@@ -103,224 +104,242 @@ class _RecommendGiftState extends State<RecommendGift> {
           ),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20 * SizeConfig.verticalBlock),
-        child: !_start
-            ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Answer a few questions, and we’ll suggest the best gifts for your loved ones.",
-              style: TextStyle(
-                fontSize: 32 * SizeConfig.textRatio,
-                color: Colors.black,
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20 * SizeConfig.verticalBlock),
-            customizeButton(
-              buttonName: "Find the Perfect Gift!",
-              buttonColor: SizeConfig.iconColor,
-              fontColor: Colors.white,
-              sufixIcon: Icons.wallet_giftcard_rounded,
-              textSize: 24 * SizeConfig.textRatio,
-              width: 309 * SizeConfig.horizontalBlock,
-              height: 55 * SizeConfig.verticalBlock,
-              onClickButton: () {
-                setState(() {
-                  _start = true;
-                });
-              },
-            ),
-            SizedBox(height: 20 * SizeConfig.verticalBlock),
-            Image.asset(
-              'assets/images/3009227 1.png',
-              width: SizeConfig.verticalBlock * 361,
-              height: SizeConfig.verticalBlock * 361,
-            ),
-          ],
-        )
-            : Column(
-          children: [
-            // Display the current question
-            Text(
-              questions.keys.toList()[_currentQuestionIndex],
-              style: TextStyle(
-                fontSize: 32 * SizeConfig.textRatio,
-                color: Colors.black,
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10 * SizeConfig.verticalBlock),
-            if (_currentQuestionIndex < questions.length - 1)
+      body: Stack(
+        children:[ Padding(
+          padding: EdgeInsets.all(20 * SizeConfig.verticalBlock),
+          child: !_start
+              ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text(
-                "Choose one option",
+                "Answer a few questions, and we’ll suggest the best gifts for your loved ones.",
                 style: TextStyle(
-                  fontSize: 20 * SizeConfig.textRatio,
+                  fontSize: 32 * SizeConfig.textRatio,
                   color: Colors.black,
                   fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
+                textAlign: TextAlign.center,
               ),
-            SizedBox(height: 20 * SizeConfig.verticalBlock),
-            if (_currentQuestionIndex < questions.length - 1)
-              ...questions.values
-                  .toList()[_currentQuestionIndex]
-                  .map((answer) {
-                return Container(
-                  width: 280 * SizeConfig.horizontalBlock,
-                  height: 55 * SizeConfig.verticalBlock,
-                  margin: EdgeInsets.symmetric(
-                      vertical: 5 * SizeConfig.verticalBlock),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Color(0xFF5095B0),
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: RadioListTile<String>(
-                    title: Text(
-                      answer,
-                      style: TextStyle(
-                        fontSize: 24 * SizeConfig.textRatio,
-                        color: SizeConfig.iconColor,
-                      ),
-                    ),
-                    value: answer,
-                    groupValue: _selectedAnswer ??
-                        answers[questions.keys.toList()[_currentQuestionIndex]],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedAnswer = value;
-                        answers[questions.keys.toList()[_currentQuestionIndex]] = value!;
-                      });
-                    },
-                    activeColor: Color(0xFF5095B0),
-                  ),
-                );
-              }).toList(),
-            if (_currentQuestionIndex == questions.length - 1)
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 20 * SizeConfig.horizontalBlock),
-                child: MyTextFormField(
-                  controller: _additionalInfoController,
-                  width: 363 * SizeConfig.horizontalBlock,
-                  height: 55 * SizeConfig.verticalBlock,
-                  hintName: "Tell us more about what you’re looking for",
-                  icon: Icons.edit_sharp,
-                  maxLines: 3,
-                ),
+              SizedBox(height: 20 * SizeConfig.verticalBlock),
+              customizeButton(
+                buttonName: "Find the Perfect Gift!",
+                buttonColor: SizeConfig.iconColor,
+                fontColor: Colors.white,
+                sufixIcon: Icons.wallet_giftcard_rounded,
+                textSize: 24 * SizeConfig.textRatio,
+                width: 309 * SizeConfig.horizontalBlock,
+                height: 55 * SizeConfig.verticalBlock,
+                onClickButton: () {
+                  setState(() {
+                    _start = true;
+                  });
+                },
               ),
-            Spacer(), // Pushes the buttons to the bottom
-            // Navigation buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentQuestionIndex > 0)
-                  customizeButton(
-                    buttonName: "Back",
-                    buttonColor: Color(0xFFE9E9E9),
-                    fontColor: SizeConfig.iconColor,
-                    buttonIcon: Icons.arrow_back,
-                    IconColor: SizeConfig.iconColor,
-                    textSize: 18 * SizeConfig.textRatio,
-                    width: 120 * SizeConfig.horizontalBlock,
-                    height: 40 * SizeConfig.verticalBlock,
-                    rad: 30,
-                    onClickButton: () {
-                      setState(() {
-                        _currentQuestionIndex--;
-                        _selectedAnswer = answers[questions.keys.toList()[_currentQuestionIndex]];
-                      });
-                    },
-                  ),
-                if (_currentQuestionIndex <= 0) Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(
-                    questions.length,
-                        (index) => Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: index == _currentQuestionIndex
-                            ? Color(0xFFB36995)
-                            : Colors.grey,
-                      ),
-                    ),
+              SizedBox(height: 20 * SizeConfig.verticalBlock),
+              Image.asset(
+                'assets/images/3009227 1.png',
+                width: SizeConfig.verticalBlock * 361,
+                height: SizeConfig.verticalBlock * 361,
+              ),
+            ],
+          )
+              : Column(
+            children: [
+              // Display the current question
+              Text(
+                questions.keys.toList()[_currentQuestionIndex],
+                style: TextStyle(
+                  fontSize: 32 * SizeConfig.textRatio,
+                  color: Colors.black,
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10 * SizeConfig.verticalBlock),
+              if (_currentQuestionIndex < questions.length - 1)
+                Text(
+                  "Choose one option",
+                  style: TextStyle(
+                    fontSize: 20 * SizeConfig.textRatio,
+                    color: Colors.black,
+                    fontFamily: "Roboto",
                   ),
                 ),
-                if (_currentQuestionIndex < questions.length - 1)
-                  customizeButton(
-                    buttonName: "Next",
-                    buttonColor: SizeConfig.iconColor,
-                    fontColor: Colors.white,
-                    sufixIcon: Icons.arrow_forward,
-                    textSize: 18 * SizeConfig.textRatio,
-                    width: 120 * SizeConfig.horizontalBlock,
-                    height: 40 * SizeConfig.verticalBlock,
-                    rad: 30,
-                    onClickButton: () {
-                      if (_selectedAnswer != null ||
-                          _currentQuestionIndex == questions.length - 1) {
+              SizedBox(height: 20 * SizeConfig.verticalBlock),
+              if (_currentQuestionIndex < questions.length - 1)
+                ...questions.values
+                    .toList()[_currentQuestionIndex]
+                    .map((answer) {
+                  return Container(
+                    width: 280 * SizeConfig.horizontalBlock,
+                    height: 55 * SizeConfig.verticalBlock,
+                    margin: EdgeInsets.symmetric(
+                        vertical: 5 * SizeConfig.verticalBlock),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Color(0xFF5095B0),
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: RadioListTile<String>(
+                      title: Text(
+                        answer,
+                        style: TextStyle(
+                          fontSize: 24 * SizeConfig.textRatio,
+                          color: SizeConfig.iconColor,
+                        ),
+                      ),
+                      value: answer,
+                      groupValue: _selectedAnswer ??
+                          answers[questions.keys.toList()[_currentQuestionIndex]],
+                      onChanged: (value) {
                         setState(() {
-                          _currentQuestionIndex++;
-                          _selectedAnswer = null;
+                          _selectedAnswer = value;
+                          answers[questions.keys.toList()[_currentQuestionIndex]] = value!;
                         });
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Please select an answer."),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
+                      },
+                      activeColor: Color(0xFF5095B0),
+                    ),
+                  );
+                }).toList(),
+              if (_currentQuestionIndex == questions.length - 1)
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 20 * SizeConfig.horizontalBlock),
+                  child: MyTextFormField(
+                    controller: _additionalInfoController,
+                    width: 363 * SizeConfig.horizontalBlock,
+                    height: 55 * SizeConfig.verticalBlock,
+                    hintName: "Tell us more about what you’re looking for",
+                    icon: Icons.edit_sharp,
+                    maxLines: 3,
                   ),
-                if (_currentQuestionIndex == questions.length - 1)
-                  customizeButton(
-                    buttonName: "Finish",
-                    buttonColor: SizeConfig.iconColor,
-                    fontColor: Colors.white,
-                    sufixIcon: Icons.arrow_forward,
-                    textSize: 18 * SizeConfig.textRatio,
-                    width: 120 * SizeConfig.horizontalBlock,
-                    height: 40 * SizeConfig.verticalBlock,
-                    rad: 30,
-                    onClickButton: () async {
-                      if (_additionalInfoController.text.isNotEmpty || _selectedAnswer != null) {
-                        // Save the final answer
-                        answers[questions.keys.toList()[_currentQuestionIndex]] =
-                            _additionalInfoController.text;
+                ),
+              Spacer(), // Pushes the buttons to the bottom
+              // Navigation buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_currentQuestionIndex > 0)
+                    customizeButton(
+                      buttonName: "Back",
+                      buttonColor: Color(0xFFE9E9E9),
+                      fontColor: SizeConfig.iconColor,
+                      buttonIcon: Icons.arrow_back,
+                      IconColor: SizeConfig.iconColor,
+                      textSize: 18 * SizeConfig.textRatio,
+                      width: 120 * SizeConfig.horizontalBlock,
+                      height: 40 * SizeConfig.verticalBlock,
+                      rad: 30,
+                      onClickButton: () {
+                        setState(() {
+                          _currentQuestionIndex--;
+                          _selectedAnswer = answers[questions.keys.toList()[_currentQuestionIndex]];
+                        });
+                      },
+                    ),
+                  if (_currentQuestionIndex <= 0) Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List.generate(
+                      questions.length,
+                          (index) => Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == _currentQuestionIndex
+                              ? Color(0xFFB36995)
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_currentQuestionIndex < questions.length - 1)
+                    customizeButton(
+                      buttonName: "Next",
+                      buttonColor: SizeConfig.iconColor,
+                      fontColor: Colors.white,
+                      sufixIcon: Icons.arrow_forward,
+                      textSize: 18 * SizeConfig.textRatio,
+                      width: 120 * SizeConfig.horizontalBlock,
+                      height: 40 * SizeConfig.verticalBlock,
+                      rad: 30,
+                      onClickButton: () {
+                        if (_selectedAnswer != null ||
+                            _currentQuestionIndex == questions.length - 1) {
+                          setState(() {
+                            _currentQuestionIndex++;
+                            _selectedAnswer = null;
+                          });
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Please select an answer."),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  if (_currentQuestionIndex == questions.length - 1)
+                    customizeButton(
+                      buttonName: "Finish",
+                      buttonColor: SizeConfig.iconColor,
+                      fontColor: Colors.white,
+                      sufixIcon: Icons.arrow_forward,
+                      textSize: 18 * SizeConfig.textRatio,
+                      width: 120 * SizeConfig.horizontalBlock,
+                      height: 40 * SizeConfig.verticalBlock,
+                      rad: 30,
+                      onClickButton: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        if (_additionalInfoController.text.isNotEmpty || _selectedAnswer != null) {
+                          // Save the final answer
+                          answers[questions.keys.toList()[_currentQuestionIndex]] =
+                              _additionalInfoController.text;
 
-                        // Fetch gift recommendations
-                        final prodProvider = Provider.of<productProvider>(context, listen: false);
-                        await prodProvider.fetchGiftRecommendProducts(answers);
+                          // Fetch gift recommendations
+                          final prodProvider = Provider.of<productProvider>(context, listen: false);
+                          await prodProvider.fetchGiftRecommendProducts(answers);
 
-                        // Navigate to a new screen to display the recommendations
-                        Navigator.pushNamed(context, GiftRecommendationProducts.id);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Please provide additional information."),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },                  ),
-              ],
-            ),
-          ],
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          // Navigate to a new screen to display the recommendations
+                          Navigator.pushReplacementNamed(context, GiftRecommendationProducts.id);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Please provide additional information."),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },                  ),
+                ],
+              ),
+            ],
+          ),
         ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+        ]
       ),
     );
   }
