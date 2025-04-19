@@ -40,7 +40,7 @@ class AddressService{
     String id = await token.getUUID('SELECT UUID FROM TOKENS');
     String Query = '''
     query GetUserAddresses {
-    getUserAddresses(userId: "${id}") {
+    getUserAddresses(userId:  "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e") {
         addressOwner
         streetName
         state
@@ -51,7 +51,7 @@ class AddressService{
     final request = {
       'query': Query,
       'variables': {
-        'userId': id,
+        'userId':  "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e",
       },
     };
 
@@ -74,7 +74,7 @@ class AddressService{
         print(addresses);
         for(var address in addresses){
           myAddresses.add(AddressModel(address['addressOwner'], address['city'],
-              address['state'], address['streetName']));
+              address['state']?? "", address['streetName']));
         }
         print(myAddresses);
         return myAddresses;
