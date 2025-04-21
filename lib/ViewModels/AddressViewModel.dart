@@ -8,7 +8,8 @@ class AddressViewModel {
 
   List<AddressModel> get ads => _addresses;
 
-  addAddress() {
+  addAddress(AddressModel address) {
+    apiServices.addAddresses(address);
   }
   getAddresses() async{
     _addresses = await apiServices.getAddresses();

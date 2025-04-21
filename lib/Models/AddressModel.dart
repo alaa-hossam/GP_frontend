@@ -1,8 +1,5 @@
 import 'dart:convert';
-
-import 'package:gp_frontend/Models/AdvertisementModel.dart';
 import 'package:http/http.dart' as http;
-
 import '../SqfliteCodes/Token.dart';
 
 class AddressModel{
@@ -40,7 +37,7 @@ class AddressService{
     String id = await token.getUUID('SELECT UUID FROM TOKENS');
     String Query = '''
     query GetUserAddresses {
-    getUserAddresses(userId:  "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e") {
+    getUserAddresses(userId:  "${id}") {
         addressOwner
         streetName
         state
@@ -51,7 +48,7 @@ class AddressService{
     final request = {
       'query': Query,
       'variables': {
-        'userId':  "1463d4fd-1f57-46f4-8c2f-af4bfe9ff05e",
+        'userId':  "${id}",
       },
     };
 
@@ -90,4 +87,59 @@ class AddressService{
     }
 
   }
+  Future<String> addAddresses(AddressModel address) async {
+    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    String Query = '''
+      mutation CreateUserAddress {
+        createUserAddress(
+          input: {
+            addressOwner: "${address.AddressOwner}"
+            buildingNumber: "${address.BuildingNum}"
+            city: "${address.City}"
+            flatNumber: "${address.FlatNum}"
+            floorNumber: "${address.FloorNum}"
+            isPrimary: ${address.isPrimary}
+            postalCode: "${address.PostalCode}"
+            streetName: "${address.StreetName}"
+            userId: "$id"
+            state: "${address.State}"
+          }
+        ) {
+          id
+        }
+      }
+    ''';
+
+    final request = {
+      'query': Query,
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(ApiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String addressId = data['data']['createUserAddress']['id'];
+        print("Created Address ID: $addressId");
+        return addressId;
+      } else {
+        throw Exception('Failed to add address: ${response.body}');
+      }
+    } catch (e) {
+      print("Error adding address: $e");
+      rethrow;
+    }
+  }
+
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/AddressModel.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
 
 import '../Models/ProductModel.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/cartAppBar.dart';
 import '../widgets/customizeButton.dart';
+import 'Home.dart';
 import 'chooseAddress.dart';
 
 class confirmOrder extends StatefulWidget {
@@ -21,6 +23,7 @@ class _confirmOrderState extends State<confirmOrder> {
   late String payment;
   late double price;
   late List<productModel> products;
+  late AddressModel myAddress;
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args =
@@ -29,6 +32,7 @@ class _confirmOrderState extends State<confirmOrder> {
     payment = args?['payment'] ?? '';
     price = args?['price']?.toDouble() ?? 0.0;
     products = args?['products'] ?? [];
+    myAddress = args?['address'] ?? [];
   }
 
   @override
@@ -136,7 +140,9 @@ class _confirmOrderState extends State<confirmOrder> {
                             color: Color(0xFF292929),
                             size: 22 * SizeConfig.textRatio),
                         SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                        Text("Choose Address",
+                        Text( "${myAddress.StreetName} ,"
+                            " ${myAddress.State != "" ?myAddress.State + ",":""}"
+                            " ${myAddress.City}",
                             style: GoogleFonts.roboto(
                                 fontSize: 20 * SizeConfig.textRatio,
                                 color: Color(0x503C3C3C))),
@@ -351,6 +357,7 @@ class _confirmOrderState extends State<confirmOrder> {
                                         ),
                                       ),
                                     ])),
+                            SizedBox(height: 5 * SizeConfig.verticalBlock,)
                           ],
                         );
                       })),
@@ -364,8 +371,13 @@ class _confirmOrderState extends State<confirmOrder> {
                   width: 370 * SizeConfig.horizontalBlock,
                   height: 50 * SizeConfig.verticalBlock,
                   onClickButton: () {
-                    Navigator.pushNamed(context, Paymentscreen.id, arguments:
+                    if(payment == "assets/images/visa.png"){
+                      Navigator.pushNamed(context, Paymentscreen.id, arguments:
                       price);
+                    }else{
+                      Navigator.pushNamed(context, Home.id);
+                    }
+
                   },
                 ),
               )

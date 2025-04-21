@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/AddressModel.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
-import 'package:gp_frontend/views/PaymentScreen.dart';
 import 'package:gp_frontend/views/confirmOrder.dart';
 import 'package:gp_frontend/widgets/cartAppBar.dart';
-
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 import 'chooseAddress.dart';
@@ -17,12 +18,16 @@ class checkOut extends StatefulWidget {
   State<checkOut> createState() => _checkOutState();
 }
 
+
+
+
 class _checkOutState extends State<checkOut> {
   late String voucher;
   late double price;
   late int percentage;
   late List<productModel> products;
-  int? selectedPaymentIndex; // To track selected payment method
+  int? selectedPaymentIndex;
+  AddressModel? addressData;
 
   @override
   void didChangeDependencies() {
@@ -88,6 +93,26 @@ class _checkOutState extends State<checkOut> {
       ),
     );
   }
+
+  void navigateToChooseAddress(BuildContext context) async {
+    final selectedAddress = await Navigator.pushNamed(
+      context,
+      chooseAddress.id,
+    );
+
+    if (selectedAddress != null) {
+
+      setState(() {
+        addressData =  selectedAddress as AddressModel;
+      });
+
+      print("Selected Address: $addressData");
+    } else {
+      print("No address selected");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +205,7 @@ class _checkOutState extends State<checkOut> {
                             fontSize: 20 * SizeConfig.textRatio)),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, chooseAddress.id);
+                        navigateToChooseAddress(context);
                       },
                       child: Container(
                         width: 358 * SizeConfig.horizontalBlock,
@@ -205,7 +230,12 @@ class _checkOutState extends State<checkOut> {
                                     size: 22 * SizeConfig.textRatio),
                                 SizedBox(
                                     width: 10 * SizeConfig.horizontalBlock),
-                                Text("Choose Address",
+                                Text(
+                                    addressData != null ?
+                                    "${addressData!.StreetName} ,"
+                                        " ${addressData!.State != "" ?addressData!.State + ",":""}"
+                                        " ${addressData!.City}":
+                                    "Choose Address",
                                     style: GoogleFonts.roboto(
                                         fontSize: 20 * SizeConfig.textRatio,
                                         color: Color(0x503C3C3C))),
@@ -281,6 +311,11 @@ class _checkOutState extends State<checkOut> {
                         SnackBar(content: Text('Please select a payment method')),
                       );
                       return;
+                    }if (addressData == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please select an Address')),
+                      );
+                      return;
                     }
 
                     Navigator.pushNamed(
@@ -289,7 +324,8 @@ class _checkOutState extends State<checkOut> {
                       arguments: {
                         "products": products,
                         "price":price.toInt(),
-                        "payment":selectedPaymentIndex == 0 ?"assets/images/visa.png" :"assets/images/cash.png"
+                        "payment":selectedPaymentIndex == 0 ?"assets/images/visa.png" :"assets/images/cash.png",
+                        "address": addressData
                       }
                     );
                   },
