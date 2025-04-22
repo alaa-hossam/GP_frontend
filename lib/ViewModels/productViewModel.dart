@@ -40,6 +40,17 @@ class productViewModel  extends ChangeNotifier{
       return [];
     }
   }
+  Future<List<productModel>> historyProducts() async {
+    try {
+      print("Fetching history products from API in VM...");
+      final products = await apiServices.HistoryProducts();
+      print("history productsfetched successfully: $products");
+      return products;
+    } catch (e) {
+      debugPrint("Error fetching history products in VM: $e");
+      return [];
+    }
+  }
 
   Future<String> addProductReview(String comment,String productId,double rate)async{
     return await apiServices.addProductReview(comment, productId, rate);

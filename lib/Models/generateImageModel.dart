@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../SqfliteCodes/Token.dart';
 
 class generateImageModel {
   String prompt;
@@ -12,6 +13,7 @@ class generateImageModel {
 
 class generateImageServices {
   final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
+  Token token = Token();
 
   Future<String> generateImage(String prompt) async {
     print("=====================================================$prompt");
@@ -27,9 +29,14 @@ class generateImageServices {
     };
 
     try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
         body: jsonEncode(request),
       );
 
@@ -58,6 +65,7 @@ class generateImageServices {
       return "An error occurred: $e";
     }
   }
+
   Future<String> saveGeneratedImage(generateImageModel generatedImage) async {
     final request = {
       'query': '''
@@ -73,9 +81,13 @@ class generateImageServices {
     };
 
     try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken'},
         body: jsonEncode(request),
       );
 

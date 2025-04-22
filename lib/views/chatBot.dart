@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../Models/generateImageModel.dart';
 import '../ViewModels/generateImageViewModel.dart';
 import '../widgets/Dimensions.dart';
@@ -113,11 +114,28 @@ class _AIChatState extends State<AIChat> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        toolbarHeight: 80 * SizeConfig.verticalBlock,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF223F4A),
+                Color(0xFF5095B0),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: const Color(0xFF292929),
+            color: Colors.white,
             size: SizeConfig.textRatio * 15,
           ),
           onPressed: () {
@@ -125,11 +143,16 @@ class _AIChatState extends State<AIChat> {
           },
         ),
         title: Text(
-          "AI Chat",
-          style: TextStyle(
-            fontFamily: "Rubik",
-            fontSize: SizeConfig.textRatio * 20,
-            color: Colors.black54,
+          'AI Chat',
+          style: GoogleFonts.rubik(
+            color: Colors.white,
+            fontSize: 20 * SizeConfig.textRatio,
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
         ),
       ),
@@ -142,36 +165,36 @@ class _AIChatState extends State<AIChat> {
                 horizontal: SizeConfig.horizontalBlock * 10,
                 vertical: SizeConfig.verticalBlock * 5,
               ),
+              margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 border: Border.all(width: 2, color: SizeConfig.iconColor),
               ),
               child: chatItems.isEmpty
-                  ? Column(
-                spacing: SizeConfig.verticalBlock * 10,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/images/robot.png',
-                    width: SizeConfig.verticalBlock * 65,
-                    height: SizeConfig.verticalBlock * 65,
-                  ),
-                  SizedBox(height: SizeConfig.verticalBlock * 20),
-                  _buildInfoContainer("Generate all the craft images you want."),
-                  _buildInfoContainer("Answer all your questions about handicraft"),
-                  _buildInfoContainer("Conversational AI (I can only send a photos)"),
-                ],
+                  ? Center( // Wrap the content with a Center widget
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                  crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+                  children: [
+                    Image.asset(
+                      'assets/images/robot.png',
+                      width: SizeConfig.verticalBlock * 65,
+                      height: SizeConfig.verticalBlock * 65,
+                    ),
+                    SizedBox(height: SizeConfig.verticalBlock * 20),
+                    _buildInfoContainer("Generate all the craft images you want."),
+                    _buildInfoContainer("Answer all your questions about handicraft"),
+                    _buildInfoContainer("Conversational AI (I can only send a photos)"),
+                  ],
+                ),
               )
                   : Stack(
                 children: [
                   SingleChildScrollView(
                     child: Column(
-                      spacing: SizeConfig.verticalBlock * 10,
                       children: [
                         SizedBox(height: SizeConfig.verticalBlock * 20),
-                        for (int i = 0; i < chatItems.length; i++)
-                          _buildChatItem(i),
+                        for (int i = 0; i < chatItems.length; i++) _buildChatItem(i),
                         SizedBox(height: SizeConfig.verticalBlock * 20),
                       ],
                     ),
@@ -204,8 +227,7 @@ class _AIChatState extends State<AIChat> {
                 ],
               ),
             ),
-          ),
-          _buildInputField(),
+          ),          _buildInputField(),
         ],
       ),
     );

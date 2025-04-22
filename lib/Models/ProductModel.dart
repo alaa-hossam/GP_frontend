@@ -256,6 +256,81 @@ class productService {
       return []; // Return an empty list in case of error
     }
   }
+
+
+  Future<List<productModel>> HistoryProducts() async {
+    print("Fetching history products from API...");
+    List<productModel> historyProducts = [];
+
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    final query = '''
+        query GetUserHistory {
+            getUserHistory(userId: "${userId}") {
+                product {
+                    averageRating
+                    category {
+                        name
+                    }
+                    imageUrl
+                    id
+                    lowestCustomPrice
+                    name
+                    indicators {
+                        indicator {
+                            imageUrl
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+        }
+  ''';
+
+    final request = {
+      'query': query,
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getUserHistory']['product'];
+        print(data);
+
+        for (var product in prods) {
+          historyProducts.add(productModel(
+            product['id'],
+            product['imageUrl'],
+            product['name'],
+            category: product['category']['name'],
+            product['lowestCustomPrice'].toDouble(),
+            product['averageRating'].toDouble(),
+          ));
+        }
+
+        print("history Products fetched successfully: $historyProducts");
+        return historyProducts;
+      } else {
+        throw Exception('Failed to load history products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching history products: $e");
+      return [];
+    }
+  }
+
   Future<String> addProductReview(String comment, String productId, double rate) async {
     print("Fetching products from API...");
     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
@@ -311,6 +386,7 @@ class productService {
       return "Error sending review: $e";
     }
   }
+
   Future<List<dynamic>> searchProduct(String word) async {
     List<dynamic> products;
     print("before");

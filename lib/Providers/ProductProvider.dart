@@ -12,6 +12,8 @@ class productProvider extends ChangeNotifier {
   List<productModel>  bazarProducts = [];
   List<productModel> _giftRecommendProducts = [];
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
+  List<productModel> _historyProducts = [];
+  List<productModel> get historyProducts => _historyProducts;
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
@@ -41,6 +43,17 @@ class productProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint("Error fetching gift recommendations: $e");
+      notifyListeners();
+    }
+  }
+  Future<void> fetchHistoryProducts() async {
+    try {
+      print("Fetching history products...");
+      _historyProducts = await productVM.historyProducts();
+      print("history products fetched: $_historyProducts");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching history products: $e");
       notifyListeners();
     }
   }

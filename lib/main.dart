@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Providers/AddressProvider.dart';
 import 'package:gp_frontend/Providers/BackagesProvider.dart';
+import 'package:gp_frontend/Providers/eventProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
 import 'package:gp_frontend/views/AdvertisementsPackages.dart';
@@ -15,6 +16,7 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/addAddress.dart';
+import 'package:gp_frontend/views/addEvent.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
@@ -22,7 +24,9 @@ import 'package:gp_frontend/views/checkOut.dart';
 import 'package:gp_frontend/views/chooseAddress.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/confirmOrder.dart';
+import 'package:gp_frontend/views/eventsView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
+import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/productDetails.dart';
@@ -75,6 +79,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => BackagesProvider()),
         ChangeNotifierProvider(create: (_) => BazarProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => EventProvider()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),
@@ -125,7 +130,8 @@ class MyApp extends StatelessWidget {
         chooseAddress.id : (BuildContext context) => chooseAddress(),
         addAddress.id : (BuildContext context) => addAddress(),
         confirmOrder.id : (BuildContext context) => confirmOrder(),
-
+        HistoryProducts.id : (BuildContext context) => HistoryProducts(),
+        EventsView.id : (BuildContext context) => EventsView(),
       },
     );
   }

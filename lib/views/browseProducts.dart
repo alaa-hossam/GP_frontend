@@ -8,13 +8,17 @@ import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
+import '../SqfliteCodes/Token.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/SideButton.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
+import 'MyHandcrafterProfile.dart';
 import 'ProfileView.dart';
+import 'eventsView.dart';
+import 'historyView.dart';
 import 'logInView.dart';
 
 class browseProducts extends StatefulWidget {
@@ -30,12 +34,12 @@ class _BrowseProductsState extends State<browseProducts> {
   int selectedIndex = 0;
   int selectedChildIndex = 0;
   bool showCompare = false;
-  bool isLoading = false; // Track loading state
+  bool isLoading = false;
   List<productModel> comparedProducts = [];
   late productProvider prodProvider;
   late CategoryProvider catProvider;
-  String? selectedCategoryId; // Track the selected category ID
-  List<CategoryModel> categoryChildren = []; // Track children of the selected category
+  String? selectedCategoryId;
+  List<CategoryModel> categoryChildren = [];
 
   @override
   void initState() {
@@ -163,8 +167,16 @@ class _BrowseProductsState extends State<browseProducts> {
                   child: Column(
                     children: [
                       sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
+                          SizeConfig.iconColor, () async{
+                            final token = Token();
+                            final role = await token.getRole('SELECT ROLE FROM TOKENS');
+                            print(role);
+                            // Navigate to the appropriate profile based on the role
+                            if (role == 'Handicrafter') {
+                              Navigator.pushNamed(context, MyHandcrafterProfile.id);
+                            } else if (role == 'Client') {
+                              Navigator.pushNamed(context, Profile.id);
+                            }
                           }),
                       sideButton("My orders", Icons.shopping_cart_outlined,
                           SizeConfig.iconColor, () {
@@ -172,7 +184,7 @@ class _BrowseProductsState extends State<browseProducts> {
                           }),
                       sideButton("History", Icons.history_outlined,
                           SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
+                            Navigator.pushNamed(context, HistoryProducts.id);
                           }),
                       sideButton(
                           "My posts", Icons.post_add, SizeConfig.iconColor, () {
@@ -192,7 +204,7 @@ class _BrowseProductsState extends State<browseProducts> {
                           "Event reminder",
                           Icons.event_available_outlined,
                           SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
+                        Navigator.pushNamed(context, EventsView.id);
                       }),
                       sideButton("Add Advertisement",
                           Icons.camera_roll_outlined, SizeConfig.iconColor, () {
@@ -235,9 +247,16 @@ class _BrowseProductsState extends State<browseProducts> {
                 size: 24 * SizeConfig.textRatio,
               ),
               IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, Profile.id);
-                },
+                onPressed: () async{
+                  final token = Token();
+                  final role = await token.getRole('SELECT ROLE FROM TOKENS');
+                  print(role);
+                  // Navigate to the appropriate profile based on the role
+                  if (role == 'Handicrafter') {
+                    Navigator.pushNamed(context, MyHandcrafterProfile.id);
+                  } else if (role == 'Client') {
+                    Navigator.pushNamed(context, Profile.id);
+                  }                },
                 icon: Icon(Icons.account_circle_outlined,
                     size: 24 * SizeConfig.textRatio),
               ),
@@ -271,7 +290,6 @@ class _BrowseProductsState extends State<browseProducts> {
           SingleChildScrollView(
             child: Column(
               children: [
-// Search Bar and Filters
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

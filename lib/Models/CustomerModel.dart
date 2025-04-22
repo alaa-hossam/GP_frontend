@@ -239,6 +239,7 @@ class customerServices {
         final UUID = data['data']['login']['user']['id'];
         final Role = data['data']['login']['user']['role'];
         final email = data['data']['login']['user']['email'];
+        print("+++++++++++++++++++++++++++++++++++$Role");
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, EXPIRED , ROLE , email)
                               VALUES ("$UUID", "$accessToken", "$expireAt" , "$Role" , "$email")

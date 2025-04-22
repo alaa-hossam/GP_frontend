@@ -5,6 +5,7 @@ import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
+import 'package:gp_frontend/views/eventsView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/showBazar.dart';
@@ -26,6 +27,7 @@ import '../widgets/SideButton.dart';
 import 'AddAdvertisement.dart';
 import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
+import 'historyView.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
@@ -37,7 +39,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   int selectedIndex = 0;
-
   late Future<void> _initialization;
 
   @override
@@ -94,16 +95,24 @@ class _HomeState extends State<Home> {
                 child: Column(
                   children: [
                     sideButton("My Account", Icons.account_circle_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, Profile.id);
-                        }),
+                        SizeConfig.iconColor, () async{
+                          final token = Token();
+                          final role = await token.getRole('SELECT ROLE FROM TOKENS');
+                          print(role);
+                          // Navigate to the appropriate profile based on the role
+                          if (role == 'Handicrafter') {
+                            Navigator.pushNamed(context, MyHandcrafterProfile.id);
+                          } else if (role == 'Client') {
+                            Navigator.pushNamed(context, Profile.id);
+                          }
+                    }),
                     sideButton("My orders", Icons.shopping_cart_outlined,
                         SizeConfig.iconColor, () {
                           Navigator.pushNamed(context, JoinBazar.id);
                         }),
                     sideButton("History", Icons.history_outlined,
                         SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, Profile.id);
+                          Navigator.pushNamed(context, HistoryProducts.id);
                         }),
                     sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
                             () {
@@ -119,7 +128,7 @@ class _HomeState extends State<Home> {
                         }),
                     sideButton("Event Reminder", Icons.event_available_outlined,
                         SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, Profile.id);
+                          Navigator.pushNamed(context, EventsView.id);
                         }),
                     sideButton("Add Advertisement", Icons.camera_roll_outlined,
                         SizeConfig.iconColor, () {
@@ -191,7 +200,18 @@ class _HomeState extends State<Home> {
           icon: Icon(Icons.shopping_cart_outlined, size: 24),
         ),
         IconButton(
-          onPressed: () => Navigator.pushNamed(context, MyHandcrafterProfile.id),
+          onPressed: () async {
+            // Fetch the user's role from the database or token
+            final token = Token();
+            final role = await token.getRole('SELECT ROLE FROM TOKENS');
+print(role);
+            // Navigate to the appropriate profile based on the role
+            if (role == 'Handicrafter') {
+              Navigator.pushNamed(context, MyHandcrafterProfile.id);
+            } else if (role == 'Client') {
+              Navigator.pushNamed(context, Profile.id);
+            }
+          },
           icon: Icon(Icons.account_circle_outlined, size: 24),
         ),
       ],
@@ -213,7 +233,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
   Widget _buildHomeContent() {
     final adsProvider = Provider.of<AdvertisementProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);

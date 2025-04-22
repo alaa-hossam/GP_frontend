@@ -17,7 +17,7 @@ class MyTextFormField extends StatelessWidget {
   final int? maxLines;
   Color? fillColor , borderColor;
   final int? maxLength;
-  final TextStyle? hintStyle;
+  final TextStyle? hintStyle , labelStyle;
   final FormFieldValidator<String>? validator;
   Key? myKey;
 
@@ -45,7 +45,8 @@ class MyTextFormField extends StatelessWidget {
     this.myKey,
     this.borderColor,
     this.borderwidth,
-    this.borderRadius
+    this.borderRadius,
+    this.labelStyle
   });
 
   @override
@@ -65,10 +66,10 @@ class MyTextFormField extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   labelText!,
-                  style: TextStyle(
+                  style: labelStyle == null ?TextStyle(
                     fontSize: 20 * SizeConfig.textRatio,
                     fontFamily: "Roboto",
-                  ),
+                  ): labelStyle,
                 ),
               ),
             ConstrainedBox(
