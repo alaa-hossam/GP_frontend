@@ -17,6 +17,7 @@ import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/addAddress.dart';
 import 'package:gp_frontend/views/addEvent.dart';
+import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
@@ -29,6 +30,7 @@ import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
+import 'package:gp_frontend/views/posts.dart';
 import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/showBazar.dart';
@@ -132,6 +134,8 @@ class MyApp extends StatelessWidget {
         confirmOrder.id : (BuildContext context) => confirmOrder(),
         HistoryProducts.id : (BuildContext context) => HistoryProducts(),
         EventsView.id : (BuildContext context) => EventsView(),
+        posts.id : (BuildContext context) => posts(),
+        addPost.id : (BuildContext context) => addPost(),
       },
     );
   }

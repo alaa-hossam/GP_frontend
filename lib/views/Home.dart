@@ -28,6 +28,7 @@ import 'AddAdvertisement.dart';
 import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
 import 'historyView.dart';
+import 'posts.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
@@ -116,11 +117,11 @@ class _HomeState extends State<Home> {
                         }),
                     sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
                             () {
-                          Navigator.pushNamed(context, showBazar.id);
+                          Navigator.pushNamed(context, posts.id);
                         }),
                     sideButton("Compare Products", Icons.compare_outlined,
                         SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, Profile.id);
+                          Navigator.pushNamed(context, showBazar.id);
                         }),
                     sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
                         SizeConfig.iconColor, () {
