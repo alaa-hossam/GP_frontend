@@ -1,9 +1,17 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/postModel.dart';
+import 'package:gp_frontend/Providers/postProvider.dart';
+import 'package:gp_frontend/widgets/customizeButton.dart';
+import 'package:gp_frontend/widgets/increement_decrement_buttons.dart';
+import 'package:gp_frontend/widgets/messages.dart';
+import 'package:gp_frontend/widgets/specializtion.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../Providers/CategoryProvider.dart';
+import '../widgets/AppBar.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/Dimensions.dart';
 
@@ -16,13 +24,10 @@ class addPost extends StatefulWidget {
 }
 
 class _addPostState extends State<addPost> {
-  TextEditingController description = TextEditingController();
-  TextEditingController title = TextEditingController();
-  TextEditingController price = TextEditingController();
-  TextEditingController duration = TextEditingController();
-  TextEditingController quantity = TextEditingController();
   File? postImage;
+  bool _isLoading = false;
 
+  postProvider myPostProvider = postProvider();
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -33,339 +38,207 @@ class _addPostState extends State<addPost> {
       });
     }
   }
+
+  Future<bool> submitOrder(postModel post, String specialization, File? image) async {
+    await myPostProvider.addPost(post, specialization, image);
+    return true;
+  }
+
+  void clearFields(postProvider addPostProvider) {
+    addPostProvider.description.clear();
+    addPostProvider.title.clear();
+    addPostProvider.price.clear();
+    addPostProvider.duration.clear();
+    addPostProvider.quantity.clear();
+    Provider.of<CategoryProvider>(context, listen: false).clearSelected();
+    setState(() {
+      postImage = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight:
-        85 * SizeConfig.verticalBlock, // Set the height of the AppBar
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-              bottomRight: Radius.circular(20), // Rounded bottom-right corner
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: SizeConfig.textRatio * 15,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+    final addPostProvider = Provider.of<postProvider>(context);
 
-        title: Text(
-          'Add Post',
-          style: GoogleFonts.rubik(
-            color: Colors.white,
-            fontSize: 20 * SizeConfig.textRatio,
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-            bottomRight: Radius.circular(20), // Rounded bottom-right corner
-          ),
+    return Scaffold(
+      appBar: customAppbar(
+        "add Post",
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Container(
-            height: 650 * SizeConfig.verticalBlock,
-            child: ListView(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.only(left:16 * SizeConfig.horizontalBlock,
-                      right:16 * SizeConfig.horizontalBlock,
-                  top: 5 * SizeConfig.verticalBlock),
-                  child: MyTextFormField(
-                    height: 80 * SizeConfig.verticalBlock,
-                    width: 350 * SizeConfig.horizontalBlock,
-                    hintName: "Write here...",
-                    hintStyle: TextStyle(color: Color(0x503C3C3C)),
-                    maxLines: 3,
-                    controller: description,
-                    labelText: "Description",
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.only(left:16 * SizeConfig.horizontalBlock,
-                      right:16 * SizeConfig.horizontalBlock,
-                      top: 5 * SizeConfig.verticalBlock),
-                  child: MyTextFormField(
-                    height: 80 * SizeConfig.verticalBlock,
-                    width: 350 * SizeConfig.horizontalBlock,
-                    hintName: "Product Name",
-                    hintStyle: TextStyle(color: Color(0x503C3C3C)),
-                    maxLines: 3,
-                    controller: title,
-                    labelText: "Title",
-                  ),
-                ),
-
-                Padding(
-                  padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Price" , style: GoogleFonts.roboto(fontSize: 20 * SizeConfig.verticalBlock),),
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center, // <--- Centers child
-
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
-
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -11 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(price.text) ?? 0;
-                                      if (currentValue > 0) {
-                                        price.text = (currentValue - 1).toString();
-                                      }
-                                    },
-                                    icon: Icon(Icons.minimize_outlined),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16 * SizeConfig.horizontalBlock),
-                              child: MyTextFormField(
-                                type: TextInputType.number,
-                                width: 150 * SizeConfig.horizontalBlock,
-                                hintName: "0.00",
-                                hintStyle: TextStyle(color: Color(0x503C3C3C) , fontSize: 20),
-                                maxLines: 3,
-                                controller: price,
-                              ),
-                            ),
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
-
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -4 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(price.text) ?? 0;
-                                      price.text = (currentValue + 1).toString();
-                                    },
-                                    icon: Icon(Icons.add),
-                                  ),
-                                )
-                              ],
-                            ),
-
-                          ],
+          ListView(
+            children: [
+              Container(
+                height: 600 * SizeConfig.verticalBlock,
+                child: ListView(
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16 * SizeConfig.horizontalBlock,
+                        vertical: 5 * SizeConfig.verticalBlock,
+                      ),
+                      child: MyTextFormField(
+                        height: 80 * SizeConfig.verticalBlock,
+                        width: 350 * SizeConfig.horizontalBlock,
+                        hintName: "Write here...",
+                        hintStyle: TextStyle(color: Color(0x503C3C3C)),
+                        maxLines: 3,
+                        controller: addPostProvider.description,
+                        labelText: "Description",
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16 * SizeConfig.horizontalBlock,
+                        vertical: 5 * SizeConfig.verticalBlock,
+                      ),
+                      child: MyTextFormField(
+                        height: 80 * SizeConfig.verticalBlock,
+                        width: 350 * SizeConfig.horizontalBlock,
+                        hintName: "Product Name",
+                        hintStyle: TextStyle(color: Color(0x503C3C3C)),
+                        maxLines: 3,
+                        controller: addPostProvider.title,
+                        labelText: "Title",
+                      ),
+                    ),
+                    incrementDecrementButtons(
+                        "price", "0.00", addPostProvider.price, "ًWrite an estimated price that suits you for the whole."),
+                    incrementDecrementButtons("Duration", "0.00", addPostProvider.duration,
+                        "Write an estimated time you can wait for the order to be completed."),
+                    incrementDecrementButtons(
+                        "Quantity", "0.00", addPostProvider.quantity, "Write the number you want."),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: 20 * SizeConfig.horizontalBlock,
+                          bottom: 10 * SizeConfig.verticalBlock),
+                      child: Text(
+                        "Specializations",
+                        style: TextStyle(fontSize: 20 * SizeConfig.textRatio),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16 * SizeConfig.horizontalBlock,
+                        vertical: 10 * SizeConfig.verticalBlock,
+                      ),
+                      child: specializtions(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
+                      child: Text(
+                        "Upload post Image (Max 5MB, JPG, PNG) ",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          _pickImage(ImageSource.gallery);
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
+                          height: 100 * SizeConfig.horizontalBlock,
+                          width: 100 * SizeConfig.horizontalBlock,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(width: 1, color: SizeConfig.iconColor),
+                            color: const Color(0x80E9E9E9),
+                          ),
+                          child: postImage == null
+                              ? Icon(Icons.file_upload_outlined,
+                              color: SizeConfig.iconColor, size: 30 * SizeConfig.textRatio)
+                              : Image.file(
+                            File(postImage!.path),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Duration" , style: GoogleFonts.roboto(fontSize: 20 * SizeConfig.verticalBlock),),
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center,
-
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
-
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -11 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(duration.text) ?? 0;
-                                      if (currentValue > 0) {
-                                        duration.text = (currentValue - 1).toString();
-                                      }
-                                    },
-                                    icon: Icon(Icons.minimize_outlined),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16 * SizeConfig.horizontalBlock),
-                              child: MyTextFormField(
-                                type: TextInputType.number,
-                                width: 150 * SizeConfig.horizontalBlock,
-                                hintName: "0.00",
-                                hintStyle: TextStyle(color: Color(0x503C3C3C) , fontSize: 20),
-                                maxLines: 3,
-                                controller: duration,
-                              ),
-                            ),
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
-
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -4 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(duration.text) ?? 0;
-                                      duration.text = (currentValue + 1).toString();
-                                    },
-                                    icon: Icon(Icons.add),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16 * SizeConfig.horizontalBlock,
+                  vertical: 10 * SizeConfig.verticalBlock,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Quantity" , style: GoogleFonts.roboto(fontSize: 20 * SizeConfig.verticalBlock),),
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center, // <--- Centers child
+                child: customizeButton(
+                  buttonName: "Add Post",
+                  buttonColor: SizeConfig.iconColor,
+                  fontColor: Colors.white,
+                    onClickButton: () async {
+                      final catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
+                      if (addPostProvider.title.text.trim().isEmpty ||
+                          addPostProvider.description.text.trim().isEmpty ||
+                          addPostProvider.price.text.trim().isEmpty ||
+                          addPostProvider.duration.text.trim().isEmpty ||
+                          addPostProvider.quantity.text.trim().isEmpty ||
+                          catProvider.selectedSpecializationId == null ||
+                          catProvider.selectedSpecializationId!.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please fill in all fields and select at least one specialization")),
+                        );
+                        return;
+                      }
 
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -11 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(quantity.text) ?? 0;
-                                      if (currentValue > 0) {
-                                        quantity.text = (currentValue - 1).toString();
-                                      }
-                                    },
-                                    icon: Icon(Icons.minimize_outlined),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16 * SizeConfig.horizontalBlock),
-                              child: MyTextFormField(
-                                type: TextInputType.number,
-                                width: 150 * SizeConfig.horizontalBlock,
-                                hintName: "0.00",
-                                hintStyle: TextStyle(color: Color(0x503C3C3C) , fontSize: 20),
-                                maxLines: 3,
-                                controller: quantity,
-                              ),
-                            ),
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 40 * SizeConfig.horizontalBlock,
-                                  height: 40 * SizeConfig.verticalBlock,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: SizeConfig.iconColor, width: 2 * SizeConfig.textRatio),
-                                    borderRadius: BorderRadius.all(Radius.circular(20 * SizeConfig.textRatio)),
-                                  ),
 
-                                ),
-                                Positioned(
-                                  left: -4 * SizeConfig.horizontalBlock,
-                                  top: -4 * SizeConfig.verticalBlock,
-                                  child:IconButton(
-                                    onPressed: () {
-                                      int currentValue = int.tryParse(quantity.text) ?? 0;
-                                      quantity.text = (currentValue + 1).toString();
-                                    },
-                                    icon: Icon(Icons.add),
-                                  ),
-                                )
-                              ],
-                            ),
+                      setState(() {
+                        _isLoading = true;
+                      });
 
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                      final selectedSpecializations = catProvider.selectedSpecializationId!;
+
+                      try {
+                        bool success = await submitOrder(
+                          postModel(
+                            description: addPostProvider.description.text,
+                            title: addPostProvider.title.text,
+                            price: double.parse(addPostProvider.price.text),
+                            duration: int.parse(addPostProvider.duration.text),
+                            quantity: int.parse(addPostProvider.quantity.text),
+                          ),
+                          selectedSpecializations,
+                          postImage,
+                        );
+
+                        if (success && mounted) {
+                          clearFields(addPostProvider);
+                          Navigator.pop(context, true);
+                        } else {
+                          showCustomPopup(context, "Post", "Failed to add post", []);
+
+                        }
+                      } catch (e) {
+                        showCustomPopup(context, "Post", "${e.toString()}", []);
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                      }
+                    }
+                ),
+              ),
+            ],
           ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
-
     );
   }
 }

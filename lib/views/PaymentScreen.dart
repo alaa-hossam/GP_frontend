@@ -54,7 +54,6 @@ class _PaymentscreenState extends State<Paymentscreen> {
         isLoading = false;
       });
     } catch (e) {
-      // handle error, maybe show an alert
       print("Payment init failed: $e");
     }
   }

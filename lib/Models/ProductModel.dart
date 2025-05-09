@@ -436,16 +436,10 @@ class productService {
 
   Future<List<dynamic>> getWishProducts() async {
 
-    customerViewModel customer = customerViewModel();
     String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
     wishList myWish = wishList();
-    // myWish.recreateWishListTable();
-
 
     List<String> ids = await myWish.getProductIdsByEmail(email);
-
-    print("ids are:");
-    print(ids);
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {

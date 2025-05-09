@@ -27,12 +27,19 @@ import '../SqfliteCodes/Token.dart';
 // }
 
 class postModel{
-  String userName , clientImage , description , postImage, title;
-  int quantity , duration;
-  double  price;
+  String? userName , clientImage , description , postImage, title;
+  int? quantity , duration;
+  double?  price;
 
-  postModel(this.userName, this.clientImage, this.description, this.postImage,
-      this.quantity, this.duration, this.price ,this.title);
+  postModel(
+      {this.userName,
+      this.clientImage,
+      this.description,
+      this.postImage,
+      this.quantity,
+      this.duration,
+      this.price,
+      this.title});
 }
 
 
@@ -87,12 +94,16 @@ class postService{
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         final List<dynamic> getPosts = data['data']['getPostsByClient'];
+        // print("------------------------------");
+        // print(getPosts[0]['customer']['clientProfile']);
         for(var post in getPosts){
-          posts.add(postModel(post['customer']['username'] ?? "" ,
-              post['customer']['clientProfile'] ?? "assets/images/Frame 36920.png" ,
-              post['description'], post['gallery']['fileURL'] ?? "assets/images/Frame 36920.png"
-              , post['suggestedQuantity'], post['suggestedOneDuration'], post['suggestedOnePrice'].toDouble(), post['title'] ?? ""));
+          posts.add(postModel(userName: post['customer']['username'] ?? "" ,
+              clientImage:post['customer']['clientProfile'],
+              description: post['description'],postImage:  post['gallery'][0]['fileURL']
+              ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
+              , price: post['suggestedOnePrice'].toDouble(),title:  post['title'] ?? ""));
         }
+
         } else {
         print('Failed to load product: ${response.statusCode}');
       }
@@ -105,12 +116,11 @@ class postService{
 
 
 
-  Future<String> addPost(postModel order, String specializationId, File? image) async {
+  Future<String> addPost(postModel post, String specializationId, File? image) async {
     Token tokenTable = Token();
     String id = await tokenTable.getUUID("SELECT UUID FROM TOKENS");
     String myToken = await tokenTable.getToken('SELECT TOKEN FROM TOKENS');
 
-    final apiUrl = 'YOUR_API_ENDPOINT_HERE'; // Replace with actual URL
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
@@ -120,21 +130,20 @@ class postService{
       request.headers['x-apollo-operation-name'] = 'CreatePost';
       request.headers['Authorization'] = 'Bearer $myToken';
 
-      // Define the GraphQL operation with variables
       final operations = {
         "query": """
         mutation CreatePost(\$file: Upload!) {
           createPost(
             data: {
               customerId: "$id",
-              description: "${order.description}",
+              description: "${post.description}",
               fileType: Image,
-              images: \$file
+              images: [\$file]
               specializationId: "$specializationId",
-              suggestedOneDuration: ${order.duration},
-              suggestedOnePrice: ${(order.price).toDouble()},
-              suggestedQuantity: ${order.quantity},
-              title: "${order.title}",
+              suggestedOneDuration: ${post.duration},
+              suggestedOnePrice: ${(post.price ?? 0).toDouble()},
+              suggestedQuantity: ${post.quantity},
+              title: "${post.title}",
               type: General
             }
           ){
@@ -149,32 +158,36 @@ class postService{
 
       request.fields['operations'] = jsonEncode(operations);
 
-      // Map the file to the variable
       request.fields['map'] = jsonEncode({
         "0": ["variables.file"]
       });
 
+      print(image);
       if (image != null) {
+
         request.files.add(await http.MultipartFile.fromPath(
           '0',
           image.path,
         ));
       }
-
       final response = await request.send();
+
       final responseBody = await response.stream.bytesToString();
 
       print('Status Code: ${response.statusCode}');
       print('Response Body: $responseBody');
 
       if (response.statusCode == 200) {
+
+
+
         final data = jsonDecode(responseBody);
         if (data['errors'] != null) {
           throw Exception('GraphQL Error: ${data['errors'][0]['message']}');
         }
-        return "Advertisement Added Successfully";
+        return "post Added Successfully";
       } else {
-        throw Exception('Failed to create Advertisement: ${response.statusCode} - $responseBody');
+        throw Exception('Failed to create post: ${response.statusCode} - $responseBody');
       }
     } catch (e) {
       return "Error creating Advertisement: $e";

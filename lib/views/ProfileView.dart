@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/voucherView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/customizeNavigatorProfile.dart';
 import 'package:gp_frontend/widgets/customizeProfileOptions.dart';
@@ -89,7 +90,7 @@ class _ProfileState extends State<Profile> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: SizeConfig.horizontalBlock *15,
                 children: [
-                  CustomizeProfileOptions(buttonName: 'Voucher', buttonIcon: Icons.confirmation_num_outlined, iconColor: Color(0xFFDF9B3B), onClickButton: (){}),
+                  CustomizeProfileOptions(buttonName: 'Voucher', buttonIcon: Icons.confirmation_num_outlined, iconColor: Color(0xFFDF9B3B), onClickButton: (){Navigator.pushNamed(context, voucherView.id);}),
                   CustomizeProfileOptions(buttonName: 'Point', buttonIcon: Icons.verified_outlined, iconColor: Color(0xFF0B44ED), onClickButton: (){}),
                   CustomizeProfileOptions(buttonName: 'Wishlist', buttonIcon: Icons.favorite, iconColor: Color(0xFFCA0003), onClickButton: (){Navigator.pushNamed(context, wishListView.id);}),
                   CustomizeProfileOptions(buttonName: 'Gift Card', buttonIcon: Icons.wallet_giftcard_rounded, iconColor: Color(0xFF24944D), onClickButton: (){}),

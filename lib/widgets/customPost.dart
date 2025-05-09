@@ -36,7 +36,7 @@ class customPost extends StatelessWidget {
                             padding:
                             EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
                             child: CircleAvatar(
-                              backgroundImage: AssetImage(post.clientImage),
+                              backgroundImage: NetworkImage(post.clientImage!),
                               backgroundColor: Colors.transparent,
                               radius: 20 * SizeConfig.horizontalBlock,
                             ),
@@ -126,7 +126,7 @@ class customPost extends StatelessWidget {
                     height: 201 * SizeConfig.verticalBlock,
                     width: double.infinity,
                     child: Image.asset(
-                      post.postImage,
+                      post.postImage ?? "assets/images/Frame 36920.png" ,
                       fit: BoxFit.cover,
                     ),
                   ),

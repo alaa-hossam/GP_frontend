@@ -7,6 +7,7 @@ import 'package:gp_frontend/views/addAddress.dart';
 class AddressProvider extends ChangeNotifier{
   List<AddressModel> addresses = [];
   AddressViewModel AddressVM = AddressViewModel();
+  bool isLoading = false;
 
   addAddress(AddressModel address)async{
     AddressVM.addAddress(address);
@@ -14,9 +15,9 @@ class AddressProvider extends ChangeNotifier{
   }
 
   getAddresses() async {
-    print("Fetching Addresses...");
+    isLoading = true;
     addresses = await AddressVM.getAddresses();
-    print(addresses);
+    isLoading = false;
     notifyListeners();
   }
 

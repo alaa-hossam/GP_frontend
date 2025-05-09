@@ -5,6 +5,7 @@ import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/confirmOrder.dart';
 import 'package:gp_frontend/widgets/cartAppBar.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:gp_frontend/widgets/messages.dart';
 import 'package:latlong2/latlong.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
@@ -26,6 +27,7 @@ class _checkOutState extends State<checkOut> {
   late double price;
   late int percentage;
   late List<productModel> products;
+  late String type;
   int? selectedPaymentIndex;
   AddressModel? addressData;
 
@@ -39,6 +41,7 @@ class _checkOutState extends State<checkOut> {
     price = args?['price']?.toDouble() ?? 0.0;
     percentage = args?['percentage'] ?? 0;
     products = args?['products'] ?? [];
+    type = args?['type'] ?? '';
   }
 
   Widget buildPaymentMethod({
@@ -255,7 +258,6 @@ class _checkOutState extends State<checkOut> {
                         index: 0, assetPath: "assets/images/visa.png"),
                     buildPaymentMethod(
                         index: 1, assetPath: "assets/images/cash.png"),
-                    SizedBox(height: 20),
                     if (voucher.isNotEmpty)
                       Column(
                         children: [
@@ -272,12 +274,60 @@ class _checkOutState extends State<checkOut> {
                                     fontWeight: FontWeight.bold)),
                           ),
                           SizedBox(height: 10),
-                          Text("Price: LE $price",
-                              style: GoogleFonts.rubik(
-                                  fontSize: 18 * SizeConfig.textRatio)),
-                          Text("Discount: $percentage%",
-                              style: GoogleFonts.rubik(
-                                  fontSize: 18 * SizeConfig.textRatio)),
+                          Padding(
+                            padding:  EdgeInsets.only(left:20 * SizeConfig.horizontalBlock,
+                                right:20 * SizeConfig.horizontalBlock),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Price:",
+                                    style: GoogleFonts.rubik(
+                                        fontSize: 24 * SizeConfig.textRatio,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0x70000000)
+                                    )
+                                ),
+                                Text(type.toLowerCase() == "amount"?
+                                    "${price - percentage} LE":
+                                    "${price - (price * percentage)}",
+                                    style: GoogleFonts.rubik(
+                                        fontSize: 24 * SizeConfig.textRatio,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0x70000000)
+                                    )
+                                ),
+
+                              ],
+                            ),
+                          ),
+
+                          Padding(
+                            padding:  EdgeInsets.only(left:20 * SizeConfig.horizontalBlock,
+                                right:20 * SizeConfig.horizontalBlock),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Discount:",
+                                    style: GoogleFonts.rubik(
+                                        fontSize: 24 * SizeConfig.textRatio,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0x70000000)
+                                    )
+                                ),
+                                Text(type.toLowerCase() == "amount"?
+                                "${percentage} LE":
+                                "${percentage} %",
+                                    style: GoogleFonts.rubik(
+                                        fontSize: 24 * SizeConfig.textRatio,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0x70000000)
+                                    )
+                                ),
+
+                              ],
+                            ),
+                          ),
+
                           Divider(thickness: 1, color: Colors.grey),
                         ],
                       )
@@ -305,16 +355,13 @@ class _checkOutState extends State<checkOut> {
                   fontColor: Colors.white,
                   width: 370 * SizeConfig.horizontalBlock,
                   height: 50 * SizeConfig.verticalBlock,
-                  onClickButton: () {
+                  onClickButton: () async{
                     if (selectedPaymentIndex == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a payment method')),
-                      );
+                      await showCustomPopup(context, "Missing", "Please select a payment method", []);
                       return;
                     }if (addressData == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select an Address')),
-                      );
+                      await showCustomPopup(context, "Missing", "Please select an Address" , []);
+
                       return;
                     }
 

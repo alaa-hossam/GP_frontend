@@ -17,6 +17,7 @@ class CartBar extends StatelessWidget {
       this.step,
       this.label});
 
+
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -30,7 +31,7 @@ class CartBar extends StatelessWidget {
               top: 5 * SizeConfig.verticalBlock,
               left: 5 * SizeConfig.verticalBlock,
               child: CircleAvatar(
-                backgroundColor: Colors.white,
+                backgroundColor: disabled ? Color(0x50E9E9E9) : Colors.white,
                 radius: 20 * SizeConfig.verticalBlock,
               ),
             ),

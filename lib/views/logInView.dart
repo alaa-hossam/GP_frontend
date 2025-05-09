@@ -5,6 +5,7 @@ import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/signUpView.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
+import 'package:gp_frontend/widgets/messages.dart';
 import '../SqfliteCodes/Token.dart';
 import '../SqfliteCodes/cart.dart';
 import '../widgets/Dimensions.dart';
@@ -21,25 +22,19 @@ class _logInState extends State<logIn> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool obscureText = true;
-  customerViewModel cvm= customerViewModel();
+  customerViewModel cvm = customerViewModel();
   bool _isLoading = false;
   Token token = Token();
-
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-
     });
   }
 
   Future<String> logInCustomer() async {
     try {
-
-      return await cvm.logIn(
-          email: email.text,
-          password: password.text
-      );
+      return await cvm.logIn(email: email.text, password: password.text);
     } catch (e) {
       return e.toString();
     }
@@ -54,29 +49,37 @@ class _logInState extends State<logIn> {
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.only(top: SizeConfig.verticalBlock * 200),
+              padding: EdgeInsets.only(top: SizeConfig.verticalBlock * 50),
               child: Form(
                 key: _globalKey,
                 child: Center(
                   child: Column(
                     spacing: SizeConfig.verticalBlock * 10,
                     children: [
-                      Text("Logo"),
-                      SizedBox(height: SizeConfig.verticalBlock * 70),
+                      Container(
+                          width: 300,
+                          height: 300,
+                          child: Image.asset(
+                            "assets/images/logo.png",
+                            fit: BoxFit.fill,
+                          )),
                       MyTextFormField(
                           controller: email,
                           hintName: "Email",
-                          icon: Icons.email_outlined
-                      ),
+                          icon: Icons.email_outlined),
                       MyTextFormField(
                         controller: password,
                         hintName: "Password",
                         icon: Icons.lock,
                         isObscureText: obscureText,
-                        maxLines: obscureText ? 1 : null, // Set maxLines to 1 if obscureText is true
+                        maxLines: obscureText
+                            ? 1
+                            : null, // Set maxLines to 1 if obscureText is true
                         suffixIcon: IconButton(
                           icon: Icon(
-                            obscureText ? Icons.visibility_off : Icons.visibility,
+                            obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                           onPressed: togglePasswordVisibility,
                         ),
@@ -88,7 +91,8 @@ class _logInState extends State<logIn> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacementNamed(context, forgetPassword.id);
+                                Navigator.pushReplacementNamed(
+                                    context, forgetPassword.id);
                               },
                               child: Text(
                                 'Forget password?',
@@ -118,41 +122,39 @@ class _logInState extends State<logIn> {
                           });
 
                           if (response == "User Log In Successfully") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Log In Successful!")),
-                            );
+                            showCustomPopup(context, "Login", response, []);
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Home(),
                               ),
                             );
-
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(response)),
-                            );
+                            showCustomPopup(context, "Login", response, []);
                           }
                         },
                       ),
-                      SizedBox(height: SizeConfig.verticalBlock * 100),
+                      SizedBox(height: SizeConfig.verticalBlock * 30),
                       Row(
-                        spacing: SizeConfig.horizontalBlock *5,
+                        spacing: SizeConfig.horizontalBlock * 5,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
                             width: SizeConfig.horizontalBlock * 140,
                             height: SizeConfig.verticalBlock * 2,
-                            decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                            decoration:
+                                const BoxDecoration(color: Color(0xFFD8DADC)),
                           ),
                           Text(
                             "Or With",
-                            style: TextStyle(fontSize: SizeConfig.textRatio * 14),
+                            style:
+                                TextStyle(fontSize: SizeConfig.textRatio * 14),
                           ),
                           Container(
                             width: SizeConfig.horizontalBlock * 140,
                             height: SizeConfig.verticalBlock * 2,
-                            decoration: const BoxDecoration(color: Color(0xFFD8DADC)),
+                            decoration:
+                                const BoxDecoration(color: Color(0xFFD8DADC)),
                           )
                         ],
                       ),
@@ -177,7 +179,8 @@ class _logInState extends State<logIn> {
                           SizedBox(width: SizeConfig.horizontalBlock * 5),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacementNamed(context, SignUp.id);
+                              Navigator.pushReplacementNamed(
+                                  context, SignUp.id);
                             },
                             child: Text(
                               'Sign Up',
@@ -210,5 +213,4 @@ class _logInState extends State<logIn> {
       ),
     );
   }
-
 }

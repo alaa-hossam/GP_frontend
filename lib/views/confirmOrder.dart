@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/AddressModel.dart';
+import 'package:gp_frontend/Providers/cartProvider.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
+import 'package:gp_frontend/views/showOrders.dart';
+import 'package:gp_frontend/widgets/messages.dart';
 
 import '../Models/ProductModel.dart';
 import '../widgets/Dimensions.dart';
@@ -375,7 +378,26 @@ class _confirmOrderState extends State<confirmOrder> {
                       Navigator.pushNamed(context, Paymentscreen.id, arguments:
                       price);
                     }else{
-                      Navigator.pushNamed(context, Home.id);
+
+                      showCustomPopup(context, "Payment Successful",
+                          "Thank you for your purchase.",
+                        [
+                          customizeButton(buttonName: "Back to home",
+                              buttonColor: Colors.white,
+                              fontColor: SizeConfig.iconColor,
+                              width: 140 * SizeConfig.horizontalBlock,
+                              height: 50 * SizeConfig.verticalBlock,
+                              onClickButton:(){ Navigator.pushReplacementNamed(context, Home.id);},
+                          ),
+                          customizeButton(buttonName: "View orders",
+                              buttonColor: SizeConfig.iconColor,
+                              fontColor: Colors.white,
+                              width: 135 * SizeConfig.horizontalBlock,
+                              height: 50 * SizeConfig.verticalBlock,
+                              onClickButton: (){Navigator.pushReplacementNamed(context, showOrders.id);},
+                          )
+                        ], dialogIcon: Icon(Icons.check , color: Colors.white ,size: 50,));
+
                     }
 
                   },

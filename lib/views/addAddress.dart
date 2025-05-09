@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/AddressModel.dart';
 import 'package:gp_frontend/Providers/AddressProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/widgets/messages.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../widgets/AppBar.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/Dimensions.dart';
@@ -66,7 +68,6 @@ class _addAddressState extends State<addAddress> {
       }
     });
 
-    // Check if there are any validation errors
     if (!errors.any((e) => e != null)) {
       final address = AddressModel(
          controllers[0].text.trim(),
@@ -82,19 +83,14 @@ class _addAddressState extends State<addAddress> {
       );
 
       try {
+
         await myAddressProvider.addAddress(address);
 
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Address added successfully!")),
-        );
+        Navigator.pop(context, true);
 
-        // Navigate back to the previous screen
-        Navigator.pop(context);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add address: $e")),
-        );
+        showCustomPopup(context, "Address","${e}", []);
+
       }
     }
   }
@@ -105,41 +101,9 @@ class _addAddressState extends State<addAddress> {
     SizeConfig().init(context);
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 85 * SizeConfig.verticalBlock,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF223F4A), Color(0xFF5095B0)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new,
-              color: Colors.white, size: SizeConfig.textRatio * 15),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Add New Address',
-          style: GoogleFonts.rubik(
-            color: Colors.white,
-            fontSize: 20 * SizeConfig.textRatio,
-          ),
-        ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-      ),
+      appBar: customAppbar("add New Address" ,
+        leading:IconButton(onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new , color: Colors.white,)),),
       body: Padding(
         padding: EdgeInsets.all(10.0 * SizeConfig.verticalBlock),
         child: Form(

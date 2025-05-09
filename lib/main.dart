@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/Providers/AddressProvider.dart';
 import 'package:gp_frontend/Providers/BackagesProvider.dart';
 import 'package:gp_frontend/Providers/eventProvider.dart';
+import 'package:gp_frontend/Providers/postProvider.dart';
+import 'package:gp_frontend/Providers/voucherProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
 import 'package:gp_frontend/views/AdvertisementsPackages.dart';
@@ -34,6 +36,8 @@ import 'package:gp_frontend/views/posts.dart';
 import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/showBazar.dart';
+import 'package:gp_frontend/views/showOrders.dart';
+import 'package:gp_frontend/views/voucherView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
 import 'package:gp_frontend/widgets/BottomBar.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +86,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => BazarProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => postProvider()),
+        ChangeNotifierProvider(create: (_) => voucherProvider()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),
@@ -136,6 +142,8 @@ class MyApp extends StatelessWidget {
         EventsView.id : (BuildContext context) => EventsView(),
         posts.id : (BuildContext context) => posts(),
         addPost.id : (BuildContext context) => addPost(),
+        voucherView.id : (BuildContext context) => voucherView(),
+        showOrders.id : (BuildContext context) => showOrders(),
       },
     );
   }

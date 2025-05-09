@@ -7,6 +7,7 @@ import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../widgets/AppBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -30,18 +31,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
   bool tapped = false;
   bool _isLoading = false;
 
-//   @override
-//   void didChangeDependencies() {
-//     super.didChangeDependencies();
-//     final args =
-//     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-// print("................................");
-// print(args);
-//     Package = args?['packageName'] ?? '';
-//     print(Package);
-//     price = args?['packagePrice']?.toDouble() ?? 0.0;
-//
-//   }
+
 
   Future<void> _pickImage(ImageSource source, bool isProfileImage) async {
     final picker = ImagePicker();
@@ -75,51 +65,9 @@ class _AddadvertisementState extends State<Addadvertisement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight:
-            85 * SizeConfig.verticalBlock, // Set the height of the AppBar
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-              bottomRight: Radius.circular(20), // Rounded bottom-right corner
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: SizeConfig.textRatio * 15,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
-        title: Text(
-          'Add Advertisement',
-          style: GoogleFonts.rubik(
-            color: Colors.white,
-            fontSize: 20 * SizeConfig.textRatio,
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-            bottomRight: Radius.circular(20), // Rounded bottom-right corner
-          ),
-        ),
-      ),
+      appBar:customAppbar("add Advertisement" ,
+        leading:IconButton(onPressed: (){Navigator.pop(context);},
+            icon: Icon(Icons.arrow_back_ios_new , color: Colors.white,)),),
       body: Padding(
         padding: EdgeInsets.only(
             top: 30 * SizeConfig.verticalBlock,

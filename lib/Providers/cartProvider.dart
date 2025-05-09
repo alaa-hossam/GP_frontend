@@ -9,25 +9,25 @@ class cartProvider with ChangeNotifier {
 
   List<productModel> get cartProducts => _cartProducts;
   Map<dynamic, int> get finalProductCounts => _finalProductCounts;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-   getCartProduct() async {
+
+  getCartProduct() async {
+    _isLoading = true;
+    notifyListeners();
     try {
        _cartProducts = await productVM.cartProducts();
-      print("in provider");
-     print(_cartProducts);
+       _isLoading = false;
       notifyListeners();
-
-
     } catch (e) {
       print("Error fetching cart products: $e");
     }
   }
 
   deleteCartProduct(String finalId) async{
-     print("......................");
      await productVM.deleteCartProduct(finalId);
-     print("in delete");
-     print(productVM.cartProducts());
-getCartProduct();
+     getCartProduct();
    }
+
 }

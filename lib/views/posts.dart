@@ -86,23 +86,52 @@ class _postsState extends State<posts> {
       body: FutureBuilder(
         future: getPosts(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done ||
-              posts.isEmpty) {
-            print(snapshot.hasData);
+
+          if (snapshot.connectionState != ConnectionState.done) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Center(
                     child: Text(
-                  "You have not posted anything yet.",
+                  "Loading...",
                   style: GoogleFonts.rubik(
                       fontSize: 20 * SizeConfig.textRatio,
                       color: Color(0x503C3C3C)),
                 )),
               ],
             );
-          } else {
+          }else if(posts.isEmpty) {
+
+            return Stack(
+              children: [
+                Center(
+                    child: Text(
+                      "You have not posted anything yet.",
+                      style: GoogleFonts.rubik(
+                          fontSize: 20 * SizeConfig.textRatio,
+                          color: Color(0x503C3C3C)),
+                    )),
+                Positioned(
+                    bottom: 15 * SizeConfig.verticalBlock,
+                    right: 15 * SizeConfig.horizontalBlock,
+                    child: Container(
+                      width: 50 * SizeConfig.horizontalBlock,
+                      height: 50 * SizeConfig.verticalBlock,
+                      decoration: BoxDecoration(
+                          color: SizeConfig.iconColor,
+                          borderRadius: BorderRadius.all(Radius.circular(25 * SizeConfig.textRatio))
+                      ),
+                      child: IconButton(onPressed: (){Navigator.pushNamed(context, addPost.id);}, icon:Icon( Icons.add) ,
+                        iconSize: 30 * SizeConfig.textRatio,color: Colors.white,),
+                    )
+                )
+
+              ],
+            );
+          }
+
+          else {
             return Stack(
               children: [
                 ListView.builder(
@@ -124,7 +153,15 @@ class _postsState extends State<posts> {
                         color: SizeConfig.iconColor,
                         borderRadius: BorderRadius.all(Radius.circular(25 * SizeConfig.textRatio))
                       ),
-                      child: IconButton(onPressed: (){Navigator.pushNamed(context, addPost.id);}, icon:Icon( Icons.add) ,
+                      child: IconButton(onPressed: ()async{
+                        final result = await Navigator.pushNamed(context, addPost.id);
+                        if (result == true) {
+                          // Reload your data here, for example:
+                          setState(() {
+                            // Call your fetch method or re-initialize provider
+                          });
+                        }
+                        }, icon:Icon( Icons.add) ,
                         iconSize: 30 * SizeConfig.textRatio,color: Colors.white,),
                     )
                 )
