@@ -19,17 +19,23 @@ class CustomerModel {
   String? deviceToken;
   String? birthDate;
   DateTime? lastActive;
-  String ? profileImage;
+  String? profileImage;
+  double? points;
 
   CustomerModel(
-      {this.name, this.userName, this.password, this.email, this.phone,
-      this.gender, this.birthDate, this.profileImage
-  });
+      {this.name,
+      this.userName,
+      this.password,
+      this.email,
+      this.phone,
+      this.gender,
+      this.birthDate,
+      this.profileImage,
+      this.points});
 
   // Get the hashed device token
   Future<String?> getDeviceToken() async {
-    return NotificationFire().initNotification() ;
-
+    return NotificationFire().initNotification();
   }
 }
 
@@ -92,7 +98,7 @@ class customerServices {
   Future<String> verifyCustomer(String code, String email) async {
     Token token = Token();
 
-  print(code);
+    print(code);
     print(email);
     final request = {
       'query': '''
@@ -126,8 +132,10 @@ class customerServices {
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
         }
-        final accessToken = data['data']['verifyUserForSignUp']['token']['token'];
-        final String expireAt = data['data']['verifyUserForSignUp']['token']['expireAt'];
+        final accessToken =
+            data['data']['verifyUserForSignUp']['token']['token'];
+        final String expireAt =
+            data['data']['verifyUserForSignUp']['token']['expireAt'];
         final UUID = data['data']['verifyUserForSignUp']['user']['id'];
         String insertQuery = '''
                               INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
@@ -191,8 +199,7 @@ class customerServices {
     Token token = Token();
     String? deviceToken = "";
     try {
-      deviceToken =
-          await CustomerModel().getDeviceToken();
+      deviceToken = await CustomerModel().getDeviceToken();
     } catch (e) {
       print("Error retrieving device token: $e");
     }
@@ -224,7 +231,6 @@ class customerServices {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(request),
       );
-
 
       print("Response: ${response.body}");
 
@@ -347,7 +353,8 @@ class customerServices {
     }
   }
 
-  Future<String> ResetPass(String email, String newPass, String confirmPass) async {
+  Future<String> ResetPass(
+      String email, String newPass, String confirmPass) async {
     final request = {
       'query': '''
       mutation ResetPassword {
@@ -425,8 +432,60 @@ class customerServices {
 
         // Access getProduct safely
         final getCustomer = data['data']['user']['clientProfile'];
-        customer =  CustomerModel(name: getCustomer['name'], profileImage: getCustomer['imageUrl']);
-          return customer;
+        customer = CustomerModel(
+            name: getCustomer['name'], profileImage: getCustomer['imageUrl']);
+        return customer;
+      }
+    } catch (e) {
+      print('Error fetching user: $e');
+      return customer;
+    }
+  }
+
+  Future<CustomerModel?> getUserProfile() async {
+    print("get user profile");
+    Token token = Token();
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    CustomerModel? customer;
+    String query = '''
+    query User {
+    user(id: "${userId}") {
+        email
+        clientProfile {
+            imageUrl
+            name
+            points
+        }
+    }
+}
+    ''';
+    final request = {
+      'query': query,
+    };
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        // Access getProduct safely
+        final getCustomer = data['data']['user'];
+        customer = CustomerModel(
+            name: getCustomer['clientProfile']['name'],
+            profileImage: getCustomer['clientProfile']['imageUrl'],
+            email: getCustomer['email'],
+            points: getCustomer['clientProfile']['points'].toDouble()
+        );
+        return customer;
       }
     } catch (e) {
       print('Error fetching user: $e');
@@ -468,7 +527,7 @@ class customerServices {
 
         final email = data['data']['user']['email'];
 
-          return email;
+        return email;
       }
       return 'error happen';
     } catch (e) {
@@ -476,5 +535,4 @@ class customerServices {
       return 'Error fetching user: $e';
     }
   }
-
 }

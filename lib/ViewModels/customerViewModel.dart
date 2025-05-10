@@ -16,6 +16,9 @@ class customerViewModel {
   Future<CustomerModel?> fetchUser(String id) async {
     return customerProcesses.getUser(id);
   }
+  Future<CustomerModel?> fetchUserProfile() async {
+    return customerProcesses.getUserProfile();
+  }
 
   Future<String> verifyCustomer(String code , String email){
     return customerProcesses.verifyCustomer(code, email);
