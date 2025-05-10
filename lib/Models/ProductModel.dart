@@ -276,13 +276,6 @@ class productService {
                     id
                     lowestCustomPrice
                     name
-                    indicators {
-                        indicator {
-                            imageUrl
-                            id
-                            name
-                        }
-                    }
                 }
             }
         }
@@ -306,18 +299,22 @@ class productService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        List<dynamic> prods = data['data']['getUserHistory']['product'];
+        List<dynamic> prods = data['data']['getUserHistory'];
         print(data);
 
-        for (var product in prods) {
-          historyProducts.add(productModel(
-            product['id'],
-            product['imageUrl'],
-            product['name'],
-            category: product['category']['name'],
-            product['lowestCustomPrice'].toDouble(),
-            product['averageRating'].toDouble(),
-          ));
+        for (var historyItem in data['data']['getUserHistory']) {
+          if (historyItem['product'] != null) {
+            var product = historyItem['product'];
+            historyProducts.add(productModel(
+              product['id'],
+              product['imageUrl'],
+              product['name'],
+              category: product['category']['name'],
+              // Convert to double to avoid type errors
+              product['lowestCustomPrice'].toDouble(),
+              product['averageRating'].toDouble(),
+            ));
+          }
         }
 
         print("history Products fetched successfully: $historyProducts");

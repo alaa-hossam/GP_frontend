@@ -25,11 +25,13 @@ class _HistoryProductsState extends State<HistoryProducts> {
   void initState() {
     super.initState();
     // Simulate a 5-second loading process
+    prodProvider = Provider.of<productProvider>(context, listen: false);
+    prodProvider.historyProducts.clear();
+    prodProvider.fetchHistoryProducts();
+    hasHistory = prodProvider.historyProducts.isNotEmpty;
     Future.delayed(const Duration(seconds: 5), () {
       setState(() {
         isLoading = false; // Stop loading after 5 seconds
-        prodProvider = Provider.of<productProvider>(context, listen: false);
-        hasHistory = prodProvider.historyProducts.isNotEmpty; // Check if history exists
       });
     });
   }
@@ -97,54 +99,9 @@ class _HistoryProductsState extends State<HistoryProducts> {
                 ],
               ),
             )
-          else if (!hasHistory)
-            Center(
-              child: Text(
-                "No history of watch",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            )
           else
             ListView(
               children: [
-                Consumer<CategoryProvider>(
-                  builder: (context, categoryProvider, child) {
-                    if (categoryProvider.categories.isEmpty) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width: SizeConfig.horizontalBlock,
-                        height: 43 * SizeConfig.verticalBlock,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categoryProvider.categories.length,
-                          itemBuilder: (context, index) {
-                            bool isSelected = index == selectedIndex;
-                            var category = categoryProvider.categories[index];
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedIndex = index;
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  Customizecategory("${category.name}", isSelected),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
                 Consumer<productProvider>(
                   builder: (context, productProvider, child) {
                     if (productProvider.historyProducts.isEmpty) {
