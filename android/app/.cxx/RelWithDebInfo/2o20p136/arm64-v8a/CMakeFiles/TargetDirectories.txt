@@ -1,0 +1,2 @@
+D:/GP/FrontEnd/GP_frontend/android/app/.cxx/RelWithDebInfo/2o20p136/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/GP/FrontEnd/GP_frontend/android/app/.cxx/RelWithDebInfo/2o20p136/arm64-v8a/CMakeFiles/rebuild_cache.dir

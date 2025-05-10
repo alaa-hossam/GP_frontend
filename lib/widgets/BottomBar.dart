@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gp_frontend/views/posts.dart';
+import 'package:gp_frontend/views/showOrders.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import '../views/Home.dart';
 import '../views/ProfileView.dart';
@@ -49,9 +53,18 @@ class BottomBarState extends State<BottomBar> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 label: '',
+
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.chat),
+                icon: Icon(FontAwesomeIcons.android),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.checkroom),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart_outlined),
                 label: '',
               ),
             ],
@@ -69,6 +82,8 @@ class buttonProvider extends ChangeNotifier {
   static List<Widget> _widgetOptions = <Widget>[
     Home(),
     AIChat(),
+    posts(),
+    showOrders()
   ];
   int get selectedIndex => _selectedIndex;
 

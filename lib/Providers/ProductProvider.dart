@@ -26,12 +26,8 @@ class productProvider extends ChangeNotifier {
   }
 
   Future<void> fetchProducts(String categoryId) async {
-    // print("Fetching products...");
-    // print("///////////////////IDddddddd///////////////////////");
-    // print(categoryId);
     await productVM.fetchProducts(categoryId);
     _products = productVM.products.map((product) => product).toList();
-    // print("Products fetched: $_products");
     notifyListeners();
   }
 
@@ -96,12 +92,17 @@ class productProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  // Make this method async and await the result
   Future<void> getWishProducts() async {
 
     wishListProducts = await productVM.wishProducts();
     notifyListeners(); // Notify listeners after updating the data
   }
+
+  void clearWishProducts() {
+    wishListProducts.clear();
+    notifyListeners();
+  }
+
   Future<void> deleteProduct(String id) async {
     // Delete the product from the database
     // customerViewModel customer = customerViewModel();

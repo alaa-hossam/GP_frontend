@@ -1,19 +1,12 @@
 import 'dart:async';
 import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
-import 'package:gp_frontend/SqfliteCodes/wishList.dart';
-import 'package:gp_frontend/views/HandcrafterRequest.dart';
-import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
-import 'package:gp_frontend/views/eventsView.dart';
-import 'package:gp_frontend/views/joinBazar.dart';
-import 'package:gp_frontend/views/logInView.dart';
-import 'package:gp_frontend/views/showBazar.dart';
+import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/ViewModels/AdvertisementsViewModel.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
@@ -23,12 +16,8 @@ import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
-import '../widgets/SideButton.dart';
-import 'AddAdvertisement.dart';
 import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
-import 'historyView.dart';
-import 'posts.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
@@ -66,7 +55,7 @@ class _HomeState extends State<Home> {
     SizeConfig().init(context);
 
     return Scaffold(
-      drawer: _buildDrawer(),
+      drawer: Mydrawer(),
       appBar: _buildAppBar(context),
       body: FutureBuilder(
         future: _initialization,
@@ -82,111 +71,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildDrawer() {
-    return Drawer(
-      width: 223 * SizeConfig.horizontalBlock,
-      backgroundColor: Colors.white,
-      child: Stack(
-        children: [
-          ListView(
-            children: [
-              _buildDrawerHeader(),
-              Padding(
-                padding: EdgeInsets.only(left: 10, top: 10),
-                child: Column(
-                  children: [
-                    sideButton("My Account", Icons.account_circle_outlined,
-                        SizeConfig.iconColor, () async{
-                          final token = Token();
-                          final role = await token.getRole('SELECT ROLE FROM TOKENS');
-                          print(role);
-                          // Navigate to the appropriate profile based on the role
-                          if (role == 'Handicrafter') {
-                            Navigator.pushNamed(context, MyHandcrafterProfile.id);
-                          } else if (role == 'Client') {
-                            Navigator.pushNamed(context, Profile.id);
-                          }
-                    }),
-                    sideButton("My orders", Icons.shopping_cart_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, JoinBazar.id);
-                        }),
-                    sideButton("History", Icons.history_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, HistoryProducts.id);
-                        }),
-                    sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
-                            () {
-                          Navigator.pushNamed(context, posts.id);
-                        }),
-                    sideButton("Compare Products", Icons.compare_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, showBazar.id);
-                        }),
-                    sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, RecommendGift.id);
-                        }),
-                    sideButton("Event Reminder", Icons.event_available_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, EventsView.id);
-                        }),
-                    sideButton("Add Advertisement", Icons.camera_roll_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, Addadvertisement.id);
-                        }),
-                    sideButton("Join as Handcrafter", Icons.shopping_bag_outlined,
-                        SizeConfig.iconColor, () {
-                          Navigator.pushNamed(context, HandcrafterRequest.id);
-                        }),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            left: 10,
-            bottom: 10,
-            child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
-              Navigator.pushReplacementNamed(context, logIn.id);
-            }),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildDrawerHeader() {
-    return Stack(
-      children: [
-        Container(
-          color: const Color(0xFFE9E9E9),
-          height: 251 * SizeConfig.verticalBlock,
-        ),
-        Positioned(
-          left: 15,
-          bottom: 15,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Color(0xFF5095B0), width: 3),
-                ),
-                child: const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/images/p1.jpg'),
-                ),
-              ),
-              Text("my name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              Text("myemail@gmail.com", style: TextStyle(fontSize: 14)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -205,7 +90,6 @@ class _HomeState extends State<Home> {
             // Fetch the user's role from the database or token
             final token = Token();
             final role = await token.getRole('SELECT ROLE FROM TOKENS');
-print(role);
             // Navigate to the appropriate profile based on the role
             if (role == 'Handicrafter') {
               Navigator.pushNamed(context, MyHandcrafterProfile.id);
@@ -276,8 +160,6 @@ print(role);
           ),
           SizedBox(width: 10),
           Icon(Icons.tune),
-          SizedBox(width: 10),
-          Icon(Icons.compare_outlined),
         ],
       ),
     );

@@ -32,15 +32,16 @@ class customPost extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Padding(
-                            padding:
-                            EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(post.clientImage!),
-                              backgroundColor: Colors.transparent,
-                              radius: 20 * SizeConfig.horizontalBlock,
-                            ),
-                          ),
+                          // Padding(
+                          //   padding:
+                          //   EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
+                          //   child:
+                            // CircleAvatar(
+                            //   backgroundImage: NetworkImage(post.clientImage!),
+                            //   backgroundColor: Colors.transparent,
+                            //   radius: 20 * SizeConfig.horizontalBlock,
+                            // ),
+                          // ),
                           SizedBox(width: 10 * SizeConfig.horizontalBlock),
                           Text(
                             "${post.userName}",
@@ -125,9 +126,9 @@ class customPost extends StatelessWidget {
                   Container(
                     height: 201 * SizeConfig.verticalBlock,
                     width: double.infinity,
-                    child: Image.asset(
+                    child: Image.network(
                       post.postImage ?? "assets/images/Frame 36920.png" ,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   ),
                 ],

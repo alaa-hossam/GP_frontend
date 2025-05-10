@@ -93,11 +93,22 @@ class MyTextFormField extends StatelessWidget {
                   initialValue: initialValue,
                   validator: validator ?? (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter ${labelText ?? hintName ?? "this field"}'; // Use labelText or hintName for validation message
-                    } else if (hintName == 'Password' && value.length < 8) {
-                      return 'Password should be at least 8 characters';
-                    } else if (!_emailRegex.hasMatch(value) && hintName == 'Email') {
-                      return 'Email address is not valid\n It should be an Email structure';
+                      return 'Please enter ${labelText ?? hintName ?? "this field"}';
+                    } else if (hintName == 'Password' || labelText == 'Password') {
+                      if (value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      if (!_passwordRegex.hasMatch(value)) {
+                        return 'Password must contain:\n- At least one uppercase letter\n- One lowercase letter\n- One number\n- One special character';
+                      }
+                    } else if (hintName == 'Email' || labelText == 'Email') {
+                      if (!_emailRegex.hasMatch(value)) {
+                        return 'Please enter a valid email address\n(e.g., example@domain.com)';
+                      }
+                    } else if (hintName == 'Phone' || labelText == 'Phone') {
+                      if (!_phoneRegex.hasMatch(value)) {
+                        return 'Please enter a valid phone number';
+                      }
                     } else if (hintName == 'Birth Date') {
                       DateTime? parsedDate = DateTime.tryParse(value);
                       if (parsedDate == null) {
@@ -159,5 +170,17 @@ class MyTextFormField extends StatelessWidget {
   }
 
   // Email regex for validation
-  RegExp get _emailRegex => RegExp(r'^\S+@gmail.com');
+  RegExp get _emailRegex => RegExp(
+      r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'
+  );
+
+  // Password regex pattern (at least 8 chars with uppercase, lowercase, number, and special char)
+  RegExp get _passwordRegex => RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%^&*()_+{}\[\]:;"\<>,.?~\\-]).{8,}$'
+  );
+
+
+  RegExp get _phoneRegex => RegExp(
+      r'^\+?[0-9]{11,13}$');
+
 }

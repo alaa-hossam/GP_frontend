@@ -4,6 +4,7 @@ import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/compareView.dart';
+import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
 import '../Providers/CategoryProvider.dart';
@@ -24,7 +25,6 @@ import 'logInView.dart';
 class browseProducts extends StatefulWidget {
   static String id = "browseProductsScreen";
 
-  const browseProducts({super.key});
   @override
   State<browseProducts> createState() => _BrowseProductsState();
 }
@@ -40,6 +40,8 @@ class _BrowseProductsState extends State<browseProducts> {
   late CategoryProvider catProvider;
   String? selectedCategoryId;
   List<CategoryModel> categoryChildren = [];
+
+
 
   @override
   void initState() {
@@ -108,130 +110,13 @@ class _BrowseProductsState extends State<browseProducts> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    showCompare = args?['showCompare']??false;
     SizeConfig().init(context);
     return Scaffold(
-      drawer: Drawer(
-        width: 223 * SizeConfig.horizontalBlock,
-        backgroundColor: Colors.white,
-        child: Stack(
-          children: [
-            ListView(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      color: const Color(0xFFE9E9E9),
-                      height: 251 * SizeConfig.verticalBlock,
-                      width: 223 * SizeConfig.horizontalBlock,
-                    ),
-                    Positioned(
-                      left: 15,
-                      bottom: 15,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Color(0xFF5095B0),
-                                width: 3,
-                              ),
-                            ),
-                            child: const CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                              AssetImage('assets/images/p1.jpg'),
-                            ),
-                          ),
-                          Text(
-                            "my name",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20 * SizeConfig.textRatio),
-                          ),
-                          Text(
-                            "myemail.gmail.com",
-                            style:
-                            TextStyle(fontSize: 14 * SizeConfig.textRatio),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: 10 * SizeConfig.textRatio,
-                      top: 10 * SizeConfig.textRatio),
-                  child: Column(
-                    children: [
-                      sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor, () async{
-                            final token = Token();
-                            final role = await token.getRole('SELECT ROLE FROM TOKENS');
-                            print(role);
-                            // Navigate to the appropriate profile based on the role
-                            if (role == 'Handicrafter') {
-                              Navigator.pushNamed(context, MyHandcrafterProfile.id);
-                            } else if (role == 'Client') {
-                              Navigator.pushNamed(context, Profile.id);
-                            }
-                          }),
-                      sideButton("My orders", Icons.shopping_cart_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton("History", Icons.history_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, HistoryProducts.id);
-                          }),
-                      sideButton(
-                          "My posts", Icons.post_add, SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, Profile.id);
-                      }),
-                      sideButton("Compare Products", Icons.compare_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton(
-                          "Recommend Gifts",
-                          Icons.card_giftcard_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, RecommendGift.id);
-                      }),
-                      sideButton(
-                          "Event reminder",
-                          Icons.event_available_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, EventsView.id);
-                      }),
-                      sideButton("Add Advertisement",
-                          Icons.camera_roll_outlined, SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Profile.id);
-                          }),
-                      sideButton(
-                          "Join as Handcrafter",
-                          Icons.shopping_bag_outlined,
-                          SizeConfig.iconColor, () {
-                        Navigator.pushNamed(context, HandcrafterRequest.id);
-                      }),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              left: 10,
-              bottom: 10,
-              child:
-              sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
-                Navigator.pushReplacementNamed(context, logIn.id);
-              }),
-            ),
-          ],
-        ),
-      ),
+      drawer:Mydrawer(),
       appBar: AppBar(
         centerTitle: true,
         actions: [

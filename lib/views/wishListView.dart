@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
+import 'package:gp_frontend/widgets/AppBar.dart';
 import 'package:gp_frontend/widgets/customizeWishProduct.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/CategoryProvider.dart';
+import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeCategory.dart';
 
@@ -31,53 +33,15 @@ class _wishListViewState extends State<wishListView> {
     print(wishProvider.wishListProducts);
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 85 * SizeConfig.verticalBlock, // Set the height of the AppBar
-        flexibleSpace: Container(
-          decoration:const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-              bottomRight: Radius.circular(20), // Rounded bottom-right corner
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: SizeConfig.textRatio * 15,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
-        title: Text(
-          'Wishlist',
-          style: GoogleFonts.rubik(
-            color: Colors.white,
-            fontSize: 20 * SizeConfig.textRatio,
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-            bottomRight: Radius.circular(20), // Rounded bottom-right corner
-          ),
-        ),
-      ),
+      appBar:customAppbar("WishList" , leading: IconButton(
+        icon:Icon(Icons.arrow_back_ios_new) , color: Colors.white,
+        onPressed: (){Navigator.pop(context);}
+      )
+        ,),
       body: ListView(
         children: [
           Consumer<CategoryProvider>(
@@ -150,6 +114,8 @@ class _wishListViewState extends State<wishListView> {
           ),
         ],
       ),
+      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: true),
+
     );
   }
 }

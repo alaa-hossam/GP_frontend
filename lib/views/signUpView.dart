@@ -8,6 +8,7 @@ import 'package:gp_frontend/widgets/customizeDropDownMenu.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
+import '../widgets/messages.dart';
 
 class SignUp extends StatefulWidget {
   static String id = "SignUpScreen";
@@ -97,8 +98,13 @@ Token token=Token();
                 key: _formKey,
                 child: Column(
                   children: [
-                    Text("Logo"),
-                    SizedBox(height: SizeConfig.verticalBlock * 80),
+                    Container(
+                        width: 200,
+                        height: 200,
+                        child: Image.asset(
+                          "assets/images/logo.png",
+                          fit: BoxFit.fill,
+                        )),
 
                     // Full Name Field
                     MyTextFormField(
@@ -114,6 +120,7 @@ Token token=Token();
                       prefixIcon: Icons.account_circle_outlined,
                       hintText: "Gender",
                       onChanged: (String? value) {
+
                         setState(() {
                           _gender = value; // Store the selected gender
                         });
@@ -172,32 +179,36 @@ Token token=Token();
                       buttonColor: SizeConfig.iconColor,
                       fontColor: Color(0xFFF5F5F5),
                       onClickButton: () async {
-                        if (_formKey.currentState!.validate()) { // Validate the form
-                          setState(() {
-                            _isLoading = true; // Set loading to true
-                          });
 
-                          String response = await addCustomer();
+                        if (_formKey.currentState!.validate()) {
+                          if(_gender == null){
+                            showCustomPopup(context , "Gender" , "Please Enter your Gender" , []);
+                          }else{
+                            setState(() {
+                              _isLoading = true;
+                            });
 
-                          setState(() {
-                            _isLoading = false; // Set loading to false
-                          });
+                            String response = await addCustomer();
 
-                          if (response == "User added successfully") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Sign-Up Successful!")),
-                            );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Getotp(_email.text, 0), // Instantiate Getotp
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("${response}")),
-                            );
+                            setState(() {
+                              _isLoading = false; // Set loading to false
+                            });
+
+                            if (response == "User added successfully") {
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Getotp(_email.text, 0), // Instantiate Getotp
+                                ),
+                              );
+                            } else {
+                              showCustomPopup(context , "ERROR" , "${response}" , []);
+
+
+                            }
                           }
+
                         }
                       },
                     ),
