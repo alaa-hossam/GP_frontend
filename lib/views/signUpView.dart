@@ -179,7 +179,6 @@ Token token=Token();
                       buttonColor: SizeConfig.iconColor,
                       fontColor: Color(0xFFF5F5F5),
                       onClickButton: () async {
-
                         if (_formKey.currentState!.validate()) {
                           if(_gender == null){
                             showCustomPopup(context , "Gender" , "Please Enter your Gender" , []);
@@ -213,8 +212,6 @@ Token token=Token();
                       },
                     ),
                     SizedBox(height: SizeConfig.verticalBlock * 20),
-
-                    // Other UI elements...
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

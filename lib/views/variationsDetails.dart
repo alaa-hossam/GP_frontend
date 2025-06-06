@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/detailsProvider.dart';
 import 'package:gp_frontend/views/cartView.dart';
+import 'package:gp_frontend/widgets/messages.dart';
 import 'package:provider/provider.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import '../SqfliteCodes/cart.dart';
@@ -359,10 +360,8 @@ class _variationScreenState extends State<variationScreen> {
                                   Text("${count}", style: GoogleFonts.roboto(fontSize: 20 * SizeConfig.textRatio), ),
                                   IconButton(onPressed: (){setState(() {
                                     if(detailsProvider.finalPrice == 0){
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  "You Should specify product First")));
+                                      showCustomPopup(context, "Take Care", "You Should specify product First", []);
+
                                     }else{
                                       count++;
 
@@ -377,31 +376,20 @@ class _variationScreenState extends State<variationScreen> {
                               10 * SizeConfig.horizontalBlock),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-
-                              });
                               if (detailsProvider.finalPrice == 0) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "You Should specify product First")));
-                              } else if (detailsProvider
-                                  .finalProductsProvider.length >
-                                  1) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "You Should specify one product")));
+                                showCustomPopup(context, "Take Care", "You Should specify product First", []);
+                              } else if (detailsProvider.finalProductsProvider.length > 1) {
+                                showCustomPopup(context, "Take Care", "You Should specify one product ", []);
                               } else {
-                                for(int  i = 0 ; i < count ; i++){
-                                  insertProductData(widget.myProduct.id,
-                                      detailsProvider.selectedFinalProductId!);
+                                if (count == 0) {
+                                  showCustomPopup(context, "Take Care", "Choose the amount of product", []);
+                                } else {
+                                  // Show the popup
+                                  for (int i = 0; i < count; i++) {
+                                    insertProductData(widget.myProduct.id, detailsProvider.selectedFinalProductId!);
+                                  }
+                                  showCustomPopup(context, "Congratulation", "Products added successfully", []);
                                 }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "products added successfully")));
-
                               }
                             },
                             child: Container(
@@ -409,8 +397,7 @@ class _variationScreenState extends State<variationScreen> {
                               height: 55 * SizeConfig.horizontalBlock,
                               decoration: BoxDecoration(
                                 color: SizeConfig.iconColor,
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(15)),
+                                borderRadius: BorderRadius.all(Radius.circular(15)),
                               ),
                               child: Center(
                                 child: Text(

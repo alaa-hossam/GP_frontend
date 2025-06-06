@@ -94,11 +94,11 @@ class _postsState extends State<posts> {
               children: [
                 Center(
                     child: Text(
-                  "Loading...",
-                  style: GoogleFonts.rubik(
-                      fontSize: 20 * SizeConfig.textRatio,
-                      color: Color(0x503C3C3C)),
-                )),
+                      "Loading...",
+                      style: GoogleFonts.rubik(
+                          fontSize: 20 * SizeConfig.textRatio,
+                          color: Color(0x503C3C3C)),
+                    )),
               ],
             );
           }else if(posts.isEmpty) {

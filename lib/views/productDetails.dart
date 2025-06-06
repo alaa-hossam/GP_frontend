@@ -51,204 +51,200 @@ class _productDetailsState extends State<productDetails> {
 
 
     return Scaffold(
-      body: Consumer<productProvider>(
-        builder: (context, productProvider, child) {
-          return FutureBuilder(
-            future: productDetails.getProductDetails(arguments),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error loading product details"));
-              } else {
-                productModel myProduct = productDetails.productDetails;
+      body: FutureBuilder(
+        future: productDetails.getProductDetails(arguments),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error loading product details"));
+          } else {
+            productModel myProduct = productDetails.productDetails;
 
-                return ListView(
+            return ListView(
+              children: [
+                // Product Image Section
+                Column(
                   children: [
-                    // Product Image Section
-                    Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: 422 * SizeConfig.verticalBlock,
-                                width: 361 * SizeConfig.horizontalBlock,
-                                decoration: BoxDecoration(
-                                  color: SizeConfig.iconColor,
-                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                ),
-                                child: Center(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                                    child: Image.network(
-                                      myProduct.imageURL,
-                                      width: 359 * SizeConfig.horizontalBlock,
-                                      height: 420 * SizeConfig.verticalBlock,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: 422 * SizeConfig.verticalBlock,
+                            width: 361 * SizeConfig.horizontalBlock,
+                            decoration: BoxDecoration(
+                              color: SizeConfig.iconColor,
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                            ),
+                            child: Center(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                child: Image.network(
+                                  myProduct.imageURL,
+                                  width: 359 * SizeConfig.horizontalBlock,
+                                  height: 420 * SizeConfig.verticalBlock,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              Positioned(
-                                top: 15,
-                                right: 25,
-                                child: FutureBuilder<bool>(
-                                  future: wishListObj.doesIdExist(myProduct.id),
-                                  builder: (context, snapshot) {
-                                    bool exists = snapshot.data ?? false;
-                                    return CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        icon: Icon(
-                                          Icons.favorite,
-                                          size: 25 * SizeConfig.textRatio,
-                                          color: exists ? Colors.red : SizeConfig.fontColor,
-                                        ),
-                                        onPressed: () {
-                                          toggleFavourite(
-                                            exists ? "red" : "${SizeConfig.fontColor}",
-                                            myProduct.id,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              Positioned(
-                                top: 15,
-                                left: 15,
-                                child: CircleAvatar(
-                                  backgroundColor: const Color(0xFFD9D9D9),
+                            ),
+                          ),
+                          Positioned(
+                            top: 15,
+                            right: 25,
+                            child: FutureBuilder<bool>(
+                              future: wishListObj.doesIdExist(myProduct.id),
+                              builder: (context, snapshot) {
+                                bool exists = snapshot.data ?? false;
+                                return CircleAvatar(
+                                  backgroundColor: Colors.white,
                                   child: IconButton(
                                     padding: EdgeInsets.zero,
                                     icon: Icon(
-                                      Icons.arrow_back_ios_new,
-                                      size: 20 * SizeConfig.textRatio,
-                                      color: const Color(0x503C3C3C),
+                                      Icons.favorite,
+                                      size: 25 * SizeConfig.textRatio,
+                                      color: exists ? Colors.red : SizeConfig.fontColor,
                                     ),
                                     onPressed: () {
-                                      Navigator.pop(context);
+                                      toggleFavourite(
+                                        exists ? "red" : "${SizeConfig.fontColor}",
+                                        myProduct.id,
+                                      );
                                     },
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10 * SizeConfig.verticalBlock),
-
-                        // Product Details Section
-                        Padding(
-                          padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
-                          child: Container(
-                            width: 361 * SizeConfig.horizontalBlock, // Fixed width
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
-                              color: Color(0X50E9E9E9),
-                              border: Border.all(color: SizeConfig.iconColor),
+                                );
+                              },
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.all(10.0 * SizeConfig.textRatio),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                          Positioned(
+                            top: 15,
+                            left: 15,
+                            child: CircleAvatar(
+                              backgroundColor: const Color(0xFFD9D9D9),
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  size: 20 * SizeConfig.textRatio,
+                                  color: const Color(0x503C3C3C),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10 * SizeConfig.verticalBlock),
+
+                    // Product Details Section
+                    Padding(
+                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      child: Container(
+                        width: 361 * SizeConfig.horizontalBlock, // Fixed width
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
+                          color: Color(0X50E9E9E9),
+                          border: Border.all(color: SizeConfig.iconColor),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0 * SizeConfig.textRatio),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.person_outline),
-                                          SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                                          Text(
-                                            '${myProduct.handcrafterName}',
-                                            style: GoogleFonts.roboto(
-                                              fontSize: 12 * SizeConfig.textRatio,
-                                              color: Color(0x703C3C3C),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.star,
-                                            color: Color(0xFFD4931C),
-                                            size: 21 * SizeConfig.textRatio,
-                                          ),
-                                          SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                                          Text("${myProduct.rate}"),
-                                        ],
+                                      Icon(Icons.person_outline),
+                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                                      Text(
+                                        '${myProduct.handcrafterName}',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 12 * SizeConfig.textRatio,
+                                          color: Color(0x703C3C3C),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
-                                  Text(
-                                    "${myProduct.name}",
-                                    style: GoogleFonts.rubik(
-                                      fontSize: 24 * SizeConfig.textRatio,
-                                      color: Color(0X80000000),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
-                                  Text(
-                                    '${myProduct.description}',
-                                    style: GoogleFonts.roboto(
-                                      fontSize: 14 * SizeConfig.textRatio,
-                                      color: const Color(0X50000000),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10 * SizeConfig.verticalBlock),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          print(myProduct.reviews);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => Productreviews(reviews: myProduct.reviews!, rate: myProduct.rate), // Ensure myProduct.reviews is not null
-                                            ),
-                                          );                                        },
-                                        icon:const Icon(
-                                          Icons.chat,
-                                          color: SizeConfig.iconColor,
-                                        ),
+                                      Icon(
+                                        Icons.star,
+                                        color: Color(0xFFD4931C),
+                                        size: 21 * SizeConfig.textRatio,
                                       ),
-                                      SizedBox(width: 5 * SizeConfig.verticalBlock),
-
-                                      Text(
-                                        '${myProduct.ratingCount} Reviews',
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 14 * SizeConfig.textRatio,
-                                          color: const Color(0X50000000),
-                                        ),
-                                      ),
+                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                                      Text("${myProduct.rate}"),
                                     ],
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 10 * SizeConfig.verticalBlock),
+                              Text(
+                                "${myProduct.name}",
+                                style: GoogleFonts.rubik(
+                                  fontSize: 24 * SizeConfig.textRatio,
+                                  color: Color(0X80000000),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 10 * SizeConfig.verticalBlock),
+                              Text(
+                                '${myProduct.description}',
+                                style: GoogleFonts.roboto(
+                                  fontSize: 14 * SizeConfig.textRatio,
+                                  color: const Color(0X50000000),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 10 * SizeConfig.verticalBlock),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      print(myProduct.reviews);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Productreviews(reviews: myProduct.reviews!, rate: myProduct.rate), // Ensure myProduct.reviews is not null
+                                        ),
+                                      );                                        },
+                                    icon:const Icon(
+                                      Icons.chat,
+                                      color: SizeConfig.iconColor,
+                                    ),
+                                  ),
+                                  SizedBox(width: 5 * SizeConfig.verticalBlock),
+
+                                  Text(
+                                    '${myProduct.ratingCount} Reviews',
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 14 * SizeConfig.textRatio,
+                                      color: const Color(0X50000000),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 10 * SizeConfig.verticalBlock),
-
-                        SizedBox(height: 10 * SizeConfig.verticalBlock,),
-                        // Text('${myProduct.finalProducts}'),
-                        variationScreen(myProduct)
-                      ],
+                      ),
                     ),
+                    SizedBox(height: 10 * SizeConfig.verticalBlock),
+
+                    SizedBox(height: 10 * SizeConfig.verticalBlock,),
+                    // Text('${myProduct.finalProducts}'),
+                    variationScreen(myProduct)
                   ],
-                );
-              }
-            },
-          );
+                ),
+              ],
+            );
+          }
         },
       ),
     );

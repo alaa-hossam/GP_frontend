@@ -63,7 +63,7 @@ class MyTextFormField extends StatelessWidget {
           children: [
             if (labelText != null) // Display label if provided
               Padding(
-                padding: EdgeInsets.only(bottom: 8.0),
+                padding: EdgeInsets.only(bottom: 8.0 * SizeConfig.verticalBlock),
                 child: Text(
                   labelText!,
                   style: labelStyle == null ?TextStyle(
@@ -78,8 +78,8 @@ class MyTextFormField extends StatelessWidget {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(width: borderwidth ?? 0 , color: borderColor ?? Colors.transparent),
-                  borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 0))
+                    border: Border.all(width: borderwidth ?? 0 , color: borderColor ?? Colors.transparent),
+                    borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 0))
                 ),
 
                 child: TextFormField(

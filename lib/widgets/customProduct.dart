@@ -45,9 +45,11 @@ class _customProductState extends State<customProduct> {
   int? comparNum;
   String? Category,compareName;
   final Function(productModel)? onComparePressed;
-  bool isTapped = true;
+  bool isTapped = true , exist = false;
   customerViewModel customer = customerViewModel();
   Token myToken = Token();
+  bool? isFavorite;
+
 
 
   _customProductState(this.imageURL, this.Name, this.Price,
@@ -56,28 +58,37 @@ class _customProductState extends State<customProduct> {
 
 
 
-  toggleFavourite(String color) async{
-    wishListObj.isWishlistTableEmpty;
+
+
+  toggleFavourite() async {
     String email = await myToken.getEmail('SELECT EMAIL FROM TOKENS');
-      if (color == "${SizeConfig.fontColor}") {
-        wishListObj.addProduct('''
-            INSERT INTO WISHLIST(ID,EMAIL) 
-            VALUES (
-                "$id",
-                "$email"
-             
-            )
-''');
-
-      } else {
-        wishListObj.deleteProduct('''
+    if (isFavorite == true) {
+      await wishListObj.deleteProduct('''
         DELETE FROM WISHLIST 
-        WHERE ID = "$id" AND EMAIL = "$email"
+        WHERE ID = "${widget.id}" AND EMAIL = "$email"
       ''');
-
-      }
-
-    // wishListObj.recreateWishListTable();
+    } else {
+      await wishListObj.addProduct('''
+        INSERT INTO WISHLIST(ID, EMAIL) 
+        VALUES ("${widget.id}", "$email")
+      ''');
+    }
+    setState(() {
+      isFavorite = !isFavorite!;
+    });
+  }
+  void _loadFavoriteStatus() async {
+    bool exists = await wishListObj.doesIdExist(widget.id);
+    if (mounted) {
+      setState(() {
+        isFavorite = exists;
+      });
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteStatus();
   }
 
   Tapping() {
@@ -147,22 +158,21 @@ class _customProductState extends State<customProduct> {
                     top: 5,
                     right: 5,
                     child: CircleAvatar(
-                        radius: 15 * SizeConfig.verticalBlock,
-                        backgroundColor: Colors.white,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: Icon(
-                            Icons.favorite,
-                            size: 22 * SizeConfig.textRatio,
-                            color: myProductProvider.isFavorite(widget.id)
-                                ? Colors.red
-                                : SizeConfig.fontColor,
+                          backgroundColor: Colors.white,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.favorite,
+                              size: 25 * SizeConfig.textRatio,
+                              color: isFavorite == true ? Colors.red : SizeConfig.fontColor,
+                            ),
+                            onPressed: () {
+                              toggleFavourite();
+                            },
                           ),
-                          onPressed: () {
-                            myProductProvider.toggleFavorite(widget.id);
-                          },
-                        ),
-                    )),
+                        )
+
+                ),
                 if (widget.showCompare)
                   Positioned(
                       bottom: 5,

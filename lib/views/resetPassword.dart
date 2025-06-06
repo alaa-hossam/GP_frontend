@@ -163,10 +163,7 @@ class _resetPasswordState extends State<resetPassword> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => logIn()),
-                              );
+                             Navigator.pushReplacementNamed(context, logIn.id);
                             },
                             child: Text(
                               'Log In',

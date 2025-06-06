@@ -18,7 +18,6 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/addAddress.dart';
-import 'package:gp_frontend/views/addEvent.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
@@ -34,7 +33,6 @@ import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/posts.dart';
 import 'package:gp_frontend/views/productDetails.dart';
-import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/showBazar.dart';
 import 'package:gp_frontend/views/showOrders.dart';
 import 'package:gp_frontend/views/voucherView.dart';
@@ -52,9 +50,7 @@ import 'SqfliteCodes/wishList.dart';
 import 'firebase_options.dart';
 import 'views/signUpView.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'fireBaseNotification.dart';
 import 'views/BazarVariations.dart';
-import 'views/PaymentScreen.dart';
 
 
 void main() async {

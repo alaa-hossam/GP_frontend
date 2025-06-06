@@ -118,11 +118,12 @@ class wishList {
     Database? myWishlist = await db;
     customerViewModel customer =customerViewModel();
     String email = await customer.getEmail();
-
+    print(email);
     List<Map> result = await myWishlist!.rawQuery(
       'SELECT 1 FROM WISHLIST WHERE ID = ? AND EMAIL = "$email"',
       [id],
     );
+    print(result);
 
     return result.isNotEmpty;
   }
