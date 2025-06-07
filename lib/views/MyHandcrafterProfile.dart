@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/handcrafterModel.dart';
+import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
+import 'package:gp_frontend/views/addCrafterReel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +22,9 @@ class MyHandcrafterProfile extends StatefulWidget {
 
 class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
   File? _image;
+  handcrafterViewModel hvm = handcrafterViewModel();
+  handcrafterModel? _handcrafter;
+  bool _isLoading = true;
   late productProvider prodProvider;
 
   Future<void> _pickImage(ImageSource source) async {
@@ -47,15 +53,32 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
     return textPainter.width + 40 * SizeConfig.horizontalBlock;
   }
 
+  Future<void> _loadHandcrafterData() async {
+    try {
+      final handcrafter = await hvm.fetchHandcrafter();
+      setState(() {
+        _handcrafter = handcrafter;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print("Error loading customer data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading profile data')),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadHandcrafterData();
     prodProvider = Provider.of<productProvider>(context, listen: false);
-
-    prodProvider.products.clear();
-    prodProvider.fetchProducts('0');
+    prodProvider.handCrafterProducts.clear();
+    prodProvider.fetchHandCrafter();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,24 +139,47 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                     backgroundColor: SizeConfig.iconColor,
                     radius: SizeConfig.horizontalBlock * 70,
                     child: CircleAvatar(
-                      backgroundImage: AssetImage('assets/images/BPM.png'),
                       radius: SizeConfig.horizontalBlock * 67,
+                      backgroundColor: Colors.white,
+                      child: _handcrafter?.profileURL != null
+                          ? ClipOval(
+                              child: Image.network(
+                                _handcrafter!.profileURL!,
+                                width: SizeConfig.horizontalBlock * 134,
+                                height: SizeConfig.horizontalBlock * 134,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Center(
+                              child: Icon(
+                                Icons.person,
+                                size: SizeConfig.horizontalBlock * 60,
+                                color: SizeConfig.iconColor,
+                              ),
+                            ),
                     ),
                   ),
                   Positioned(
                     right: 0,
                     bottom: 0,
-                    child: CircleAvatar(
-                      backgroundColor: Color(0xFFB36995),
-                      radius: SizeConfig.horizontalBlock * 20,
-                      child: IconButton(
-                        onPressed: () {
-                          _pickImage(ImageSource.gallery);
-                        },
-                        icon: Icon(
-                          Icons.edit_outlined,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
                           color: Colors.white,
-                          size: SizeConfig.textRatio * 24,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: SizeConfig.iconColor,
+                        radius: SizeConfig.horizontalBlock * 20,
+                        child: IconButton(
+                          onPressed: () => _pickImage(ImageSource.gallery),
+                          icon: Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white,
+                            size: SizeConfig.textRatio * 24,
+                          ),
                         ),
                       ),
                     ),
@@ -143,7 +189,7 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
             ),
             Center(
               child: Text(
-                'name',
+                _handcrafter?.name ?? 'No Name',
                 style: TextStyle(
                   fontFamily: "Rubik",
                   fontSize: 24 * SizeConfig.textRatio,
@@ -153,7 +199,7 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
               ),
             ),
             Text(
-              'description',
+              _handcrafter?.description ?? 'NO Description',
               style: TextStyle(
                 fontFamily: "Roboto",
                 fontSize: 16 * SizeConfig.textRatio,
@@ -203,6 +249,9 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                       textSize: 14 * SizeConfig.textRatio,
                       width: _calculateButtonWidth("Add Reel", context),
                       height: 40 * SizeConfig.verticalBlock,
+                      onClickButton: () {
+                        Navigator.pushNamed(context, addCrafterReel.id);
+                      },
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                   ],
@@ -262,27 +311,30 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
             ),
             Consumer<productProvider>(
               builder: (context, prodProvider, child) {
-                if (prodProvider.products.isEmpty) {
+                if (prodProvider.handCrafterProducts.isEmpty) {
                   return Center(child: CircularProgressIndicator());
                 }
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0,right: 8,left: 8),
+                  padding:
+                      const EdgeInsets.only(bottom: 8.0, right: 8, left: 8),
                   child: GridView.builder(
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(), // Disable GridView's scrolling
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Disable GridView's scrolling
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2, // Two products per row
                       crossAxisSpacing: 10.0, // Spacing between columns
                       mainAxisSpacing: 10.0, // Spacing between rows
                       childAspectRatio: 0.7, // Adjust based on your design
                     ),
-                    itemCount: prodProvider.products.length,
+                    itemCount: prodProvider.handCrafterProducts.length,
                     itemBuilder: (context, index) {
-                      var product = prodProvider.products[index];
+                      var product = prodProvider.handCrafterProducts[index];
                       return customProduct(
                         product.imageURL,
                         product.name,
-                        Category:product.category,
+                        Category: product.category,
                         product.price,
                         product.rate,
                         product.id,
@@ -293,7 +345,6 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                 );
               },
             ),
-
           ],
         ),
       ),

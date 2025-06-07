@@ -11,6 +11,7 @@ import '../Models/CustomerModel.dart';
 import '../ViewModels/customerViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
+import 'chooseAddress.dart';
 import 'logInView.dart';
 
 class Profile extends StatefulWidget {
@@ -74,8 +75,8 @@ class _ProfileState extends State<Profile> {
     SizeConfig().init(context);
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        toolbarHeight: 85 * SizeConfig.verticalBlock,
+        centerTitle: false,
+        toolbarHeight: 310 * SizeConfig.verticalBlock,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -92,22 +93,142 @@ class _ProfileState extends State<Profile> {
             ),
           ),
         ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: SizeConfig.textRatio * 15,
-          ),
-          onPressed: () => Navigator.pop(context),
+        leading: null,
+        automaticallyImplyLeading: false,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 5 * SizeConfig.verticalBlock,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: SizeConfig.textRatio * 15,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                Text(
+                  'My Profile',
+                  style: TextStyle(
+                    fontFamily: "Rubik",
+                    fontSize: 20 * SizeConfig.textRatio,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: SizeConfig.horizontalBlock * 85,
+                  height: SizeConfig.verticalBlock * 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.emoji_events_outlined,color: Color(0xFF0B44ED),size: 20 * SizeConfig.textRatio,),
+                      Text(_customer!.points.toString(),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 19 * SizeConfig.textRatio,
+                      ),),
+                      Text('points',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 10 * SizeConfig.textRatio,
+                      ),)
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // Profile content below
+            Center(
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: SizeConfig.iconColor,
+                    radius: SizeConfig.horizontalBlock * 70,
+                    child: CircleAvatar(
+                      radius: SizeConfig.horizontalBlock * 67,
+                      backgroundColor: Colors.white,
+                      child: _customer?.profileImage != null
+                          ? ClipOval(
+                        child: Image.network(
+                          _customer!.profileImage!,
+                          width: SizeConfig.horizontalBlock * 134,
+                          height: SizeConfig.horizontalBlock * 134,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : Center(
+                        child: Icon(
+                          Icons.person,
+                          size: SizeConfig.horizontalBlock * 60,
+                          color: SizeConfig.iconColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: SizeConfig.iconColor,
+                        radius: SizeConfig.horizontalBlock * 20,
+                        child: IconButton(
+                          onPressed: () => _pickImage(ImageSource.gallery),
+                          icon: Icon(
+                            Icons.edit_outlined,
+                            color: Colors.white,
+                            size: SizeConfig.textRatio * 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Center(
+              child: Text(
+                _customer?.name ?? 'No Name',
+                style: TextStyle(
+                  fontFamily: "Rubik",
+                  fontSize: 24 * SizeConfig.textRatio,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                _customer?.email ?? 'NO Email',
+                style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontSize: 16 * SizeConfig.textRatio,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
         ),
-        title: Text(
-          'Profile',
-          style: GoogleFonts.rubik(
-            color: Colors.white,
-            fontSize: 20 * SizeConfig.textRatio,
-          ),
-        ),
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(20),
             bottomRight: Radius.circular(20),
@@ -120,76 +241,7 @@ class _ProfileState extends State<Profile> {
               child: Center(
                 child: Column(
                   children: [
-                    SizedBox(height: SizeConfig.verticalBlock * 30),
-                    Stack(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: SizeConfig.iconColor,
-                          radius: SizeConfig.horizontalBlock * 70,
-                          child: CircleAvatar(
-                            radius: SizeConfig.horizontalBlock * 67,
-                            backgroundColor: SizeConfig.iconColor,
-                            child: _customer?.profileImage != null && _customer!.profileImage!.isNotEmpty
-                                ? ClipOval(
-                              child: Image.network(
-                                _customer!.profileImage!,
-                                width: SizeConfig.horizontalBlock * 134,
-                                height: SizeConfig.horizontalBlock * 134,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                                : Center(
-                              child: Icon(
-                                Icons.person,
-                                size: SizeConfig.horizontalBlock * 60,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 1.0,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: SizeConfig.iconColor,
-                              radius: SizeConfig.horizontalBlock * 20,
-                              child: IconButton(
-                                onPressed: () => _pickImage(ImageSource.gallery),
-                                icon: Icon(
-                                  Icons.edit_outlined,
-                                  color: Colors.white,
-                                  size: SizeConfig.textRatio * 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),                    SizedBox(height: SizeConfig.verticalBlock * 2),
-                    Text(
-                      _customer?.name ?? 'No Name',
-                      style: GoogleFonts.rubik(
-                        color: SizeConfig.fontColor,
-                        fontSize: SizeConfig.textRatio * 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      _customer?.email ?? 'No Email',
-                      style: GoogleFonts.roboto(
-                        color: SizeConfig.fontColor,
-                        fontSize: SizeConfig.textRatio * 14,
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
+                    SizedBox(height: SizeConfig.verticalBlock * 20),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -201,15 +253,6 @@ class _ProfileState extends State<Profile> {
                             iconColor: const Color(0xFFDF9B3B),
                             onClickButton: () =>
                                 Navigator.pushNamed(context, voucherView.id),
-                          ),
-                          SizedBox(width: SizeConfig.horizontalBlock * 15),
-                          CustomizeProfileOptions(
-                            buttonName: 'Points',
-                            buttonIcon: Icons.verified_outlined,
-                            iconColor: const Color(0xFF0B44ED),
-                            points:
-                                _customer?.points, // Pass the double directly
-                            onClickButton: () {},
                           ),
                           SizedBox(width: SizeConfig.horizontalBlock * 15),
                           CustomizeProfileOptions(
@@ -254,6 +297,13 @@ class _ProfileState extends State<Profile> {
         buttonIcon: Icons.history_outlined,
         iconColor: SizeConfig.iconColor,
         onClickButton: () => Navigator.pushNamed(context, HistoryProducts.id),
+      ),
+      SizedBox(height: SizeConfig.verticalBlock * 10),
+      customizeNavigatorProfile(
+        buttonName: 'My Addresses ',
+        buttonIcon: Icons.location_on_outlined,
+        iconColor: SizeConfig.iconColor,
+        onClickButton: () => Navigator.pushNamed(context, chooseAddress.id),
       ),
       SizedBox(height: SizeConfig.verticalBlock * 10),
       customizeNavigatorProfile(

@@ -18,6 +18,7 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/addAddress.dart';
+import 'package:gp_frontend/views/addCrafterReel.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
@@ -140,6 +141,7 @@ class MyApp extends StatelessWidget {
         addPost.id : (BuildContext context) => addPost(),
         voucherView.id : (BuildContext context) => voucherView(),
         showOrders.id : (BuildContext context) => showOrders(),
+        addCrafterReel.id : (BuildContext context) => addCrafterReel(),
       },
     );
   }

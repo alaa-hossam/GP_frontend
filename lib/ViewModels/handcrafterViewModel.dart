@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:gp_frontend/Models/CustomerModel.dart';
 import 'package:gp_frontend/Models/handcrafterModel.dart';
-import 'package:http/http.dart' as http;
 
 class handcrafterViewModel {
   final String apiUrl = "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
@@ -10,9 +7,12 @@ class handcrafterViewModel {
 
   Future<String> addHandcrafter({required profileImage,required name,required BIO,required nationalIdImage, required specializationsId})async{
     print("in HVMMMMMMMMMMMM");
-    handcrafterModel handcrafter = handcrafterModel(name,profileImage,BIO, specializationsId, nationalIdImage);
+    handcrafterModel handcrafter = handcrafterModel(name: name,profileImage: profileImage,description: BIO, specializationsId: specializationsId, nationalIdImage: nationalIdImage);
     print("in HVMMMMMMMMMMMM22222222222222222");
     return handcrafterSer.addHandcrafter(handcrafter);
   }
 
+  Future<handcrafterModel?> fetchHandcrafter() async {
+    return handcrafterSer.getHandcrafter();
+  }
 }

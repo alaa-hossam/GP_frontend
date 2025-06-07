@@ -762,6 +762,7 @@ class productService {
       return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
     }
   }
+
   Future<List<productModel>> getHandcrafterProduct() async{
     List<productModel> handcrafterProducts = [];
     final String viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
