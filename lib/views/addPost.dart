@@ -39,7 +39,8 @@ class _addPostState extends State<addPost> {
     }
   }
 
-  Future<bool> submitOrder(postModel post, String specialization, File? image) async {
+  Future<bool> submitOrder(
+      postModel post, String specialization, File? image) async {
     await myPostProvider.addPost(post, specialization, image);
     return true;
   }
@@ -73,7 +74,7 @@ class _addPostState extends State<addPost> {
           ListView(
             children: [
               Container(
-                height: 600 * SizeConfig.verticalBlock,
+                height: 640 * SizeConfig.verticalBlock,
                 child: ListView(
                   children: [
                     Container(
@@ -109,11 +110,17 @@ class _addPostState extends State<addPost> {
                       ),
                     ),
                     incrementDecrementButtons(
-                        "price", "0.00", addPostProvider.price, "ًWrite an estimated price that suits you for the whole."),
-                    incrementDecrementButtons("Duration", "0.00", addPostProvider.duration,
-                        "Write an estimated time you can wait for the order to be completed."),
+                        "price",
+                        "0.00",
+                        addPostProvider.price,
+                        "ًWrite an estimated price that suits you for the whole."),
                     incrementDecrementButtons(
-                        "Quantity", "0.00", addPostProvider.quantity, "Write the number you want."),
+                        "Duration",
+                        "0.00",
+                        addPostProvider.duration,
+                        "Write an estimated time you can wait for the order to be completed."),
+                    incrementDecrementButtons("Quantity", "0.00",
+                        addPostProvider.quantity, "Write the number you want."),
                     Padding(
                       padding: EdgeInsets.only(
                           left: 20 * SizeConfig.horizontalBlock,
@@ -131,7 +138,8 @@ class _addPostState extends State<addPost> {
                       child: specializtions(),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
+                      padding: EdgeInsets.only(
+                          left: 16 * SizeConfig.horizontalBlock),
                       child: Text(
                         "Upload post Image (Max 5MB, JPG, PNG) ",
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -143,21 +151,24 @@ class _addPostState extends State<addPost> {
                           _pickImage(ImageSource.gallery);
                         },
                         child: Container(
-                          margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
+                          margin: EdgeInsets.only(
+                              top: 10 * SizeConfig.verticalBlock),
                           height: 100 * SizeConfig.horizontalBlock,
                           width: 100 * SizeConfig.horizontalBlock,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(width: 1, color: SizeConfig.iconColor),
+                            border: Border.all(
+                                width: 1, color: SizeConfig.iconColor),
                             color: const Color(0x80E9E9E9),
                           ),
                           child: postImage == null
                               ? Icon(Icons.file_upload_outlined,
-                              color: SizeConfig.iconColor, size: 30 * SizeConfig.textRatio)
+                                  color: SizeConfig.iconColor,
+                                  size: 30 * SizeConfig.textRatio)
                               : Image.file(
-                            File(postImage!.path),
-                            fit: BoxFit.cover,
-                          ),
+                                  File(postImage!.path),
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
                     ),
@@ -170,11 +181,12 @@ class _addPostState extends State<addPost> {
                   vertical: 10 * SizeConfig.verticalBlock,
                 ),
                 child: customizeButton(
-                  buttonName: "Add Post",
-                  buttonColor: SizeConfig.iconColor,
-                  fontColor: Colors.white,
+                    buttonName: "Add Post",
+                    buttonColor: SizeConfig.iconColor,
+                    fontColor: Colors.white,
                     onClickButton: () async {
-                      final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+                      final catProvider =
+                          Provider.of<CategoryProvider>(context, listen: false);
 
                       if (addPostProvider.title.text.trim().isEmpty ||
                           addPostProvider.description.text.trim().isEmpty ||
@@ -183,18 +195,22 @@ class _addPostState extends State<addPost> {
                           addPostProvider.quantity.text.trim().isEmpty ||
                           catProvider.selectedSpecializationId == null ||
                           catProvider.selectedSpecializationId!.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Please fill in all fields and select at least one specialization")),
-                        );
+                        showCustomPopup(
+                            context,
+                            "Missing!",
+                            "Please fill in all fields and select specialization",
+                          []
+                            );
+
                         return;
                       }
-
 
                       setState(() {
                         _isLoading = true;
                       });
 
-                      final selectedSpecializations = catProvider.selectedSpecializationId!;
+                      final selectedSpecializations =
+                          catProvider.selectedSpecializationId!;
 
                       try {
                         bool success = await submitOrder(
@@ -213,8 +229,8 @@ class _addPostState extends State<addPost> {
                           clearFields(addPostProvider);
                           Navigator.pop(context, true);
                         } else {
-                          showCustomPopup(context, "Post", "Failed to add post", []);
-
+                          showCustomPopup(
+                              context, "Post", "Failed to add post", []);
                         }
                       } catch (e) {
                         showCustomPopup(context, "Post", "${e.toString()}", []);
@@ -225,8 +241,7 @@ class _addPostState extends State<addPost> {
                           });
                         }
                       }
-                    }
-                ),
+                    }),
               ),
             ],
           ),

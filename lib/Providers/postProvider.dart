@@ -14,9 +14,20 @@ class postProvider with ChangeNotifier {
   final TextEditingController quantity = TextEditingController();
 
 
-  getPosts() async {
+  getClientPosts() async {
     try {
-      posts = await postVM.fetchPosts();
+      posts = await postVM.fetchClientPosts();
+      print("in provider");
+      print(posts);
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching posts: $e");
+    }
+  }
+
+  getAllPosts() async {
+    try {
+      posts = await postVM.fetchAllPosts();
       print("in provider");
       print(posts);
       notifyListeners();

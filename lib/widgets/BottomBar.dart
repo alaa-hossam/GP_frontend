@@ -93,7 +93,13 @@ class buttonProvider extends ChangeNotifier {
     if(_oldselected != _selectedIndex) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => _widgetOptions[index]),
+        MaterialPageRoute(
+          builder: (context) => _widgetOptions[index] ,
+        settings: RouteSettings(
+          arguments:1,
+        ),),
+
+
       );
     }
     notifyListeners();

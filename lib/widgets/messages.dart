@@ -57,25 +57,25 @@ Future<void> showCustomPopup(
                   ),
                   if(dialogIcon == null)
                     SizedBox(width:100 *SizeConfig.horizontalBlock ,),
-                    Container(
-                      width: 30 * SizeConfig.horizontalBlock,
-                      height: 30 * SizeConfig.horizontalBlock,
-                      decoration: BoxDecoration(
-                        color: SizeConfig.iconColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        icon: Icon(Icons.clear, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
+                    // Container(
+                    //   width: 30 * SizeConfig.horizontalBlock,
+                    //   height: 30 * SizeConfig.horizontalBlock,
+                    //   decoration: BoxDecoration(
+                    //     color: SizeConfig.iconColor,
+                    //     shape: BoxShape.circle,
+                    //   ),
+                    //   child: IconButton(
+                    //     padding: EdgeInsets.zero,
+                    //     icon: Icon(Icons.clear, color: Colors.white),
+                    //     onPressed: () => Navigator.pop(context),
+                    //   ),
+                    // ),
                 ],
               ),
               SizedBox(height: 16 * SizeConfig.verticalBlock),
               // Description section
-              SingleChildScrollView(
-                child: Center(
+              Center(
+                child: SingleChildScrollView(
                   child: Text(
                     description,
                     style: TextStyle(
@@ -89,7 +89,7 @@ Future<void> showCustomPopup(
               SizedBox(height: 20 * SizeConfig.verticalBlock),
               // Actions (if provided)
               if (actions != null) ...[
-                Divider(height: 1),
+                // Divider(height: 1),
                 SizedBox(height: 16 * SizeConfig.verticalBlock),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,

@@ -1,45 +1,29 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:gp_frontend/Models/specializationModel.dart';
 import 'package:http/http.dart' as http;
-
 import '../SqfliteCodes/Token.dart';
 
 
 
-
-// mutation CreatePost {
-// createPost(
-// data: {
-// customerId: null
-// description: null
-// fileType: Image
-// images: null
-// specializationId: null
-// suggestedOneDuration: null
-// suggestedOnePrice: null
-// suggestedQuantity: null
-// title: null
-// type: General
-// }
-// )
-// }
-
 class postModel{
-  String? userName , clientImage , description , postImage, title;
+  String? userName , clientImage , description , postImage, title, createdAt, id;
   int? quantity , duration;
   double?  price;
+  List<String>? offersIds;
 
   postModel(
-      {this.userName,
-      this.clientImage,
-      this.description,
-      this.postImage,
-      this.quantity,
-      this.duration,
-      this.price,
-      this.title});
+      {
+        this.id,
+        this.userName,
+        this.clientImage,
+        this.description,
+        this.postImage,
+        this.quantity,
+        this.duration,
+        this.price,
+        this.title,
+        this.createdAt,
+        this.offersIds});
 }
 
 
@@ -48,7 +32,7 @@ class postService{
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
 
-  Future<List<postModel>> getPosts() async {
+  Future<List<postModel>> getClientPosts() async {
     final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
     List<postModel> posts = [];
     String query = '''
@@ -60,9 +44,15 @@ class postService{
                 imageUrl
             }
         }
+        id
+        createdAt
         description
         gallery {
             fileURL
+        }
+        
+       offers {
+            id
         }
         suggestedOneDuration
         suggestedOnePrice
@@ -94,17 +84,110 @@ class postService{
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         final List<dynamic> getPosts = data['data']['getPostsByClient'];
-        // print("------------------------------");
-        // print(getPosts[0]['customer']['clientProfile']);
+
         for(var post in getPosts){
+          List<String>? ids = [];
+          for(var offer in post['offers']){
+            if(post['offers'] != null){
+              ids.add(offer['id']);
+            }
+          }
+          posts.add(postModel(userName: post['customer']['username'] ?? "" ,
+              clientImage:post['customer']['clientProfile'],
+              id: post['id'],
+              description: post['description'],postImage:  post['gallery'][0]['fileURL']
+              ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
+              , price: post['suggestedOnePrice'].toDouble(),
+              title:  post['title'] ?? "" , createdAt: post['createdAt'],
+              offersIds: ids
+
+          ));
+        }
+
+        } else {
+        print('Failed to load product: ${response.statusCode}');
+      }
+      return posts;
+    } catch (e) {
+      print('Error fetching product: $e');
+      return posts;
+    }
+  }
+
+  Future<List<postModel>> getAllPosts() async {
+    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    List<postModel> posts = [];
+    String query = '''
+   query GetPosts {
+    getPosts {
+        description
+        suggestedOnePrice
+        suggestedQuantity
+        title
+        id
+        offers {
+            id
+        }
+        suggestedOneDuration
+        createdAt
+        customer {
+            username
+            clientProfile {
+                imageUrl
+            }
+        }
+        gallery {
+            fileURL
+        }
+    }
+}
+
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'viewerId': viewerId,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        final List<dynamic> getPosts = data['data']['getPosts'];
+
+        for(var post in getPosts){
+          List<String>? ids = [];
+            if(post['offers'] != null){
+              for(var offer in post['offers']){
+                ids.add(offer['id']);
+            }
+          }
           posts.add(postModel(userName: post['customer']['username'] ?? "" ,
               clientImage:post['customer']['clientProfile'],
               description: post['description'],postImage:  post['gallery'][0]['fileURL']
               ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
-              , price: post['suggestedOnePrice'].toDouble(),title:  post['title'] ?? ""));
+              , price: post['suggestedOnePrice'].toDouble(),
+              id:  post['id'],
+              title:  post['title'] ?? "" , createdAt: post['createdAt'],
+              offersIds: ids
+
+          ));
         }
 
-        } else {
+      } else {
         print('Failed to load product: ${response.statusCode}');
       }
       return posts;

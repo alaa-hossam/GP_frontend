@@ -11,7 +11,6 @@ import '../views/RecommendGiftView.dart';
 import '../views/browseProducts.dart';
 import '../views/eventsView.dart';
 import '../views/historyView.dart';
-import '../views/joinBazar.dart';
 import '../views/logInView.dart';
 import '../views/posts.dart';
 import 'Dimensions.dart';
@@ -94,7 +93,7 @@ class _MydrawerState extends State<Mydrawer> {
                           }),
                       sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
                               () {
-                            Navigator.pushNamed(context, posts.id);
+                            Navigator.pushNamed(context, posts.id , arguments: 0);
                           }),
                       sideButton("Compare Products", Icons.compare_outlined,
                           SizeConfig.iconColor, () {

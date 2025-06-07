@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/Providers/AddressProvider.dart';
 import 'package:gp_frontend/Providers/BackagesProvider.dart';
 import 'package:gp_frontend/Providers/eventProvider.dart';
+import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/Providers/postProvider.dart';
 import 'package:gp_frontend/Providers/voucherProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
@@ -19,6 +20,7 @@ import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/addAddress.dart';
 import 'package:gp_frontend/views/addCrafterReel.dart';
+import 'package:gp_frontend/views/addOffer.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
@@ -32,6 +34,7 @@ import 'package:gp_frontend/views/forgetPasswordView.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';
+import 'package:gp_frontend/views/offers.dart';
 import 'package:gp_frontend/views/posts.dart';
 import 'package:gp_frontend/views/productDetails.dart';
 import 'package:gp_frontend/views/showBazar.dart';
@@ -84,6 +87,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => postProvider()),
+        ChangeNotifierProvider(create: (_) => offerProvider()),
         ChangeNotifierProvider(create: (_) => voucherProvider()),
       ],
       child: DevicePreview(
@@ -142,6 +146,7 @@ class MyApp extends StatelessWidget {
         voucherView.id : (BuildContext context) => voucherView(),
         showOrders.id : (BuildContext context) => showOrders(),
         addCrafterReel.id : (BuildContext context) => addCrafterReel(),
+        addOffer.id : (BuildContext context) => addOffer(),
       },
     );
   }

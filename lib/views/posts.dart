@@ -11,7 +11,7 @@ import 'ProfileView.dart';
 
 class posts extends StatefulWidget {
   static String id = "posts";
-  const posts({super.key});
+  posts({super.key});
 
   @override
   State<posts> createState() => _postsState();
@@ -20,31 +20,53 @@ class posts extends StatefulWidget {
 class _postsState extends State<posts> {
   postProvider myPostProvider = postProvider();
   List<postModel> posts = [];
-  getPosts() async {
-    await myPostProvider.getPosts();
-    posts = myPostProvider.posts;
+  Future<void>? _postsFuture;
+  late int page;
+
+  @override
+  void initState() {
+    super.initState();
+    page = 0;
+  }
+
+  Future<void> getPosts(int page) async {
+    if (page == 0) {
+      await myPostProvider.getClientPosts();
+    } else {
+      await myPostProvider.getAllPosts();
+    }
+    setState(() {
+      posts = myPostProvider.posts;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Get page argument once here:
+    final routePage = ModalRoute.of(context)?.settings.arguments as int?;
+    if (routePage != null && routePage != page) {
+      page = routePage;
+      _postsFuture = getPosts(page);
+    }
+    _postsFuture = _postsFuture ?? getPosts(page);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        toolbarHeight:
-            85 * SizeConfig.verticalBlock, // Set the height of the AppBar
+        toolbarHeight: 85 * SizeConfig.verticalBlock,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
+                Color(0xFF223F4A),
+                Color(0xFF5095B0),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-              bottomRight: Radius.circular(20), // Rounded bottom-right corner
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
             ),
           ),
         ),
@@ -58,9 +80,8 @@ class _postsState extends State<posts> {
             Navigator.pop(context);
           },
         ),
-
         title: Text(
-          'My Posts',
+          page == 0 ? 'My Posts' : 'Posts',
           style: GoogleFonts.rubik(
             color: Colors.white,
             fontSize: 20 * SizeConfig.textRatio,
@@ -68,103 +89,117 @@ class _postsState extends State<posts> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, Profile.id);
-              },
-              icon: Icon(
-                Icons.account_circle_outlined,
-                color: Colors.white,
-              ))
+            onPressed: () {
+              Navigator.pushNamed(context, Profile.id);
+            },
+            icon: Icon(
+              Icons.account_circle_outlined,
+              color: Colors.white,
+            ),
+          )
         ],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20), // Rounded bottom-left corner
-            bottomRight: Radius.circular(20), // Rounded bottom-right corner
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
           ),
         ),
       ),
       body: FutureBuilder(
-        future: getPosts(),
+        future: _postsFuture,
         builder: (context, snapshot) {
-
           if (snapshot.connectionState != ConnectionState.done) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(
-                    child: Text(
-                      "Loading...",
-                      style: GoogleFonts.rubik(
-                          fontSize: 20 * SizeConfig.textRatio,
-                          color: Color(0x503C3C3C)),
-                    )),
-              ],
+            return Center(
+              child: Text(
+                "Loading...",
+                style: GoogleFonts.rubik(
+                  fontSize: 20 * SizeConfig.textRatio,
+                  color: Color(0x503C3C3C),
+                ),
+              ),
             );
-          }else if(posts.isEmpty) {
-
+          } else if (posts.isEmpty) {
             return Stack(
               children: [
                 Center(
-                    child: Text(
-                      "You have not posted anything yet.",
-                      style: GoogleFonts.rubik(
-                          fontSize: 20 * SizeConfig.textRatio,
-                          color: Color(0x503C3C3C)),
-                    )),
+                  child: Text(
+                    "You have not posted anything yet.",
+                    style: GoogleFonts.rubik(
+                      fontSize: 20 * SizeConfig.textRatio,
+                      color: Color(0x503C3C3C),
+                    ),
+                  ),
+                ),
                 Positioned(
-                    bottom: 15 * SizeConfig.verticalBlock,
-                    right: 15 * SizeConfig.horizontalBlock,
-                    child: Container(
-                      width: 50 * SizeConfig.horizontalBlock,
-                      height: 50 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                          color: SizeConfig.iconColor,
-                          borderRadius: BorderRadius.all(Radius.circular(25 * SizeConfig.textRatio))
+                  bottom: 15 * SizeConfig.verticalBlock,
+                  right: 15 * SizeConfig.horizontalBlock,
+                  child: Container(
+                    width: 50 * SizeConfig.horizontalBlock,
+                    height: 50 * SizeConfig.verticalBlock,
+                    decoration: BoxDecoration(
+                      color: SizeConfig.iconColor,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(25 * SizeConfig.textRatio),
                       ),
-                      child: IconButton(onPressed: (){Navigator.pushNamed(context, addPost.id);}, icon:Icon( Icons.add) ,
-                        iconSize: 30 * SizeConfig.textRatio,color: Colors.white,),
-                    )
-                )
-
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, addPost.id);
+                      },
+                      icon: Icon(Icons.add),
+                      iconSize: 30 * SizeConfig.textRatio,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             );
-          }
-
-          else {
+          } else {
             return Stack(
               children: [
                 ListView.builder(
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding:
-                            EdgeInsets.all(10.0 * SizeConfig.horizontalBlock),
-                        child: customPost(posts[index]),
-                      );
-                    }),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding:index != posts.length-1?
+                      EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock,
+                      right: 10.0 * SizeConfig.horizontalBlock,
+                     ):
+                      EdgeInsets.only(
+                      left:10.0 * SizeConfig.horizontalBlock,
+                      right: 10.0 * SizeConfig.horizontalBlock,
+                      bottom: 50.0 * SizeConfig.horizontalBlock),
+                      child: customPost(posts[index]),
+                    );
+                  },
+                ),
                 Positioned(
-                    bottom: 15 * SizeConfig.verticalBlock,
-                    right: 15 * SizeConfig.horizontalBlock,
-                    child: Container(
-                      width: 50 * SizeConfig.horizontalBlock,
-                      height: 50 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                        color: SizeConfig.iconColor,
-                        borderRadius: BorderRadius.all(Radius.circular(25 * SizeConfig.textRatio))
+                  bottom: 15 * SizeConfig.verticalBlock,
+                  right: 15 * SizeConfig.horizontalBlock,
+                  child: Container(
+                    width: 50 * SizeConfig.horizontalBlock,
+                    height: 50 * SizeConfig.verticalBlock,
+                    decoration: BoxDecoration(
+                      color: SizeConfig.iconColor,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(25 * SizeConfig.textRatio),
                       ),
-                      child: IconButton(onPressed: ()async{
+                    ),
+                    child: IconButton(
+                      onPressed: () async {
                         final result = await Navigator.pushNamed(context, addPost.id);
                         if (result == true) {
-                          // Reload your data here, for example:
                           setState(() {
-                            // Call your fetch method or re-initialize provider
+                            _postsFuture = getPosts(page);
                           });
                         }
-                        }, icon:Icon( Icons.add) ,
-                        iconSize: 30 * SizeConfig.textRatio,color: Colors.white,),
-                    )
-                )
+                      },
+                      icon: Icon(Icons.add),
+                      iconSize: 30 * SizeConfig.textRatio,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ],
             );
           }
