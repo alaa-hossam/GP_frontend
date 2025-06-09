@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
-import 'package:flutter/foundation.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
-import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:http/http.dart' as http;
-import 'package:sqflite/sqflite.dart';
 import '../SqfliteCodes/Token.dart';
 import '../SqfliteCodes/cart.dart';
 
