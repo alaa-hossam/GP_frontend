@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/postModel.dart';
+import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/widgets/customPost.dart';
+import 'package:provider/provider.dart';
 
 import '../Providers/postProvider.dart';
 import '../widgets/Dimensions.dart';
@@ -157,21 +159,25 @@ class _postsState extends State<posts> {
           } else {
             return Stack(
               children: [
-                ListView.builder(
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding:index != posts.length-1?
-                      EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock,
-                      right: 10.0 * SizeConfig.horizontalBlock,
-                     ):
-                      EdgeInsets.only(
-                      left:10.0 * SizeConfig.horizontalBlock,
-                      right: 10.0 * SizeConfig.horizontalBlock,
-                      bottom: 50.0 * SizeConfig.horizontalBlock),
-                      child: customPost(posts[index]),
+                Consumer<offerProvider>(
+                  builder: (context , offProvider ,child ) {
+                    return ListView.builder(
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding:index != posts.length-1?
+                          EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock,
+                          right: 10.0 * SizeConfig.horizontalBlock,
+                         ):
+                          EdgeInsets.only(
+                          left:10.0 * SizeConfig.horizontalBlock,
+                          right: 10.0 * SizeConfig.horizontalBlock,
+                          bottom: 50.0 * SizeConfig.horizontalBlock),
+                          child: customPost(posts[index]),
+                        );
+                      },
                     );
-                  },
+                  }
                 ),
                 Positioned(
                   bottom: 15 * SizeConfig.verticalBlock,

@@ -10,7 +10,8 @@ import '../widgets/Dimensions.dart';
 
 class offers extends StatefulWidget {
   String postId;
-  offers({super.key , required this.postId});
+  String clientId;
+  offers({super.key , required this.postId , required this.clientId});
 
   @override
   State<offers> createState() => _offersState();
@@ -19,14 +20,17 @@ class offers extends StatefulWidget {
 class _offersState extends State<offers> {
   offerProvider offerProv = offerProvider();
   final token = Token();
+  bool handcrafter = false ;
 
 
-  bool checkRole(){
-    final role = token.getRole('SELECT ROLE FROM TOKENS');
-    if (role == 'Handicrafter') {
-      return false;
-    } else if (role == 'Client') {
-     return true;
+
+   checkRole()async{
+    final roleSQL = await token.getRole('SELECT ROLE FROM TOKENS');
+    if (roleSQL == 'Handicrafter') {
+      handcrafter = true;
+    } else if (roleSQL == 'Client') {
+      handcrafter = false;
+
     }
     return true;
   }
@@ -77,7 +81,7 @@ class _offersState extends State<offers> {
                             return ListView.builder(
                               itemCount: offers.length,
                               itemBuilder: (context, index) {
-                                return customOffer(offer: offers[index],);
+                                return customOffer(offer: offers[index] , clientId: widget.clientId ?? "");
                               },
                             );
                           },
@@ -91,27 +95,35 @@ class _offersState extends State<offers> {
                 ],
               ),
             ),
-            if(checkRole())
             Positioned(
               bottom: 15 * SizeConfig.verticalBlock,
               right: 15 * SizeConfig.horizontalBlock,
-              child: Container(
-                width: 50 * SizeConfig.horizontalBlock,
-                height: 50 * SizeConfig.verticalBlock,
-                decoration: BoxDecoration(
-                  color: SizeConfig.iconColor,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(25 * SizeConfig.textRatio),
-                  ),
-                ),
-                child: IconButton(
-                  onPressed: () async {
-                    Navigator.pushNamed(context, addOffer.id);},
+              child: FutureBuilder(
+                future: checkRole(),
+                builder: (context,child) {
+                  if(handcrafter){
+                    return Container(
+                      width: 50 * SizeConfig.horizontalBlock,
+                      height: 50 * SizeConfig.verticalBlock,
+                      decoration: BoxDecoration(
+                        color: SizeConfig.iconColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(25 * SizeConfig.textRatio),
+                        ),
+                      ),
+                      child: IconButton(
+                        onPressed: () async {
+                          Navigator.pushNamed(context, addOffer.id,arguments: widget.postId);},
 
-                  icon: Icon(Icons.add),
-                  iconSize: 30 * SizeConfig.textRatio,
-                  color: Colors.white,
-                ),
+                        icon: Icon(Icons.add),
+                        iconSize: 30 * SizeConfig.textRatio,
+                        color: Colors.white,
+                      ),
+                    );
+
+                  }
+                  return Container();
+                }
               ),
             ),
           ],

@@ -219,13 +219,12 @@ class customPost extends StatelessWidget {
                 ),
             ],
           ),
-
           Positioned(
             bottom: 0 * SizeConfig.verticalBlock,
             right: 10 * SizeConfig.horizontalBlock,
             child: Row(
               children: [
-                offers(postId: post.id ?? ""),
+                offers(postId: post.id ?? "" , clientId: post.clientId ?? ""),
                 Text(
                   "${post.offersIds != null ? post.offersIds!.length : 0}",
                   style: GoogleFonts.roboto(

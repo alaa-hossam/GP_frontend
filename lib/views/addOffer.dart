@@ -19,10 +19,11 @@ class addOffer extends StatelessWidget {
   Widget build(BuildContext context) {
     final addPostProvider = Provider.of<postProvider>(context);
     offerProvider myOfferProvider = offerProvider();
+    final postId = ModalRoute.of(context)!.settings.arguments as String;
 
     Future<bool> submitOffer(
         offerModel offer) async {
-      await myOfferProvider.addOffer(offer);
+      await myOfferProvider.addOffer(offer , postId);
       return true;
     }
 

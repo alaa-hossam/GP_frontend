@@ -6,7 +6,7 @@ import '../SqfliteCodes/Token.dart';
 
 
 class postModel{
-  String? userName , clientImage , description , postImage, title, createdAt, id;
+  String? userName , clientImage , description , postImage, title, createdAt, id, clientId;
   int? quantity , duration;
   double?  price;
   List<String>? offersIds;

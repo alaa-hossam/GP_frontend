@@ -11,8 +11,11 @@ class offerProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  addOffer(offerModel offer){
-
+  Future<bool> addOffer(offerModel offer , String postId)async{
+    bool response =  await offerVM.addOffer(offer, postId);
+    print("..................");
+    notifyListeners();
+    return response;
   }
 
 

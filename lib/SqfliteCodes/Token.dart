@@ -48,7 +48,7 @@ class Token {
   }
 
   Future<String> getUUID(String query) async {
-    Database? myToken = await db; // Initialize the database
+    Database? myToken = await db;
     List<Map> response = await myToken!.rawQuery(query);
     return response[0]['UUID'];
   }

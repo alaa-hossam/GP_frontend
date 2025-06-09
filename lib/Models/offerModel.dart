@@ -27,21 +27,17 @@ class offerService{
     List<offerModel> offers = [];
     String query = '''
     query ListOffersForPost {
-    listOffersForPost(postId: "550e8400-e29b-41d4-a716-446655440030") {
-        comments {
-            content
-            offer {
-                suggestedOneDuration
-                suggestedOnePrice
-            }
-        }
+    listOffersForPost(postId: "$postID") {
+         description
+        createdAt
         handicrafter {
-            clientProfile {
+            handicrafterProfile {
                 imageUrl
                 name
             }
-            createdAt
         }
+        suggestedOneDuration
+        suggestedOnePrice
     }
 }
 
@@ -49,6 +45,9 @@ class offerService{
 
     final request = {
       'query': query,
+      'variable':{
+        'postId':postID
+      }
 
     };
 
@@ -62,10 +61,21 @@ class offerService{
         },
         body: jsonEncode(request),
       );
+      print(postID);
       print(response.body);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        List<dynamic> offersData = data['data']['listOffersForPost'];
+        for(var offer in offersData){
+          offers.add(offerModel(createdAt: offer['createdAt'],duration: offer['suggestedOneDuration'],
+          price: offer['suggestedOnePrice'].toDouble(),description: offer['description'],
+            name: offer['handicrafter']['handicrafterProfile']['name'],
+              profileImage: offer['handicrafter']['handicrafterProfile']['imageUrl']
+          ));
+        }
 
+        return offers;
 
       } else {
         print('Failed to load offers: ${response.statusCode}');
@@ -74,6 +84,48 @@ class offerService{
     } catch (e) {
       print('Error fetching offers: $e');
       return offers;
+    }
+  }
+  Future<bool> addOffer(offerModel offer , String postId)async{
+    Token token = Token();
+    final String handcrafterId = await token.getUUID('SELECT UUID FROM TOKENS');
+    String query = '''
+    mutation CreateOffer {
+    createOffer(
+        data: { description: "${offer.description}", suggestedOneDuration: ${offer.duration}, suggestedOnePrice: ${offer.price} }
+        handicrafterId: "$handcrafterId"
+        postId: "$postId"
+    ) {
+        id
+    }
+}
+''';
+    final request = {
+      'query': query,
+      'variables': {
+        'description':offer.description,
+        'suggestedOnePrice':offer.price,
+        'handicrafterId':handcrafterId,
+        'postId' :postId
+      },
+    };
+    try{
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final response = await http.post(
+          Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request)
+      );
+      print(response.body);
+      if(response.statusCode == 200){
+        return true;
+      }
+      return false;
+    }catch(e){
+      return false;
     }
   }
 }
