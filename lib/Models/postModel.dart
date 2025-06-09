@@ -13,6 +13,7 @@ class postModel{
 
   postModel(
       {
+        this.clientId,
         this.id,
         this.userName,
         this.clientImage,
@@ -39,6 +40,7 @@ class postService{
     query GetPostsByClient {
     getPostsByClient(clientId: "${viewerId}") {
         customer {
+        id
             username
             clientProfile {
                 imageUrl
@@ -54,6 +56,7 @@ class postService{
        offers {
             id
         }
+        
         suggestedOneDuration
         suggestedOnePrice
         suggestedQuantity
@@ -78,7 +81,7 @@ class postService{
         },
         body: jsonEncode(request),
       );
-      print(response.body);
+
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -99,10 +102,15 @@ class postService{
               ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
               , price: post['suggestedOnePrice'].toDouble(),
               title:  post['title'] ?? "" , createdAt: post['createdAt'],
-              offersIds: ids
+              offersIds: ids, clientId: post['customer']['id']
 
           ));
+          print("****************************************");
+          print(post['customer']['id']);
+
         }
+
+        return posts;
 
         } else {
         print('Failed to load product: ${response.statusCode}');
@@ -131,6 +139,7 @@ class postService{
         suggestedOneDuration
         createdAt
         customer {
+        id
             username
             clientProfile {
                 imageUrl
@@ -162,7 +171,7 @@ class postService{
         body: jsonEncode(request),
       );
       print(response.body);
-
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
@@ -182,7 +191,7 @@ class postService{
               , price: post['suggestedOnePrice'].toDouble(),
               id:  post['id'],
               title:  post['title'] ?? "" , createdAt: post['createdAt'],
-              offersIds: ids
+              offersIds: ids,clientId: post['customer']['id']
 
           ));
         }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/Providers/detailsProvider.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/widgets/messages.dart';
@@ -19,8 +20,10 @@ class variationScreen extends StatefulWidget {
 
 class _variationScreenState extends State<variationScreen> {
   final variationMap = <String, List<String>>{};
-  // bool showCartIcon = false;
   static int count = 0;
+  productProvider prodProvider = productProvider();
+  Cart myCart = Cart();
+
 
   @override
   void initState() {
@@ -33,6 +36,10 @@ class _variationScreenState extends State<variationScreen> {
       detailsProductProvider.initializeFinalProducts(widget.myProduct.finalProducts!);
     });
     count = 0;
+  }
+
+  Future<bool> checkCartEmpty()async{
+    return await myCart.isCartEmpty();
   }
 
   Map<String, List<String>> _getVariationMap() {
@@ -51,13 +58,21 @@ class _variationScreenState extends State<variationScreen> {
     return variationMap;
   }
 
+
+
   void insertProductData(String id, String finalId) async {
-    Cart myCart = Cart();
 
     print("insert product in cart");
     await myCart.addProduct(id, finalId);
     print('Product data inserted!');
 
+  }
+
+  Future<bool> checkCustom()async{
+    print("..................");
+    print(await prodProvider.checkCustom());
+    print("..................");
+    return await prodProvider.checkCustom();
   }
 
   void _showGalleryPopup(BuildContext context, List<dynamic> galleryImages) {
@@ -375,16 +390,19 @@ class _variationScreenState extends State<variationScreen> {
                               width:
                               10 * SizeConfig.horizontalBlock),
                           GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               if (detailsProvider.finalPrice == 0) {
                                 showCustomPopup(context, "Take Care", "You Should specify product First", []);
                               } else if (detailsProvider.finalProductsProvider.length > 1) {
                                 showCustomPopup(context, "Take Care", "You Should specify one product ", []);
+                              } else if (await checkCustom()) {
+                                showCustomPopup(context, "Take Care", "Cart Have One Or More Custom Product You Should Order Only One Type(Custom , Ready)", []);
+                              } else if (widget.myProduct.custom && ! await checkCartEmpty()) {
+                                showCustomPopup(context, "Take Care", "Product Is Custom It Should Be Added Alone", []);
                               } else {
                                 if (count == 0) {
                                   showCustomPopup(context, "Take Care", "Choose the amount of product", []);
                                 } else {
-                                  // Show the popup
                                   for (int i = 0; i < count; i++) {
                                     insertProductData(widget.myProduct.id, detailsProvider.selectedFinalProductId!);
                                   }

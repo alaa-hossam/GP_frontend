@@ -33,7 +33,7 @@ class _confirmOrderState extends State<confirmOrder> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     payment = args?['payment'] ?? '';
-    price = args?['price']?.toDouble() ?? 0.0;
+    price = double.tryParse(args?['price'])!;
     products = args?['products'] ?? [];
     myAddress = args?['address'] ?? [];
   }
@@ -192,7 +192,7 @@ class _confirmOrderState extends State<confirmOrder> {
                   style:
                       GoogleFonts.rubik(fontSize: 20 * SizeConfig.textRatio)),
               SizedBox(
-                  height: 200 * SizeConfig.verticalBlock,
+                  height: 170 * SizeConfig.verticalBlock,
                   child: ListView.builder(
                       itemCount: products.length,
                       itemBuilder: (contex, index) {
@@ -363,7 +363,22 @@ class _confirmOrderState extends State<confirmOrder> {
                             SizedBox(height: 5 * SizeConfig.verticalBlock,)
                           ],
                         );
-                      })),
+                      })
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("Total Price",
+                      style: GoogleFonts.rubik(
+                          fontSize: 24 * SizeConfig.textRatio,
+                          fontWeight: FontWeight.bold)),
+                  Text('LE ${price.toStringAsFixed(2)}',
+                      style: GoogleFonts.rubik(
+                          fontSize: 24 * SizeConfig.textRatio,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.all(20.0 * SizeConfig.verticalBlock),

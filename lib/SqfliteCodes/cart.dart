@@ -110,4 +110,10 @@ class Cart {
       whereArgs: [finalId], // Arguments for the WHERE clause
     );
   }
+
+  Future<bool> isCartEmpty() async {
+    final myCart = await db;
+    List<Map<String, dynamic>> result = await myCart!.query('products');
+    return result.isEmpty;
+  }
 }

@@ -87,7 +87,6 @@ class _HomeState extends State<Home> {
         ),
         IconButton(
           onPressed: () async {
-            // Fetch the user's role from the database or token
             final token = Token();
             final role = await token.getRole('SELECT ROLE FROM TOKENS');
             // Navigate to the appropriate profile based on the role

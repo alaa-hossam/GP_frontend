@@ -370,7 +370,7 @@ class _checkOutState extends State<checkOut> {
                       confirmOrder.id,
                       arguments: {
                         "products": products,
-                        "price":price.toInt(),
+                        "price":type.toLowerCase() == "amount"? "${price - percentage}": "${price - (price * percentage)}",
                         "payment":selectedPaymentIndex == 0 ?"assets/images/visa.png" :"assets/images/cash.png",
                         "address": addressData
                       }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import '../Models/ProductModel.dart';
 import '../SqfliteCodes/Token.dart';
@@ -141,6 +142,22 @@ class productProvider extends ChangeNotifier {
     print("in bazar");
      bazarProducts = await productVM.getBazarProducts();
      notifyListeners();
+  }
+
+
+  Future<List<String>> getCartIds()async{
+    Cart myCart = Cart();
+    myCart.db;
+    List<String> ids =
+        await myCart.getProduct("SELECT * FROM products").then((result) {
+      return result.map<String>((row) => row['id'].toString()).toList();
+    });
+    return ids;
+  }
+
+  Future<bool> checkCustom()async{
+    List<String> ids = await getCartIds();
+    return await productVM.checkCustom(ids);
   }
 
 

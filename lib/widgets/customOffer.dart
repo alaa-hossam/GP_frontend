@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/External%20Services/PaymentAPI.dart';
 import 'package:gp_frontend/Models/offerModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 
+import '../views/PaymentScreen.dart';
 import 'Dimensions.dart';
 
 class customOffer extends StatelessWidget {
@@ -33,6 +35,7 @@ class customOffer extends StatelessWidget {
   Future<bool> checkId()async{
     Token token = Token();
     final idSQL = await token.getUUID('SELECT UUID FROM TOKENS');
+    print(idSQL);
     if (idSQL == clientId) {
       match = true;
     } else {
@@ -175,13 +178,16 @@ class customOffer extends StatelessWidget {
                       FutureBuilder<bool>(
                         future: checkId(),
                         builder: (context , child) {
+
                           if(match){
                             return customizeButton(
                               buttonName: "Confirm",
                               buttonColor: SizeConfig.iconColor,
                               fontColor: Colors.white,
                               height: 30 * SizeConfig.verticalBlock,
-                              width: 90 * SizeConfig.horizontalBlock,);
+                              width: 90 * SizeConfig.horizontalBlock,
+                              onClickButton:() => Navigator.pushNamed(context,Paymentscreen.id , arguments: offer.price),
+                            );
                           }
                          return Container();
                         }

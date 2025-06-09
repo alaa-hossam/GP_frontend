@@ -82,4 +82,8 @@ class productViewModel  extends ChangeNotifier{
   getFinalProductVariations(String productId){
     return apiServices.getFinalProductVariations(productId);
   }
+
+  Future<bool> checkCustom(List<String> ids)async{
+    return await apiServices.getproductType(ids);
+  }
 }

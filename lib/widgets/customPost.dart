@@ -11,6 +11,9 @@ class customPost extends StatelessWidget {
   const customPost(this.post, {Key? key}) : super(key: key);
 
   String _getTimeAgo(DateTime createdAt) {
+    print("--------------------------**");
+    print(post.clientId);
+    print("--------------------------**");
     DateTime now = DateTime.now().toUtc();
     Duration difference = now.difference(createdAt);
 

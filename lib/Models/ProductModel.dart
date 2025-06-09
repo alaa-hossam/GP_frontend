@@ -18,6 +18,7 @@ class productModel {
   Map<String, List<dynamic>>? variationsWithIds;
   List<dynamic>? reviews;
   List<String>? galleryImg;
+  bool custom;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
       this.stock,
@@ -32,7 +33,8 @@ class productModel {
       this.Quantity,
       this.finalId,
       this.duration,
-      this.variationsWithIds});
+      this.variationsWithIds,
+      this.custom = false});
 
 
 
@@ -614,7 +616,7 @@ class productService {
 
   Future<productModel> getProductDetails(String productId) async {
     final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
-
+    bool custom = false;
     String query = '''
     query GetProduct {
       getProduct(
@@ -688,6 +690,7 @@ class productService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
+        print(data);
 
         final Map<String, dynamic>? getProduct = data['data']?['getProduct'];
         if (getProduct != null) {
@@ -701,20 +704,17 @@ class productService {
           final String id = getProduct['id'] ?? 'No ID';
           final String handcrafterName = getProduct['handicrafter']['username'] ?? 'No Name';
           final String categoryName = getProduct['category']['name'] ?? 'No category';
+          final List<dynamic> finals = getProduct['finalProducts'] ?? [];
+
+          for(var finalpro in finals){
+            if(finalpro['isCustomMade']){
+              custom = true;
+            }
+          }
 
           // Access variations
           final List<dynamic>? variations = getProduct['variations'];
           print("before variations: ${variations}");
-
-          if (variations != null && variations.isNotEmpty) {
-            for (final variation in variations) {
-              final String variationType = variation['variationType'] ?? 'No Type';
-              final String variationValue = variation['variationValue'] ?? 'No Value';
-              final String sizeUnit = variation['sizeUnit'] ?? 'No Unit';
-            }
-          } else {
-            print('No variations available');
-          }
 
           // Access finalProducts
           final List<dynamic> finalProducts = getProduct['finalProducts'];
@@ -736,8 +736,8 @@ class productService {
             id,
             imageUrl,
             name,
-            lowestCustomPrice, // Pass the nullable double
-            averageRating.toDouble(), // Pass the nullable double
+            lowestCustomPrice,
+            averageRating.toDouble(),
             finalProducts: finalProducts,
             ratingCount: ratingCount,
             description: description,
@@ -746,6 +746,8 @@ class productService {
             reviews: reviews,
             category: categoryName,
             galleryImg: galleryImages,
+            custom: custom
+
           );
 
           return myProduct;
@@ -1038,6 +1040,67 @@ print(response.statusCode);
       return[];
     }
     }
+
+
+  Future<bool> getproductType(List<String> productIds) async {
+    bool custom = false;
+    Map<String, List<dynamic> > variations= {} ;
+
+
+    const String query = '''
+    query GetProductsByIds(\$productIds: [String!]!) {
+      getProductsByIds(productIds: \$productIds) {
+         finalProducts {
+            isCustomMade
+        }
+      }
+    }
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'productIds': productIds,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      // Debug: Print the response body
+      // print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['getProductsByIds'];
+        for(var pro in prods){
+          for(var finalPro in pro['finalProducts']){
+            if(finalPro['isCustomMade']){
+              custom = true;
+            }
+          }
+
+        }
+        return custom;
+      } else {
+        return custom;
+      }
+    } catch (e) {
+      return custom;
+    }
+  }
+
+
+
 //   Future<List<productModel>> addProductsToBazar(List<dynamic> products) async {
 //     List<productModel> products= [] ;
 //     Map<String, List<dynamic> > variations= {} ;

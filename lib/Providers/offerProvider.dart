@@ -8,6 +8,8 @@ class offerProvider extends ChangeNotifier{
 
   getOffers(String postId)async{
     offers = await offerVM.fetchOffers(postId);
+    print("////////////////////");
+    print("called");
     notifyListeners();
   }
 
