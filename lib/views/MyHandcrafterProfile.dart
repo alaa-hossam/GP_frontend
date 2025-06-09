@@ -1,16 +1,14 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/handcrafterModel.dart';
 import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
-import 'package:gp_frontend/views/addCrafterReel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../Providers/ProductProvider.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeButton.dart';
+import 'addCrafterReel.dart';
 
 class MyHandcrafterProfile extends StatefulWidget {
   static String id = "MyHandcrafterProfileScreen";
@@ -250,7 +248,7 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                       width: _calculateButtonWidth("Add Reel", context),
                       height: 40 * SizeConfig.verticalBlock,
                       onClickButton: () {
-                        Navigator.pushNamed(context, addCrafterReel.id);
+                        Navigator.pushNamed(context, AddCrafterReel.id);
                       },
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),

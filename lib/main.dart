@@ -145,7 +145,7 @@ class MyApp extends StatelessWidget {
         addPost.id : (BuildContext context) => addPost(),
         voucherView.id : (BuildContext context) => voucherView(),
         showOrders.id : (BuildContext context) => showOrders(),
-        addCrafterReel.id : (BuildContext context) => addCrafterReel(),
+        AddCrafterReel.id : (BuildContext context) => AddCrafterReel(),
         addOffer.id : (BuildContext context) => addOffer(),
       },
     );
