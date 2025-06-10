@@ -8,6 +8,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 import 'package:path_provider/path_provider.dart';
+import 'ShareCrafterReel.dart'; // Ensure this import is correct
 
 class AddCrafterReel extends StatefulWidget {
   static String id = "AddCrafterReel";
@@ -19,6 +20,8 @@ class AddCrafterReel extends StatefulWidget {
 
 class _AddCrafterReelState extends State<AddCrafterReel> {
   VideoPlayerController? _controller;
+  File? selectedVideoFile; // ✅ This will be passed to the next screen
+
   List<AssetEntity> _galleryVideos = [];
   bool _showAlbums = false;
   List<AssetPathEntity> _albums = [];
@@ -31,6 +34,7 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
     super.initState();
     _requestPermissionAndLoad();
   }
+
   @override
   void dispose() {
     _controller?.dispose();
@@ -65,10 +69,12 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
   Future<void> _loadVideos() async {
     if (_selectedAlbum == null) return;
 
-    _galleryVideos = await _selectedAlbum!.getAssetListRange(
+    final allVideos = await _selectedAlbum!.getAssetListRange(
       start: 0,
       end: 100,
     );
+
+    _galleryVideos = allVideos.where((video) => video.duration <= 30).toList();
     setState(() {});
   }
 
@@ -77,9 +83,25 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
     final pickedFile = await picker.pickVideo(
       source: fromCamera ? ImageSource.camera : ImageSource.gallery,
     );
+
     if (pickedFile != null) {
-      return File(pickedFile.path);
+      final file = File(pickedFile.path);
+      final controller = VideoPlayerController.file(file);
+      await controller.initialize();
+
+      final duration = controller.value.duration;
+      await controller.dispose();
+
+      if (duration.inSeconds <= 30) {
+        return file;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Video must be 30 seconds or less")),
+        );
+        return null;
+      }
     }
+
     return null;
   }
 
@@ -103,12 +125,6 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
     );
   }
 
-  Future<String?> _getVideoDuration(AssetEntity asset) async {
-    final duration = await asset.duration;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +173,6 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Camera Upload
             Center(
               child: Container(
                 width: SizeConfig.horizontalBlock * 110,
@@ -180,8 +195,10 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
                         if (file == null) return;
 
                         _controller?.dispose();
-                        _controller = VideoPlayerController.file(file)
-                          ..initialize().then((_) => setState(() {}));
+                        _controller = VideoPlayerController.file(file);
+                        await _controller!.initialize();
+                        selectedVideoFile = file; // ✅ Store selected video
+                        setState(() {});
                       },
                     ),
                     Text(
@@ -198,7 +215,6 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
 
             SizedBox(height: 20 * SizeConfig.verticalBlock),
 
-            // Album Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -228,6 +244,21 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
                   width: 90 * SizeConfig.horizontalBlock,
                   height: 40 * SizeConfig.verticalBlock,
                   rad: 5,
+                  onClickButton: () {
+                    if (selectedVideoFile != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ShareCrafterReel(videoFile: selectedVideoFile!),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Please select a video first")),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -259,7 +290,8 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
                             _showAlbums = false;
                             _isLoading = true;
                           });
-                          _loadVideos().then((_) => setState(() => _isLoading = false));
+                          _loadVideos()
+                              .then((_) => setState(() => _isLoading = false));
                         },
                       );
                     },
@@ -269,92 +301,14 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
 
             SizedBox(height: 10 * SizeConfig.verticalBlock),
 
-            // Gallery Videos
             Expanded(
-              child: _permissionDenied
-                  ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.lock_outline, size: 60, color: Colors.grey),
-                    SizedBox(height: 10),
-                    Text(
-                      "Permission to access videos was denied.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16 * SizeConfig.textRatio,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        final PermissionState ps = await PhotoManager.requestPermissionExtend();
-                        if (!mounted) return;
-
-                        if (ps == PermissionState.authorized || ps == PermissionState.limited) {
-                          setState(() {
-                            _permissionDenied = false;
-                          });
-                          await _loadAlbums();
-                          await _loadVideos();
-                        } else if (ps == PermissionState.denied) {
-                          // Just denied, user can try again
-                          setState(() {
-                            _permissionDenied = true;
-                          });
-                        } else if (ps == PermissionState.notDetermined) {
-                          // Still undetermined, will retry
-                          _requestPermissionAndLoad();
-                        } else {
-                          // Permanently denied
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: const Text("Permission Required"),
-                              content: const Text(
-                                  "You have permanently denied access to media. Please enable it from app settings."),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    PhotoManager.openSetting(); // 🔧 Open app settings
-                                  },
-                                  child: const Text("Open Settings"),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      },
-                      child: const Text("Retry"),
-                    ),
-
-                    TextButton(
-                      onPressed: () => PhotoManager.openSetting(),
-                      child: Text("Open Settings"),
-                    ),
-                  ],
-                ),
-              )
-                  : _isLoading
+              child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _galleryVideos.isEmpty
                   ? const Center(child: Text("No videos found"))
                   : GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 5,
                   mainAxisSpacing: 5,
@@ -365,60 +319,51 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
                   return FutureBuilder(
                     future: _getThumbnail(_galleryVideos[index]),
                     builder: (context, snapshot) {
-                      final thumbnail = snapshot.data ??
-                          Container(color: Colors.grey);
+                      final thumbnail =
+                          snapshot.data ?? Container(color: Colors.grey);
+                      return GestureDetector(
+                        onTap: () async {
+                          final file =
+                          await _galleryVideos[index].file;
+                          if (file == null) return;
 
-                      return FutureBuilder(
-                        future: _getVideoDuration(_galleryVideos[index]),
-                        builder: (context, durationSnapshot) {
-                          return GestureDetector(
-                            onTap: () async {
-                              final file = await _galleryVideos[index].file;
-                              if (file == null) return;
+                          final tempController =
+                          VideoPlayerController.file(file);
+                          await tempController.initialize();
+                          final duration = tempController.value.duration;
+                          await tempController.dispose();
 
-                              _controller?.dispose();
-                              _controller = VideoPlayerController.file(file)
-                                ..initialize().then((_) => setState(() {}));
-                            },
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: thumbnail,
-                                ),
-                                Center(
-                                  child: Icon(
-                                    Icons.play_circle_fill,
-                                    color: Colors.white.withOpacity(0.8),
-                                    size: 40,
-                                  ),
-                                ),
-                                if (durationSnapshot.hasData)
-                                  Positioned(
-                                    bottom: 5,
-                                    right: 5,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 4,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(3),
-                                      ),
-                                      child: Text(
-                                        durationSnapshot.data!,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10 * SizeConfig.textRatio,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
+                          if (duration.inSeconds <= 30) {
+                            _controller?.dispose();
+                            _controller =
+                                VideoPlayerController.file(file);
+                            await _controller!.initialize();
+                            selectedVideoFile = file; // ✅ Store file
+                            setState(() {});
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Only videos 30 seconds or shorter are allowed."),
+                              ),
+                            );
+                          }
                         },
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: thumbnail,
+                            ),
+                            Center(
+                              child: Icon(
+                                Icons.play_circle_fill,
+                                color: Colors.white.withOpacity(0.8),
+                                size: 40,
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
@@ -426,15 +371,10 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
               ),
             ),
 
-            // Selected Video Preview
             if (_controller != null && _controller!.value.isInitialized)
               Container(
                 height: 150 * SizeConfig.verticalBlock,
-                margin:
-                EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                ),
+                margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
                 child: Stack(
                   children: [
                     AspectRatio(
@@ -442,23 +382,24 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
                       child: VideoPlayer(_controller!),
                     ),
                     Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8 * SizeConfig.horizontalBlock,
-                          vertical: 4 * SizeConfig.verticalBlock,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          '${_controller!.value.duration.inMinutes}:${(_controller!.value.duration.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12 * SizeConfig.textRatio,
+                      top: 5,
+                      right: 5,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _controller!.dispose();
+                            _controller = null;
+                            selectedVideoFile = null;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
                           ),
+                          child: const Icon(Icons.close,
+                              color: Colors.white, size: 20),
                         ),
                       ),
                     ),
@@ -472,7 +413,3 @@ class _AddCrafterReelState extends State<AddCrafterReel> {
   }
 }
 
-extension on int {
-  get inMinutes => null;
-  get inSeconds => null;
-}

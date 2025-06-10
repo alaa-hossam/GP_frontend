@@ -119,7 +119,7 @@ class handcrafterService {
     }
   }
 
-  Future<String> addHandcrafterReel(String content, String type, File file) async {
+  Future<String> addHandcrafterReel(String content, File file) async {
     print("In handcrafterModel ==========");
 
     // Retrieve the user ID from the token

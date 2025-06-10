@@ -11,6 +11,10 @@ class handcrafterViewModel {
     print("in HVMMMMMMMMMMMM22222222222222222");
     return handcrafterSer.addHandcrafter(handcrafter);
   }
+  Future<String> addHandcrafterReel({required content,required file})async{
+    print("in HVMMMMMMMMMMMM");
+    return handcrafterSer.addHandcrafterReel(content,file);
+  }
 
   Future<handcrafterModel?> fetchHandcrafter() async {
     return handcrafterSer.getHandcrafter();
