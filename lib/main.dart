@@ -31,6 +31,7 @@ import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/views/confirmOrder.dart';
 import 'package:gp_frontend/views/eventsView.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
+import 'package:gp_frontend/views/handicrafterProfileClientView.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/logInView.dart';

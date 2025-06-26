@@ -7,7 +7,7 @@ import '../SqfliteCodes/cart.dart';
 
 class productModel {
   String _imageURL, _name, _id;
-  String? description, handcrafterName, category , handcrafterImage, finalId;
+  String? description, handcrafterName, category , handcrafterImage, finalId, handcrafterId;
   double _price, _rate;
   double? stock , duration;
   int? ratingCount, Quantity;
@@ -31,6 +31,7 @@ class productModel {
       this.finalId,
       this.duration,
       this.variationsWithIds,
+      this.handcrafterId,
       this.custom = false});
 
 
@@ -700,6 +701,7 @@ class productService {
           final int ratingCount = getProduct['ratingCount'] ?? 0;
           final String id = getProduct['id'] ?? 'No ID';
           final String handcrafterName = getProduct['handicrafter']['username'] ?? 'No Name';
+          final String handcrafterId = getProduct['handicrafter']['id'] ?? 'No ID';
           final String categoryName = getProduct['category']['name'] ?? 'No category';
           final List<dynamic> finals = getProduct['finalProducts'] ?? [];
 
@@ -740,6 +742,7 @@ class productService {
             description: description,
             variations: variations,
             handcrafterName: handcrafterName,
+            handcrafterId: handcrafterId,
             reviews: reviews,
             category: categoryName,
             galleryImg: galleryImages,
@@ -785,6 +788,70 @@ class productService {
       'query': Query,
       'variables': {
         'viewerId': viewerId,
+      },
+    };
+
+    try{
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+print(response.statusCode);
+      if(response.statusCode == 200){
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        List<dynamic> getProducts = data['data']?['user']['products'];
+        print(data);
+
+        for(var product in getProducts){
+          productModel myProduct = productModel(product['id'], product['imageUrl'],
+              product['name'], product['lowestCustomPrice'].toDouble(), product['averageRating'].toDouble(), category: product['category']['name']);
+          handcrafterProducts.add(myProduct);
+        }
+        print(handcrafterProducts);
+        return handcrafterProducts;
+
+      }else{
+        print("Error Happen During Fetching");
+        return [];
+      }
+
+
+    }catch (e) {
+      print('Error fetching product: $e');
+      return []; // Provide default values
+    }
+
+
+  }
+  Future<List<productModel>> getHandcrafterProductById(String crafterId) async{
+    List<productModel> handcrafterProducts = [];
+
+    String Query = '''
+    query User {
+    user(id:"${crafterId}") {
+        products {
+            imageUrl
+            averageRating
+            category {
+                name
+            }
+            name
+            lowestCustomPrice
+            id
+        }
+    }
+}
+    ''';
+    final request = {
+      'query': Query,
+      'variables': {
+        'viewerId': crafterId,
       },
     };
 

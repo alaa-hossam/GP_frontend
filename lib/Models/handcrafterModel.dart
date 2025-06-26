@@ -10,20 +10,22 @@ class handcrafterPostModel {
 }
 
 class handcrafterModel {
-  String? name, description , profileURL;
+  String? name, description, profileURL;
   File? profileImage, nationalIdImage;
   List<String>? specializationsId;
   List<handcrafterPostModel>? posts;
+  double? rate;
 
-  handcrafterModel(
-      {this.name,
-       this.profileImage,
-        this.profileURL,
-       this.description,
-      this.specializationsId,
-      this.nationalIdImage,
-      this.posts,
-      });
+  handcrafterModel({
+    this.name,
+    this.profileImage,
+    this.profileURL,
+    this.description,
+    this.specializationsId,
+    this.nationalIdImage,
+    this.posts,
+    this.rate,
+  });
 }
 
 class handcrafterService {
@@ -154,7 +156,7 @@ class handcrafterService {
     request.fields['operations'] = jsonEncode({
       'query': query,
       'variables': {
-        'file':null,
+        'file': null,
       },
     });
 
@@ -234,6 +236,55 @@ class handcrafterService {
             name: getCustomer['name'],
             profileURL: getCustomer['imageUrl'],
             description: getCustomer['description']);
+        return handcrafter;
+      }
+    } catch (e) {
+      print('Error fetching user: $e');
+      return handcrafter;
+    }
+  }
+
+  Future<handcrafterModel?> getHandcrafterById(String Id) async {
+    print("get user profile");
+    Token token = Token();
+
+    handcrafterModel? handcrafter;
+    String query = '''
+        query User {
+        user(id: "${Id}") {
+            handicrafterProfile {
+                description
+                imageUrl
+                name
+                averageRating
+            }
+        }
+    }
+    ''';
+    final request = {
+      'query': query,
+    };
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        final getCustomer = data['data']['user']['handicrafterProfile'];
+        handcrafter = handcrafterModel(
+            name: getCustomer['name'],
+            profileURL: getCustomer['imageUrl'],
+            description: getCustomer['description'],
+          rate: getCustomer['averageRating'].toDouble(),
+        );
         return handcrafter;
       }
     } catch (e) {

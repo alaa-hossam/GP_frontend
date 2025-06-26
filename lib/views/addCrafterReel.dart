@@ -20,7 +20,7 @@ class AddCrafterReel extends StatefulWidget {
 
 class _AddCrafterReelState extends State<AddCrafterReel> {
   VideoPlayerController? _controller;
-  File? selectedVideoFile; // ✅ This will be passed to the next screen
+  File? selectedVideoFile;
 
   List<AssetEntity> _galleryVideos = [];
   bool _showAlbums = false;

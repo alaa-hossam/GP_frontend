@@ -19,4 +19,7 @@ class handcrafterViewModel {
   Future<handcrafterModel?> fetchHandcrafter() async {
     return handcrafterSer.getHandcrafter();
   }
+  Future<handcrafterModel?> fetchHandcrafterById(String Id) async {
+    return handcrafterSer.getHandcrafterById(Id);
+  }
 }

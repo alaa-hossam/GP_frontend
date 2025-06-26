@@ -71,6 +71,9 @@ class productViewModel  extends ChangeNotifier{
   handCrafterProducts(){
     return apiServices.getHandcrafterProduct();
   }
+  handCrafterProductsByID(String crafterId){
+    return apiServices.getHandcrafterProductById(crafterId);
+  }
 
   productVariation(List<String> productIds){
     return apiServices.getAddedProducts(productIds);

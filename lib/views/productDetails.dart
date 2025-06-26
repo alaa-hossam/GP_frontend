@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
+import 'package:gp_frontend/views/handicrafterProfileClientView.dart';
 import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/variationsDetails.dart';
 import '../SqfliteCodes/wishList.dart';
@@ -21,7 +22,6 @@ class _productDetailsState extends State<productDetails> {
   bool isExpanded = false;
   int maxLength = 50;
 
-
   void toggleFavourite(String color, String id) async {
     bool exists = await wishListObj.doesIdExist(id);
     setState(() {
@@ -39,12 +39,10 @@ class _productDetailsState extends State<productDetails> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments as String;
     productProvider productDetails = productProvider();
-
 
     return Scaffold(
       body: FutureBuilder(
@@ -63,7 +61,8 @@ class _productDetailsState extends State<productDetails> {
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding:
+                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Stack(
                         children: [
                           Container(
@@ -71,11 +70,13 @@ class _productDetailsState extends State<productDetails> {
                             width: 361 * SizeConfig.horizontalBlock,
                             decoration: BoxDecoration(
                               color: SizeConfig.iconColor,
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
                             ),
                             child: Center(
                               child: ClipRRect(
-                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
                                 child: Image.network(
                                   myProduct.imageURL,
                                   width: 359 * SizeConfig.horizontalBlock,
@@ -99,11 +100,15 @@ class _productDetailsState extends State<productDetails> {
                                     icon: Icon(
                                       Icons.favorite,
                                       size: 25 * SizeConfig.textRatio,
-                                      color: exists ? Colors.red : SizeConfig.fontColor,
+                                      color: exists
+                                          ? Colors.red
+                                          : SizeConfig.fontColor,
                                     ),
                                     onPressed: () {
                                       toggleFavourite(
-                                        exists ? "red" : "${SizeConfig.fontColor}",
+                                        exists
+                                            ? "red"
+                                            : "${SizeConfig.fontColor}",
                                         myProduct.id,
                                       );
                                     },
@@ -137,11 +142,13 @@ class _productDetailsState extends State<productDetails> {
 
                     // Product Details Section
                     Padding(
-                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding:
+                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Container(
                         width: 361 * SizeConfig.horizontalBlock, // Fixed width
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.textRatio)),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(10 * SizeConfig.textRatio)),
                           color: Color(0X50E9E9E9),
                           border: Border.all(color: SizeConfig.iconColor),
                         ),
@@ -151,20 +158,33 @@ class _productDetailsState extends State<productDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.person_outline),
-                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                                      Text(
-                                        '${myProduct.handcrafterName}',
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 12 * SizeConfig.textRatio,
-                                          color: Color(0x703C3C3C),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                          builder: (context) =>
+                                          HandcrafterProfileClientView(handCrafterId: myProduct.handcrafterId!),
+                                      ),);
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.person_outline),
+                                        SizedBox(
+                                            width:
+                                                5 * SizeConfig.horizontalBlock),
+                                        Text(
+                                          '${myProduct.handcrafterName}',
+                                          style: GoogleFonts.roboto(
+                                            fontSize: 12 * SizeConfig.textRatio,
+                                            color: Color(0x703C3C3C),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   Row(
                                     children: [
@@ -173,7 +193,9 @@ class _productDetailsState extends State<productDetails> {
                                         color: Color(0xFFD4931C),
                                         size: 21 * SizeConfig.textRatio,
                                       ),
-                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                                      SizedBox(
+                                          width:
+                                              5 * SizeConfig.horizontalBlock),
                                       Text("${myProduct.rate}"),
                                     ],
                                   ),
@@ -207,16 +229,19 @@ class _productDetailsState extends State<productDetails> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => Productreviews(reviews: myProduct.reviews!, rate: myProduct.rate), // Ensure myProduct.reviews is not null
+                                          builder: (context) => Productreviews(
+                                              reviews: myProduct.reviews!,
+                                              rate: myProduct
+                                                  .rate), // Ensure myProduct.reviews is not null
                                         ),
-                                      );                                        },
-                                    icon:const Icon(
+                                      );
+                                    },
+                                    icon: const Icon(
                                       Icons.chat,
                                       color: SizeConfig.iconColor,
                                     ),
                                   ),
                                   SizedBox(width: 5 * SizeConfig.verticalBlock),
-
                                   Text(
                                     '${myProduct.ratingCount} Reviews',
                                     style: GoogleFonts.roboto(
@@ -233,7 +258,9 @@ class _productDetailsState extends State<productDetails> {
                     ),
                     SizedBox(height: 10 * SizeConfig.verticalBlock),
 
-                    SizedBox(height: 10 * SizeConfig.verticalBlock,),
+                    SizedBox(
+                      height: 10 * SizeConfig.verticalBlock,
+                    ),
                     // Text('${myProduct.finalProducts}'),
                     variationScreen(myProduct)
                   ],

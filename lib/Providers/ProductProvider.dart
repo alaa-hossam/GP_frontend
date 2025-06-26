@@ -129,8 +129,11 @@ class productProvider extends ChangeNotifier {
 
 
   Future<void> fetchHandCrafter() async {
-
     handCrafterProducts = await productVM.handCrafterProducts();
+    notifyListeners();
+  }
+  Future<void> fetchHandCrafterById(String crafterId) async {
+    handCrafterProducts = await productVM.handCrafterProductsByID(crafterId);
     notifyListeners();
   }
 
