@@ -104,8 +104,12 @@ class paymentService {
         'billing_data': billingData,
         'currency': 'EGP',
         'integration_id': integrationId,
-        'lock_order_when_paid': true
-      }),
+        'lock_order_when_paid': true,
+        "test_mode": true
+
+      }
+
+      ),
     );
 
     return jsonDecode(response.body)['token'];

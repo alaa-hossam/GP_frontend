@@ -294,6 +294,15 @@ class _cartScreenState extends State<cartScreen> {
                       width: 370 * SizeConfig.horizontalBlock,
                       height: 50 * SizeConfig.verticalBlock,
                       onClickButton: () {
+                        List<Map<String, dynamic>> productsToSend = myCart.cartProducts
+                            .map((product) => {
+                          'productId': product.id,
+                          'finalId': product.finalId ?? '', // Add finalId
+                          'quantity': product.Quantity ?? 0,
+                          'product': product,
+                        })
+                            .toList();
+
                         Navigator.pushNamed(
                           context,
                           checkOut.id,
@@ -301,8 +310,8 @@ class _cartScreenState extends State<cartScreen> {
                             'voucher': voucher.text,
                             'price': totalPrice,
                             'percentage': voucherProv.voucher.amount,
-                            'products':myCart.cartProducts,
-                            'type':voucherProv.voucher.type
+                            'products': productsToSend,
+                            'type': voucherProv.voucher.type,
                           },
                         );
                       },

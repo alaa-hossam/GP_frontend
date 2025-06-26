@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/AddressModel.dart';
-import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/confirmOrder.dart';
 import 'package:gp_frontend/widgets/cartAppBar.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:gp_frontend/widgets/messages.dart';
-import 'package:latlong2/latlong.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 import 'chooseAddress.dart';
@@ -26,7 +23,7 @@ class _checkOutState extends State<checkOut> {
   late String voucher;
   late double price;
   late int percentage;
-  late List<productModel> products;
+  late List<Map<String , dynamic>> products;
   late String type;
   int? selectedPaymentIndex;
   AddressModel? addressData;
@@ -370,10 +367,14 @@ class _checkOutState extends State<checkOut> {
                       confirmOrder.id,
                       arguments: {
                         "products": products,
-                        "price":type.toLowerCase() == "amount"? "${price - percentage}": "${price - (price * percentage)}",
-                        "payment":selectedPaymentIndex == 0 ?"assets/images/visa.png" :"assets/images/cash.png",
+                        "price": type.toLowerCase() == "amount"
+                            ? "${price - percentage}"
+                            : "${price - (price * percentage)}",
+                        "payment": selectedPaymentIndex == 0
+                            ? "assets/images/visa.png"
+                            : "assets/images/cash.png",
                         "address": addressData
-                      }
+                      },
                     );
                   },
                 ),

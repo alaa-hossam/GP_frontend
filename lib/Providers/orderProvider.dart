@@ -9,4 +9,13 @@ class orderProvider{
     return await orderVM.createPostOrder(order);
 
   }
+
+  createReadyOrder(orderModel order , String? giftCode ,bool fromBazar)async{
+    return await orderVM.createReadyOrder(order ,giftCode ?? "", fromBazar );
+
+  }
+  createCustomOrder(orderModel order , String? giftCode ,bool fromBazar)async{
+    return await orderVM.createCustomOrder(order ,giftCode ?? "", fromBazar );
+
+  }
 }

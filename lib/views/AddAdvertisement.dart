@@ -27,7 +27,6 @@ class _AddadvertisementState extends State<Addadvertisement> {
   final TextEditingController AdvertisementURL = TextEditingController();
    String Package = "";
    double price = 0;
-  AdvertisementsViewModel AdsVM = AdvertisementsViewModel();
   bool tapped = false;
   bool _isLoading = false;
 
@@ -43,7 +42,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
     }
   }
 
-  Future<String> _saveData(String Transaction) async {
+  String _saveData(String Transaction)  {
     print(tapped);
     if (AdvertisementURL.text.isEmpty ||
         AdvertisementImage == null ||
@@ -54,8 +53,7 @@ class _AddadvertisementState extends State<Addadvertisement> {
     }
 
     try {
-      await AdsVM.addAdvertisement(
-          AdvertisementImage, AdvertisementURL.text, Package, Transaction);
+
       return "Data Added Successfully";
     } catch (e) {
       return "An error occurred: $e";
@@ -233,13 +231,16 @@ class _AddadvertisementState extends State<Addadvertisement> {
                                 ),
                               );
                             } else if (response == "Data Added Successfully") {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        "Your Request Sent successfully!")),
-                              );
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //   SnackBar(
+                              //       content: Text(
+                              //           "Your Request Sent successfully!")),
+                              // );
                               Navigator.pushNamed(context, Paymentscreen.id , arguments:{
                                 'type': "advertisement",
+                                'advertisementImage': AdvertisementImage,
+                                'advertisementURL': AdvertisementURL.text,
+                                'package':Package,
                                 'price':price
                               });
                             } else {

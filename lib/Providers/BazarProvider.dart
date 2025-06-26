@@ -76,7 +76,7 @@ class BazarProvider extends ChangeNotifier {
     return _offers[productId] ?? '';
   }
 
-  /// Use this when navigating to the BazarReview screen
+
   List<Map<String, dynamic>> getSelectedProductDetails() {
     List<Map<String, dynamic>> selectedDetails = [];
 

@@ -1,13 +1,20 @@
 import 'dart:convert';
 
+import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:http/http.dart' as http;
 
 import '../SqfliteCodes/Token.dart';
 
 class orderModel {
   String? addressId, offerId, userId, transactionId;
+  List<Map<String, dynamic>>? products;
 
-  orderModel({this.addressId, this.offerId, this.userId, this.transactionId});
+  orderModel(
+      {this.addressId,
+      this.offerId,
+      this.userId,
+      this.transactionId,
+      this.products});
 }
 
 class orderService {
@@ -15,7 +22,7 @@ class orderService {
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
 
-  Future<String> createOrderByPost(orderModel order) async{
+  Future<String> createOrderByPost(orderModel order) async {
     String query = '''
     mutation CreatePostCustomizedOrder {
     createPostCustomizedOrder(
@@ -28,7 +35,7 @@ class orderService {
 
     final request = {
       'query': query,
-      'variables':{
+      'variables': {
         'addressId': order.addressId,
         'offerId': order.offerId,
         'transactionId': order.transactionId,
@@ -36,8 +43,9 @@ class orderService {
       }
     };
 
+    print(request);
 
-    try{
+    try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       print("Token retrieved: $myToken");
       final response = await http.post(
@@ -49,72 +57,115 @@ class orderService {
         body: jsonEncode(request),
       );
       print(response.statusCode);
+      print(response.body);
 
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         return "order Created Successfully";
       }
       return "Failed to create order";
-
-    }catch(e){
+    } catch (e) {
       return e.toString();
     }
-
   }
 
+  Future<String> createReadyOrder(orderModel order, String giftCode, bool fromBazar) async {
+    List<String> itemsString = [];
 
-//   Future<String> createReadyOrder(orderModel order) async{
-//     String query = '''
-//   mutation CreateReadyMadeOrder {
-//     createReadyMadeOrder(
-//         input: {
-//             addressId: "${order.addressId}"
-//             giftCode: "${}"
-//             items: { isBazarProduct: null, productId: null, quantity: null }
-//             transactionId: null
-//             userId: null
-//         }
-//     ) {
-//         actualPrice
-//         id
-//     }
-// }
-//
-//     ''';
-//
-//     final request = {
-//       'query': query,
-//       'variables':{
-//         'addressId': order.addressId,
-//         'offerId': order.offerId,
-//         'transactionId': order.transactionId,
-//         'userId': order.userId
-//       }
-//     };
-//
-//
-//     try{
-//       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-//       print("Token retrieved: $myToken");
-//       final response = await http.post(
-//         Uri.parse(apiUrl),
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'Authorization': 'Bearer $myToken',
-//         },
-//         body: jsonEncode(request),
-//       );
-//       print(response.statusCode);
-//
-//       if(response.statusCode == 200){
-//         return "order Created Successfully";
-//       }
-//       return "Failed to create order";
-//
-//     }catch(e){
-//       return e.toString();
-//     }
-//
-//   }
+    if (order.products != null) {
+      for (var product in order.products!) {
+        itemsString.add('''
+        {
+          isBazarProduct: ${fromBazar.toString().toLowerCase()},
+          productId: "${product['finalId']}",
+          quantity: ${product['quantity']}
+        }
+      ''');
+      }
+    }
+
+    String query = '''
+    mutation CreateReadyMadeOrder {
+      createReadyMadeOrder(
+        input: {
+          addressId: "${order.addressId}"
+          giftCode: "$giftCode"
+          items: [${itemsString.join(',')}]
+          transactionId: "${order.transactionId}"
+          userId: "${order.userId}"
+        }
+      ) {
+        actualPrice
+      }
+    }
+  ''';
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode({'query': query}),
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        return "Order created successfully";
+      } else {
+        return "Failed to create order: ${response.body}";
+      }
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
+  Future<String> createCustomOrder(orderModel order, String giftCode, bool fromBazar) async {
+
+    String query = '''
+   mutation CreateCustomMadeOrder {
+    createCustomMadeOrder(
+        input: {
+            addressId: "${order.addressId}"
+            giftCode: "$giftCode"
+            productId: "${order.products![0]['finalId']}"
+            quantity: ${order.products![0]['quantity']}
+            transactionId: "${order.transactionId}"
+            userId: "${order.userId}"
+        }
+    ){
+            id
+}
+}
+
+  ''';
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      print("Token retrieved: $myToken");
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode({'query': query}),
+      );
 
 
+
+      if (response.statusCode == 200) {
+        return "Order created successfully";
+      } else {
+        return "Failed to create order: ${response.body}";
+      }
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
 }

@@ -199,9 +199,10 @@ class customOffer extends StatelessWidget {
                                     context,
                                     chooseAddress.id,
                                   ) as AddressModel;
-
+print(selectedAddress.id);
                                   Navigator.pushNamed(context, Paymentscreen.id,
                                       arguments: {
+                                    'type':'offer',
                                         'price': offer.price,
                                         'offerId': offer.id,
                                         'addressId': selectedAddress.id
