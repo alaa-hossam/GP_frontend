@@ -10,7 +10,6 @@ class productProvider extends ChangeNotifier {
   productViewModel productVM = productViewModel();
   List<productModel> _products = [] , handCrafterProducts = [];
   List<productModel> get products => _products;
-  List<productModel>  bazarProducts = [];
   List<productModel> _giftRecommendProducts = [];
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
   List<productModel> _historyProducts = [];
@@ -141,11 +140,7 @@ class productProvider extends ChangeNotifier {
     return await productVM.productVariation(productIds);
   }
 
-  getBazarProducts()async{
-    print("in bazar");
-     bazarProducts = await productVM.getBazarProducts();
-     notifyListeners();
-  }
+
 
 
   Future<List<String>> getCartIds()async{

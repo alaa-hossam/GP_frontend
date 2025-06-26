@@ -33,7 +33,7 @@ class AdvertisementProvider with ChangeNotifier {
   void startAutoScroll() {
     _autoScrollTimer?.cancel(); // prevent duplicates
 
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 7), (_) {
       if (ads.isEmpty) return;
 
       int nextPage = _currentIndex + 1;

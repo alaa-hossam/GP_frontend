@@ -4,6 +4,8 @@ import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
 import 'package:gp_frontend/Providers/BazarProvider.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
+import 'package:gp_frontend/views/joinBazar.dart';
+import 'package:gp_frontend/views/showBazar.dart';
 import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
@@ -36,7 +38,6 @@ class _HomeState extends State<Home> {
   late Token token;
   late String role;
 
-
   @override
   void initState() {
     super.initState();
@@ -50,8 +51,8 @@ class _HomeState extends State<Home> {
         Provider.of<AdvertisementProvider>(context, listen: false);
     final bazarProvider = Provider.of<BazarProvider>(context, listen: false);
 
-     token = Token();
-     role = await token.getRole('SELECT ROLE FROM TOKENS');
+    token = Token();
+    role = await token.getRole('SELECT ROLE FROM TOKENS');
 
     await Future.wait<void>([
       catProvider.fetchCategories(),
@@ -64,7 +65,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-
 
     return Scaffold(
       drawer: Mydrawer(),
@@ -97,7 +97,6 @@ class _HomeState extends State<Home> {
         ),
         IconButton(
           onPressed: () async {
-
             // Navigate to the appropriate profile based on the role
             if (role == 'Handicrafter') {
               Navigator.pushNamed(context, MyHandcrafterProfile.id);
@@ -184,7 +183,7 @@ class _HomeState extends State<Home> {
     return Column(
       children: [
         SizedBox(
-          height: 160,
+          height: 160 * SizeConfig.verticalBlock,
           child: PageView.builder(
             controller: provider.pageController,
             itemCount: totalItems,
@@ -206,7 +205,6 @@ class _HomeState extends State<Home> {
                           height: double.infinity,
                         ),
                       ),
-
                       Positioned(
                         bottom: 16,
                         left: 16,
@@ -219,17 +217,24 @@ class _HomeState extends State<Home> {
                               fontColor: Colors.white,
                               height: 35 * SizeConfig.verticalBlock,
                               width: 70 * SizeConfig.horizontalBlock,
+                              onClickButton: () => {
+                                Navigator.pushNamed(context, showBazar.id,
+                                    arguments: bazar.activeBazar.id)
+                              },
                             ),
-
-                            SizedBox(width: 20 * SizeConfig.horizontalBlock,),
-                         if (role == 'Handicrafter')
-                            customizeButton(
-                              buttonName: "Join",
-                              buttonColor: SizeConfig.secondColor,
-                              fontColor: Colors.white,
-                              height: 35 * SizeConfig.verticalBlock,
-                              width: 70 * SizeConfig.horizontalBlock,
+                            SizedBox(
+                              width: 20 * SizeConfig.horizontalBlock,
                             ),
+                            if (role == 'Handicrafter')
+                              customizeButton(
+                                buttonName: "Join",
+                                buttonColor: SizeConfig.secondColor,
+                                fontColor: Colors.white,
+                                height: 35 * SizeConfig.verticalBlock,
+                                width: 70 * SizeConfig.horizontalBlock,
+                                onClickButton: () =>
+                                    Navigator.pushNamed(context, JoinBazar.id),
+                              ),
                           ],
                         ),
                       ),
@@ -238,7 +243,6 @@ class _HomeState extends State<Home> {
                 );
               }
 
-              // 📸 Rest of the ads (shifted if bazar is present)
               final adIndex = hasBazar ? index - 1 : index;
 
               if (provider.ads.isEmpty) {
@@ -298,7 +302,7 @@ class _HomeState extends State<Home> {
 
   Widget _buildCategories(CategoryProvider provider) {
     return SizedBox(
-      height: 43,
+      height: 43 * SizeConfig.verticalBlock,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: provider.categories.length,

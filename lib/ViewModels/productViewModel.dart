@@ -79,9 +79,7 @@ class productViewModel  extends ChangeNotifier{
     return apiServices.getAddedProducts(productIds);
   }
 
-  getBazarProducts(){
-    return apiServices.getBazarProducts();
-  }
+
   getFinalProductVariations(String productId){
     return apiServices.getFinalProductVariations(productId);
   }

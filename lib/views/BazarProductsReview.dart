@@ -179,7 +179,7 @@ class _BazarReviewState extends State<BazarReview> {
                           : customizeButton(buttonColor: SizeConfig.iconColor,
                         buttonName: "Finish",fontColor: Colors.white,width: 175 * SizeConfig.horizontalBlock,
                       height: 50 * SizeConfig.verticalBlock,onClickButton: (){
-                            Navigator.pushNamedAndRemoveUntil(context, showBazar.id ,ModalRoute.withName('/Home'),  );
+                            Navigator.pushNamedAndRemoveUntil(context, showBazar.id,ModalRoute.withName('/Home'),  );
                         },),
 
                     ],

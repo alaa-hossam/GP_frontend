@@ -41,7 +41,7 @@ class _customProductState extends State<customProduct> {
   String imageURL, Name, id;
   double Price, rate;
   wishList wishListObj = wishList();
-  bool showCompare;
+  bool? showCompare , bazar;
   int? comparNum;
   String? Category,compareName;
   final Function(productModel)? onComparePressed;
@@ -54,7 +54,7 @@ class _customProductState extends State<customProduct> {
 
   _customProductState(this.imageURL, this.Name, this.Price,
       this.rate, this.id, this.showCompare,
-      {this.onComparePressed, this.comparNum , this.Category , this.compareName});
+      {this.onComparePressed, this.comparNum , this.Category , this.compareName ,this.bazar });
 
 
 
@@ -127,7 +127,6 @@ class _customProductState extends State<customProduct> {
 
   @override
   Widget build(BuildContext context) {
-    final myProductProvider = Provider.of<productProvider>(context, listen: true);
 
     return GestureDetector(
       child: Container(

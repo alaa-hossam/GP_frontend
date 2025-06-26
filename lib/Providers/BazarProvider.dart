@@ -9,8 +9,11 @@ class BazarProvider extends ChangeNotifier {
   Map<String, bool> productSelections = {}; // Tracks selected variations
   final Map<String, String> _quantityValues = {}; // Stores quantity per variationId
   final Map<String, String> _offers = {}; // Stores offer per productId
+  bool loading = false;
 
   BazarModel activeBazar = BazarModel();
+  List<productModel>  bazarProducts = [];
+
 
   productViewModel productVM = productViewModel();
   BazarViewModel bazarVM = BazarViewModel();
@@ -134,6 +137,15 @@ class BazarProvider extends ChangeNotifier {
     activeBazar =  await bazarVM.getActiveBazar();
     print(activeBazar);
     print(activeBazar.id);
+    notifyListeners();
+  }
+
+  getBazarProducts(String id)async{
+    print("in bazar");
+    loading = true;
+    notifyListeners();
+    bazarProducts = await bazarVM.getBazarProducts(id);
+    loading = false;
     notifyListeners();
   }
 

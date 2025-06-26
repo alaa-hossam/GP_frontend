@@ -6,4 +6,8 @@ class BazarViewModel{
   Future<BazarModel> getActiveBazar()async{
     return await ApiService.getActiveBazar();
   }
+
+  getBazarProducts(String id){
+    return ApiService.getBazarProducts(id);
+  }
 }
