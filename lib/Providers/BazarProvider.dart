@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/Models/BazarModel.dart';
+import 'package:gp_frontend/ViewModels/BazarViewModel.dart';
 import '../Models/ProductModel.dart';
 import '../ViewModels/productViewModel.dart';
 
@@ -8,7 +10,10 @@ class BazarProvider extends ChangeNotifier {
   final Map<String, String> _quantityValues = {}; // Stores quantity per variationId
   final Map<String, String> _offers = {}; // Stores offer per productId
 
+  BazarModel activeBazar = BazarModel();
+
   productViewModel productVM = productViewModel();
+  BazarViewModel bazarVM = BazarViewModel();
 
   BazarProvider() {
     productSelections.clear();
@@ -121,6 +126,15 @@ class BazarProvider extends ChangeNotifier {
     }
 
     return total;
+  }
+
+
+  Future<void> getActiveBazar()async{
+    print("...................");
+    activeBazar =  await bazarVM.getActiveBazar();
+    print(activeBazar);
+    print(activeBazar.id);
+    notifyListeners();
   }
 
 }

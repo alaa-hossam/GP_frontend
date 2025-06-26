@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:gp_frontend/Models/BazarModel.dart';
 import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
+import 'package:gp_frontend/Providers/BazarProvider.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
+import 'package:gp_frontend/widgets/customizeButton.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +33,9 @@ class _HomeState extends State<Home> {
   TextEditingController search = TextEditingController();
   int selectedIndex = 0;
   late Future<void> _initialization;
+  late Token token;
+  late String role;
+
 
   @override
   void initState() {
@@ -40,19 +46,25 @@ class _HomeState extends State<Home> {
   Future<void> _fetchInitialData() async {
     final catProvider = Provider.of<CategoryProvider>(context, listen: false);
     final productProv = Provider.of<productProvider>(context, listen: false);
-    final adsProvider = Provider.of<AdvertisementProvider>(context, listen: false);
+    final adsProvider =
+        Provider.of<AdvertisementProvider>(context, listen: false);
+    final bazarProvider = Provider.of<BazarProvider>(context, listen: false);
+
+     token = Token();
+     role = await token.getRole('SELECT ROLE FROM TOKENS');
 
     await Future.wait<void>([
       catProvider.fetchCategories(),
       productProv.fetchProducts('0'),
       adsProvider.getAdvertisement(),
+      bazarProvider.getActiveBazar()
     ]);
-
   }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
 
     return Scaffold(
       drawer: Mydrawer(),
@@ -71,8 +83,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-
-
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -87,8 +97,7 @@ class _HomeState extends State<Home> {
         ),
         IconButton(
           onPressed: () async {
-            final token = Token();
-            final role = await token.getRole('SELECT ROLE FROM TOKENS');
+
             // Navigate to the appropriate profile based on the role
             if (role == 'Handicrafter') {
               Navigator.pushNamed(context, MyHandcrafterProfile.id);
@@ -117,16 +126,18 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
   Widget _buildHomeContent() {
     final adsProvider = Provider.of<AdvertisementProvider>(context);
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final productProv = Provider.of<productProvider>(context);
+    final bazarProvider = Provider.of<BazarProvider>(context);
 
     return ListView(
       children: [
         _buildSearchBar(),
         SizedBox(height: 10),
-        _buildAdsSection(adsProvider),
+        _buildAdsSection(adsProvider, bazarProvider),
         SizedBox(height: 10),
         _buildCategories(categoryProvider),
         SizedBox(height: 10),
@@ -152,7 +163,9 @@ class _HomeState extends State<Home> {
               icon: Icons.search,
               suffixIcon: IconButton(
                 icon: Icon(Icons.camera_alt_outlined),
-                onPressed: () {Navigator.pushNamed(context, searchView.id);},
+                onPressed: () {
+                  Navigator.pushNamed(context, searchView.id);
+                },
               ),
               // onClickFunction:(context) => _navigateToSearch(),
             ),
@@ -164,25 +177,81 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildAdsSection(AdvertisementProvider provider) {
+  Widget _buildAdsSection(AdvertisementProvider provider, BazarProvider bazar) {
+    final hasBazar = bazar.activeBazar.id != null;
+    final totalItems = provider.ads.length + (hasBazar ? 1 : 0);
+
     return Column(
       children: [
         SizedBox(
           height: 160,
           child: PageView.builder(
             controller: provider.pageController,
-            itemCount: provider.ads.length,
+            itemCount: totalItems,
             onPageChanged: provider.updateCurrentIndex,
             itemBuilder: (context, index) {
-              final ad = provider.ads[index];
-              if(provider.ads.isEmpty){
-                return const Center(child: CircularProgressIndicator());
+              if (hasBazar && index == 0) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 10.0 * SizeConfig.horizontalBlock),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(10 * SizeConfig.horizontalBlock)),
+                        child: Image.asset(
+                          "assets/images/bazar.png",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
 
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        child: Row(
+                          children: [
+                            customizeButton(
+                              buttonName: "Open",
+                              buttonColor: SizeConfig.secondColor,
+                              fontColor: Colors.white,
+                              height: 35 * SizeConfig.verticalBlock,
+                              width: 70 * SizeConfig.horizontalBlock,
+                            ),
+
+                            SizedBox(width: 20 * SizeConfig.horizontalBlock,),
+                         if (role == 'Handicrafter')
+                            customizeButton(
+                              buttonName: "Join",
+                              buttonColor: SizeConfig.secondColor,
+                              fontColor: Colors.white,
+                              height: 35 * SizeConfig.verticalBlock,
+                              width: 70 * SizeConfig.horizontalBlock,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
-              return Padding(
-                padding:  EdgeInsets.only(left: 10.0 * SizeConfig.horizontalBlock , right: 10* SizeConfig.horizontalBlock),
-                child: GestureDetector(
 
+              // 📸 Rest of the ads (shifted if bazar is present)
+              final adIndex = hasBazar ? index - 1 : index;
+
+              if (provider.ads.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final ad = provider.ads[adIndex];
+
+              return Padding(
+                padding: EdgeInsets.only(
+                    left: 10.0 * SizeConfig.horizontalBlock,
+                    right: 10 * SizeConfig.horizontalBlock),
+                child: GestureDetector(
                   onTap: () async {
                     final url = Uri.parse(ad.link!);
                     if (!await launchUrl(url, mode: LaunchMode.inAppWebView)) {
@@ -190,10 +259,11 @@ class _HomeState extends State<Home> {
                     }
                   },
                   child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(10 * SizeConfig.horizontalBlock)),
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(10 * SizeConfig.horizontalBlock)),
                     child: Image.network(
-
-                        ad.imageUrl ?? '', fit: BoxFit.cover
+                      ad.imageUrl ?? '',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -201,19 +271,22 @@ class _HomeState extends State<Home> {
             },
           ),
         ),
-        SizedBox(height: 10),
+
+        const SizedBox(height: 10),
+
+        // 🟣 Dots indicator
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            provider.ads.length,
-                (index) => Container(
-              margin: EdgeInsets.symmetric(horizontal: 5),
+            totalItems,
+            (index) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5),
               width: 10,
               height: 10,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: index == provider.currentIndex
-                    ? Color(0xFFB36995)
+                    ? const Color(0xFFB36995)
                     : Colors.grey,
               ),
             ),
@@ -278,9 +351,8 @@ class _HomeState extends State<Home> {
         itemCount: products.length,
         itemBuilder: (context, index) {
           final product = products[index];
-          if(products.isEmpty){
+          if (products.isEmpty) {
             return const Center(child: CircularProgressIndicator());
-
           }
           return Row(
             children: [
@@ -301,4 +373,3 @@ class _HomeState extends State<Home> {
     );
   }
 }
-

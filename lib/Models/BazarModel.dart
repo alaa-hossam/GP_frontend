@@ -6,6 +6,8 @@ import '../SqfliteCodes/Token.dart';
 
 class BazarModel{
   String? id;
+
+  BazarModel({this.id});
 }
 
 class BazarService{
@@ -40,7 +42,8 @@ class BazarService{
             'Authorization': 'Bearer $myToken',
           },
           body: jsonEncode(request));
-      bazar = jsonDecode(respone.body)['data']['getActiveBazars']['id'];
+
+      bazar =BazarModel(id: jsonDecode(respone.body)['data']['getActiveBazars'][0]['id']) ;
       return bazar;
     }catch(e){
       print("error in getting packages: ${e}");

@@ -55,6 +55,7 @@ flutter:
     - assets/images/p3.jpg
     - assets/images/logo.png
     - assets/images/
+    - assets/images/bazar.png
 
   # Add the flutter_icons section for your app icon
 flutter_icons:
