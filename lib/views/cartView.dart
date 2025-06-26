@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gp_frontend/Models/voucherModel.dart';
 import 'package:gp_frontend/Providers/cartProvider.dart';
 import 'package:gp_frontend/Providers/voucherProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
@@ -31,8 +30,6 @@ class _cartScreenState extends State<cartScreen> {
   Cart cart = Cart();
   TextEditingController voucher = TextEditingController();
   String? _selectedOption;
-  // voucherProvider myVoucherProvider = voucherProvider();
-  // voucherModel voucherM = voucherModel(code: "", amount: 0, type: "", id: "");
   voucherProvider? _voucherProvider;
 
 

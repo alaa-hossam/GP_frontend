@@ -2,17 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/AddressModel.dart';
-import 'package:gp_frontend/Providers/cartProvider.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
 import 'package:gp_frontend/views/showOrders.dart';
 import 'package:gp_frontend/widgets/messages.dart';
 
 import '../Models/ProductModel.dart';
+import '../Providers/ProductProvider.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/cartAppBar.dart';
 import '../widgets/customizeButton.dart';
 import 'Home.dart';
-import 'chooseAddress.dart';
 
 class confirmOrder extends StatefulWidget {
   static String id = "confirmOrder";
@@ -27,6 +26,9 @@ class _confirmOrderState extends State<confirmOrder> {
   late double price;
   late List<productModel> products;
   late AddressModel myAddress;
+  productProvider prodProvider = productProvider();
+  late bool isCustom;
+
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args =
@@ -36,10 +38,17 @@ class _confirmOrderState extends State<confirmOrder> {
     price = double.tryParse(args?['price'])!;
     products = args?['products'] ?? [];
     myAddress = args?['address'] ?? [];
+
+  }
+
+  Future isCustomProducts()async{
+    isCustom =await prodProvider.checkCustom();
+
   }
 
   @override
   Widget build(BuildContext context) {
+    isCustomProducts();
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -390,8 +399,12 @@ class _confirmOrderState extends State<confirmOrder> {
                   height: 50 * SizeConfig.verticalBlock,
                   onClickButton: () {
                     if(payment == "assets/images/visa.png"){
-                      Navigator.pushNamed(context, Paymentscreen.id, arguments:
-                      price);
+                      Navigator.pushNamed(context, Paymentscreen.id,
+                          arguments:{
+                          'type':isCustom ? "custom" : "notCustom",
+                            'price':price
+                          }
+                      );
                     }else{
 
                       showCustomPopup(context, "Payment Successful",

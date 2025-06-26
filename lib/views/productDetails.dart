@@ -62,7 +62,7 @@ class _productDetailsState extends State<productDetails> {
                   children: [
                     Padding(
                       padding:
-                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Stack(
                         children: [
                           Container(
@@ -71,12 +71,12 @@ class _productDetailsState extends State<productDetails> {
                             decoration: BoxDecoration(
                               color: SizeConfig.iconColor,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                              BorderRadius.all(Radius.circular(15)),
                             ),
                             child: Center(
                               child: ClipRRect(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                                BorderRadius.all(Radius.circular(15)),
                                 child: Image.network(
                                   myProduct.imageURL,
                                   width: 359 * SizeConfig.horizontalBlock,
@@ -143,7 +143,7 @@ class _productDetailsState extends State<productDetails> {
                     // Product Details Section
                     Padding(
                       padding:
-                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Container(
                         width: 361 * SizeConfig.horizontalBlock, // Fixed width
                         decoration: BoxDecoration(
@@ -159,23 +159,23 @@ class _productDetailsState extends State<productDetails> {
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                     onTap: () {
                                       Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
+                                        context,
+                                        MaterialPageRoute(
                                           builder: (context) =>
-                                          HandcrafterProfileClientView(handCrafterId: myProduct.handcrafterId!),
-                                      ),);
+                                              HandcrafterProfileClientView(handCrafterId: myProduct.handcrafterId!),
+                                        ),);
                                     },
                                     child: Row(
                                       children: [
                                         Icon(Icons.person_outline),
                                         SizedBox(
                                             width:
-                                                5 * SizeConfig.horizontalBlock),
+                                            5 * SizeConfig.horizontalBlock),
                                         Text(
                                           '${myProduct.handcrafterName}',
                                           style: GoogleFonts.roboto(
@@ -195,7 +195,7 @@ class _productDetailsState extends State<productDetails> {
                                       ),
                                       SizedBox(
                                           width:
-                                              5 * SizeConfig.horizontalBlock),
+                                          5 * SizeConfig.horizontalBlock),
                                       Text("${myProduct.rate}"),
                                     ],
                                   ),

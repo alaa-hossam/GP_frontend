@@ -12,7 +12,7 @@ import 'ProfileView.dart';
 
 class Paymentscreen extends StatefulWidget {
   static String id = "Paymentscreen";
-  const Paymentscreen({super.key});
+
 
   @override
   State<Paymentscreen> createState() => _PaymentscreenState();
@@ -22,7 +22,7 @@ class _PaymentscreenState extends State<Paymentscreen> {
   late WebViewController _controller;
   bool isLoading = true;
   late double price;
-  late String offerId, addressId;
+  late String offerId, addressId , type;
   bool _hasInitialized = false;
   orderProvider myOrderProvider = orderProvider();
 
@@ -32,16 +32,20 @@ class _PaymentscreenState extends State<Paymentscreen> {
     if (!_hasInitialized) {
       final args =
           ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      price = args['price'] ?? 0;
-      offerId = args['offerId'] ?? "";
-      addressId = args['addressId'] ?? "";
+      type = args['type'];
+      if(type == "offer"){
+        price = args['price'] ?? 0;
+        offerId = args['offerId'] ?? "";
+        addressId = args['addressId'] ?? "";
+      }
+
 
       initPayment();
       _hasInitialized = true;
     }
   }
 
-  Future<void> _sendTransactionIdToBackend(String transactionId) async {
+  Future<void> _offerPost(String transactionId) async {
     Token token = Token();
     String id = await token.getUUID('SELECT UUID FROM TOKENS');
 
@@ -55,7 +59,11 @@ class _PaymentscreenState extends State<Paymentscreen> {
   void _handlePaymentSuccess(String transactionId) {
     debugPrint("✅ Payment Successful! Transaction ID: $transactionId");
 
-    _sendTransactionIdToBackend(transactionId);
+    if(type == "offer"){
+      _offerPost(transactionId);
+
+    }
+
 
     Navigator.pushReplacementNamed(context, '/PaymentResult', arguments: {
       'status': 'success',

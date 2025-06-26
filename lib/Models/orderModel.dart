@@ -51,12 +51,7 @@ class orderService {
       print(response.statusCode);
 
       if(response.statusCode == 200){
-        // final data = jsonDecode(response.body);
-        // print(data);
-        // List<dynamic> order = data['data']['createPostCustomizedOrder']['id'];
-        // print("......................................................................................");
-        // print("......................................................................................");
-        // return jsonDecode(response.body)['data']['createPostCustomizedOrder']['id'];
+
         return "order Created Successfully";
       }
       return "Failed to create order";
@@ -66,4 +61,59 @@ class orderService {
     }
 
   }
+
+
+//   Future<String> createReadyOrder(orderModel order) async{
+//     String query = '''
+//   mutation CreateReadyMadeOrder {
+//     createReadyMadeOrder(
+//         input: {
+//             addressId: "${order.addressId}"
+//             giftCode: "${}"
+//             items: { isBazarProduct: null, productId: null, quantity: null }
+//             transactionId: null
+//             userId: null
+//         }
+//     ) {
+//         actualPrice
+//         id
+//     }
+// }
+//
+//     ''';
+//
+//     final request = {
+//       'query': query,
+//       'variables':{
+//         'addressId': order.addressId,
+//         'offerId': order.offerId,
+//         'transactionId': order.transactionId,
+//         'userId': order.userId
+//       }
+//     };
+//
+//
+//     try{
+//       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+//       print("Token retrieved: $myToken");
+//       final response = await http.post(
+//         Uri.parse(apiUrl),
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $myToken',
+//         },
+//         body: jsonEncode(request),
+//       );
+//       print(response.statusCode);
+//
+//       if(response.statusCode == 200){
+//         return "order Created Successfully";
+//       }
+//       return "Failed to create order";
+//
+//     }catch(e){
+//       return e.toString();
+//     }
+//
+//   }
 }

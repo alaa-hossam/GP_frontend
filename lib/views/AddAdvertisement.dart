@@ -238,7 +238,10 @@ class _AddadvertisementState extends State<Addadvertisement> {
                                     content: Text(
                                         "Your Request Sent successfully!")),
                               );
-                              Navigator.pushNamed(context, Paymentscreen.id , arguments: price);
+                              Navigator.pushNamed(context, Paymentscreen.id , arguments:{
+                                'type': "advertisement",
+                                'price':price
+                              });
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(response)),
