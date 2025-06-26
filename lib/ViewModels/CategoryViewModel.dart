@@ -6,6 +6,8 @@ class CategoryViewModel extends ChangeNotifier {
   final CategoryService apiServices = CategoryService();
   List<CategoryModel> _categories = [CategoryModel("0", "All")];
   List<CategoryModel> get categories => _categories;
+  List<CategoryModel> _allCategories = [];
+  List<CategoryModel> get allCategories => _allCategories;
   List<CategoryModel> _specialization = [];
   List<CategoryModel> get specialization => _specialization;
   List<CategoryModel> _categoryCildren = [];
@@ -30,6 +32,18 @@ class CategoryViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint("Error fetching Specialization: $e");
       _specialization = [];
+      notifyListeners();
+    }
+  }
+  Future<void> fetchAllCatefories() async {
+    try {
+      _allCategories = await apiServices.getAllCategories();
+      print("in VM");
+      print(_allCategories.length);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching all categories: $e");
+      _allCategories = [];
       notifyListeners();
     }
   }

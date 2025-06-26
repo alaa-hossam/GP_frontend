@@ -8,18 +8,25 @@ class CategoryProvider with ChangeNotifier {
   List<CategoryModel> _categories = [];
   List<CategoryModel> get categories => _categories;
 
+  List<CategoryModel> _AllCategories = [];
+  List<CategoryModel> get AllCategories => _AllCategories;
+
   List<CategoryModel> _categoryCildren = [];
   List<CategoryModel> get categoryCildren => _categoryCildren;
 
   List<CategoryModel> _specialization = [];
   List<CategoryModel> get specialization => _specialization;
 
-  // Single specialization selection
   String? _selectedSpecialization;
   String? _selectedSpecializationId;
+  String? _selectedCategory;
+  String? _selectedCategoryId;
 
   String? get selectedSpecialization => _selectedSpecialization;
   String? get selectedSpecializationId => _selectedSpecializationId;
+
+  String? get selectedCategory => _selectedCategory;
+  String? get selectedCategoryId => _selectedCategoryId;
 
   CategoryProvider() {
     print("CategoryProvider initialized");
@@ -30,6 +37,14 @@ class CategoryProvider with ChangeNotifier {
     await categoryVM.fetchCats();
     _categories = categoryVM.categories.map((cat) => cat).toList();
     print("Categories fetched: $_categories");
+    notifyListeners();
+  }
+
+  Future<void> fetchAllCategories() async {
+    print("Fetching all categories...");
+    await categoryVM.fetchAllCatefories();
+    _AllCategories = categoryVM.allCategories.map((cat) => cat).toList();
+    print("Categories fetched: $_AllCategories");
     notifyListeners();
   }
 
@@ -50,6 +65,12 @@ class CategoryProvider with ChangeNotifier {
   }
 
   // Select a single specialization
+  void selectCategory(String name, String id) {
+    _selectedCategory = name;
+    _selectedCategoryId = id;
+    notifyListeners();
+  }
+
   void selectSpecialization(String name, String id) {
     _selectedSpecialization = name;
     _selectedSpecializationId = id;
@@ -62,4 +83,10 @@ class CategoryProvider with ChangeNotifier {
     _selectedSpecializationId = null;
     notifyListeners();
   }
+  void clearSelectedCategory() {
+    _selectedCategory = null;
+    _selectedCategoryId = null;
+    notifyListeners();
+  }
+
 }

@@ -61,6 +61,54 @@ class CategoryService {
       return myCategories;
     }
   }
+
+  Future<List<CategoryModel>> getAllCategories() async {
+    List<CategoryModel> myCategories = [];
+    final request = {
+      'query': '''
+      query GetAllCategories {
+    getAllCategories {
+        id
+        name
+    }
+}
+
+      ''',
+    };
+    try {
+
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> categories = data['data']['getAllCategories'];
+        print(categories);
+        myCategories.clear();
+
+        for (var category in categories) {
+          myCategories.add(CategoryModel(category['id'], category['name']));
+        }
+
+        print("Categories fetched successfully: $myCategories");
+        return myCategories;
+      } else {
+        throw Exception('Failed to load categories: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching categories: $e");
+      return myCategories;
+    }
+  }
+
   Future<List<CategoryModel>> getAllSpcialization() async {
     List<CategoryModel> myCategories = [];
     final request = {
@@ -106,8 +154,6 @@ class CategoryService {
       return myCategories;
     }
   }
-
-
 
   Future<List<CategoryModel>> getCategoryChild(String parentId) async {
     List<CategoryModel> myCategories = [];
