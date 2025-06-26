@@ -23,5 +23,8 @@ class handcrafterViewModel {
   Future<handcrafterModel?> fetchHandcrafterById(String Id) async {
     return handcrafterSer.getHandcrafterById(Id);
   }
+  Future<bool> deleteHandcrafterReel(String Id) async {
+    return handcrafterSer.deleteHandCrafterPost(Id);
+  }
 
 }

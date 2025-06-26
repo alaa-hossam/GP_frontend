@@ -273,7 +273,6 @@ class handcrafterService {
     return null;
   }
 
-
   Future<handcrafterModel?> getHandcrafterById(String id) async {
     print("Fetching handcrafter reels...");
     Token token = Token();
@@ -346,5 +345,45 @@ class handcrafterService {
     }
 
     return null;
+  }
+
+  Future<bool> deleteHandCrafterPost(String postId) async {
+    print("delete handcrafter reel...");
+    Token token = Token();
+
+    String query = '''
+    mutation DeleteHandicrafterPost {
+    deleteHandicrafterPost(postId: "${postId}")
+}
+  ''';
+
+    final request = {
+      'query': query,
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final output = data['data']['deleteHandicrafterPost'];
+        return output;
+      } else {
+        print("HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print('Error fetching handcrafter reels: $e');
+    }
+
+    return false;
   }
 }

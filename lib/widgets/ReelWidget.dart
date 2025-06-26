@@ -52,6 +52,7 @@ class _ReelsWidgetState extends State<ReelsWidget> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -93,12 +94,26 @@ class _ReelsWidgetState extends State<ReelsWidget> {
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
             left: 8,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                _controller.pause();
-                Navigator.pop(context);
-              },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new, color: Colors.black,size: 20 * SizeConfig.textRatio,),
+                      onPressed: () {
+                        _controller.pause();
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Text("Reels",
+                      style: TextStyle(
+                        fontSize: 20 * SizeConfig.textRatio,
+                        fontFamily: "Rubik",
+                      ),),
+                  ],
+                ),
+              ],
             ),
           ),
 

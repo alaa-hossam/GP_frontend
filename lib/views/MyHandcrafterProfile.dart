@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/handcrafterModel.dart';
 import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
 import 'package:gp_frontend/views/ReelsView.dart';
+import 'package:gp_frontend/views/addProduct.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -235,6 +236,9 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                       textSize: 14 * SizeConfig.textRatio,
                       width: _calculateButtonWidth("Add Product", context),
                       height: 40 * SizeConfig.verticalBlock,
+                      onClickButton: () {
+                        Navigator.pushNamed(context, AddProduct.id);
+                      },
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                     customizeButton(
