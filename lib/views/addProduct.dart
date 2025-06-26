@@ -21,6 +21,9 @@ class AddProduct extends StatefulWidget {
 class _AddProductState extends State<AddProduct> {
   final TextEditingController productName = TextEditingController();
   final TextEditingController description = TextEditingController();
+  final TextEditingController sizeUnit = TextEditingController();
+  final TextEditingController sizeValue = TextEditingController();
+  final List<TextEditingController> sizeValueControllers = [];
   File? productImage;
   bool _isLoading = false;
   bool? hasVariations;
@@ -354,42 +357,146 @@ class _AddProductState extends State<AddProduct> {
             ),
           ],
           if (selectedTabIndex == 1) ...[
-            if (hasVariations == false || selectedVariations.isEmpty) ...[
-              Padding(
-                padding: EdgeInsets.only(
-                    bottom: 10 * SizeConfig.verticalBlock,
-                    top: 300 * SizeConfig.verticalBlock),
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 15 * SizeConfig.horizontalBlock,
+                  vertical: 10 * SizeConfig.verticalBlock,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  spacing: 10 * SizeConfig.verticalBlock,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Text(
-                        "There is no variations",
+                    if (selectedVariations.contains("Size")) ...[
+                      SizedBox(height: 8 * SizeConfig.verticalBlock),
+                      MyTextFormField(
+                        controller: sizeUnit,
+                        labelText: "Size Unit",
+                        labelStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: SizeConfig.textRatio * 18,
+                          fontFamily: 'Roboto',
+                        ),
+                        width: 350 * SizeConfig.horizontalBlock,
+                        height: 40 * SizeConfig.verticalBlock,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        "Size Value",
                         style: TextStyle(
-                          fontSize: 24 * SizeConfig.textRatio,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Rubik",
-                          color: Color(0xFF3C3C3C).withOpacity(0.5),
+                          color: Colors.black,
+                          fontSize: SizeConfig.textRatio * 18,
+                          fontFamily: 'Roboto',
                         ),
                       ),
-                    ),
-                    customizeButton(
-                      buttonName: 'Next',
-                      buttonColor: const Color(0xFF5095B0),
-                      fontColor: const Color(0xFFF5F5F5),
-                      width: 200 * SizeConfig.horizontalBlock,
-                      height: 50 * SizeConfig.verticalBlock,
-                      onClickButton: () {
-                        setState(() {
-                          selectedTabIndex = 2;
-                        });
-                      },
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MyTextFormField(
+                              controller: sizeValue,
+                              width: 300 * SizeConfig.horizontalBlock,
+                              height: 40 * SizeConfig.verticalBlock,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          customizeButton(
+                            buttonName: 'Add',
+                            buttonColor: const Color(0xFF5095B0),
+                            fontColor: const Color(0xFFF5F5F5),
+                            width: 60 * SizeConfig.horizontalBlock,
+                            height: 40 * SizeConfig.verticalBlock,
+                            onClickButton: () {
+                              if (sizeValue.text.trim().isNotEmpty) {
+                                setState(() {
+                                  final newController = TextEditingController(
+                                      text: sizeValue.text);
+                                  sizeValueControllers.add(newController);
+                                  sizeValue.clear();
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      ...sizeValueControllers.map((controller) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: MyTextFormField(
+                                  controller: controller,
+                                  labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: SizeConfig.textRatio * 18,
+                                    fontFamily: 'Roboto',
+                                  ),
+                                  width: 300 * SizeConfig.horizontalBlock,
+                                  height: 40 * SizeConfig.verticalBlock,
+                                ),
+                              ),
+                              SizedBox(width: 2),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    sizeValueControllers.remove(controller);
+                                    controller.dispose(); // Clean up memory
+                                  });
+                                },
+                                icon: Icon(Icons.delete,
+                                    color: SizeConfig.secondColor),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      SizedBox(height: 5 * SizeConfig.verticalBlock),
+                      Divider(
+                        height: 1,
+                        color: Colors.black26,
+                        endIndent: 10,
+                        indent: 10,
+                      ),
+                    ],
+                    if (selectedVariations.contains("Color")) ...[
+                      Text(
+                        "Color",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: SizeConfig.textRatio * 18,
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                    ],
+                    if (selectedVariations.contains("Material")) ...[
+                      // Add your material input field here
+                    ],
+                    if (selectedVariations.contains("Volume")) ...[
+                      // Add your volume input field here
+                    ],
+                    if (selectedVariations.contains("Other")) ...[
+                      // Add your custom field for 'Other' here
+                    ],
+                    SizedBox(height: 20 * SizeConfig.verticalBlock),
+                    Center(
+                      child: customizeButton(
+                        buttonName: 'Next',
+                        buttonColor: const Color(0xFF5095B0),
+                        fontColor: const Color(0xFFF5F5F5),
+                        width: 200 * SizeConfig.horizontalBlock,
+                        height: 50 * SizeConfig.verticalBlock,
+                        onClickButton: () {
+                          setState(() {
+                            selectedTabIndex = 2;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
-              )
-            ],
+              ),
+            ),
           ],
           if (selectedVariations == 2) ...[],
           if (_isLoading)
