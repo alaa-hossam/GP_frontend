@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:video_player/video_player.dart';
-
 import '../widgets/customizeButton.dart';
 import '../widgets/customizeTextFormField.dart';
 
@@ -158,123 +157,167 @@ class _ShareCrafterReelState extends State<ShareCrafterReel> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20 * SizeConfig.verticalBlock),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 20 * SizeConfig.verticalBlock,
-            children: [
-              Center(
-                child: Container(
-                  width: 200 * SizeConfig.horizontalBlock,
-                  height: 350 * SizeConfig.verticalBlock,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: SizeConfig.iconColor, width: 1),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      _isInitializing
-                          ? const CircularProgressIndicator()
-                          : _controller.value.isInitialized
-                              ? AspectRatio(
-                                  aspectRatio: _controller.value.aspectRatio,
-                                  child: VideoPlayer(_controller),
-                                )
-                              : const Text("Failed to load video"),
-                      if (_controller.value.isInitialized)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _controller.value.isPlaying
-                                  ? _controller.pause()
-                                  : _controller.play();
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.4),
-                              shape: BoxShape.circle,
-                            ),
-                            padding:
-                                EdgeInsets.all(10 * SizeConfig.horizontalBlock),
-                            child: Icon(
-                              _controller.value.isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 40 * SizeConfig.textRatio,
+      body: Stack(
+        children:[ SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(20 * SizeConfig.verticalBlock),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 20 * SizeConfig.verticalBlock,
+              children: [
+                Center(
+                  child: Container(
+                    width: 200 * SizeConfig.horizontalBlock,
+                    height: 350 * SizeConfig.verticalBlock,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: SizeConfig.iconColor, width: 1),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        _isInitializing
+                            ? const CircularProgressIndicator()
+                            : _controller.value.isInitialized
+                                ? AspectRatio(
+                                    aspectRatio: _controller.value.aspectRatio,
+                                    child: VideoPlayer(_controller),
+                                  )
+                                : const Text("Failed to load video"),
+                        if (_controller.value.isInitialized)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _controller.value.isPlaying
+                                    ? _controller.pause()
+                                    : _controller.play();
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                              padding:
+                                  EdgeInsets.all(10 * SizeConfig.horizontalBlock),
+                              child: Icon(
+                                _controller.value.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                                color: Colors.white,
+                                size: 40 * SizeConfig.textRatio,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              MyTextFormField(
-                controller: _caption,
-                labelText: "Write a caption",
-                width: 361 * SizeConfig.horizontalBlock,
-                height: 50 * SizeConfig.verticalBlock,
-                maxLength: 300,
-                labelStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: SizeConfig.textRatio * 16,
-                  fontFamily: 'Roboto',
-                ),
-                borderColor: SizeConfig.iconColor,
-                borderwidth: 1,
-                borderRadius: 5,
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "${300 - _caption.text.length} characters remaining",
-                    style: TextStyle(
-                      color: Color(0xFF3C3C3C).withOpacity(0.5),
-                      fontSize: 16 * SizeConfig.textRatio,
-                      fontFamily: "Roboto",
+                      ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 50 * SizeConfig.verticalBlock,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  customizeButton(
-                    buttonName: "Cancel",
-                    buttonColor: const Color(0xFFE9E9E9).withOpacity(0.5),
-                    fontColor: SizeConfig.iconColor,
-                    width: 173 * SizeConfig.horizontalBlock,
-                    rad: 5,
-                    onClickButton: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
+                ),
+                MyTextFormField(
+                  controller: _caption,
+                  labelText: "Write a caption",
+                  width: 361 * SizeConfig.horizontalBlock,
+                  height: 50 * SizeConfig.verticalBlock,
+                  maxLength: 300,
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: SizeConfig.textRatio * 16,
+                    fontFamily: 'Roboto',
                   ),
-                  customizeButton(
-                    buttonName: "Share",
-                    buttonColor: SizeConfig.iconColor,
-                    fontColor: Colors.white,
-                    width: 173 * SizeConfig.horizontalBlock,
-                    rad: 5,
-                    // Add onClickButton logic here
-                  ),
-                ],
-              ),
-            ],
+                  borderColor: SizeConfig.iconColor,
+                  borderwidth: 1,
+                  borderRadius: 5,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "${300 - _caption.text.length} characters remaining",
+                      style: TextStyle(
+                        color: Color(0xFF3C3C3C).withOpacity(0.5),
+                        fontSize: 16 * SizeConfig.textRatio,
+                        fontFamily: "Roboto",
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 50 * SizeConfig.verticalBlock,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    customizeButton(
+                      buttonName: "Cancel",
+                      buttonColor: const Color(0xFFE9E9E9).withOpacity(0.5),
+                      fontColor: SizeConfig.iconColor,
+                      width: 173 * SizeConfig.horizontalBlock,
+                      rad: 5,
+                      onClickButton: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    customizeButton(
+                      buttonName: "Share",
+                      buttonColor: SizeConfig.iconColor,
+                      fontColor: Colors.white,
+                      width: 173 * SizeConfig.horizontalBlock,
+                      rad: 5,
+                      onClickButton: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        String response = await _saveData();
+
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          if (response == "Please write a caption") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Please write a caption"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else if (response == "Handcrafter reel added successfully") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Handcrafter reel added successfully!")),
+                            );
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response)),
+                            );
+                          }
+                        }
+                      },
+
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: CircularProgressIndicator(color: SizeConfig.iconColor,),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

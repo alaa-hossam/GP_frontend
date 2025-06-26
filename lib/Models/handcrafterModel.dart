@@ -129,7 +129,7 @@ class handcrafterService {
       return "Error: User ID not found.";
     }
     final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-    print("Token in getCartProducts: $myToken");
+    print("Token in addHandcrafterReel: $myToken");
     // Create a multipart request
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
 
