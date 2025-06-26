@@ -198,25 +198,34 @@ class handcrafterService {
   }
 
   Future<handcrafterModel?> getHandcrafter() async {
-    print("get user profile");
+    print("Fetching handcrafter reels...");
     Token token = Token();
     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
 
     handcrafterModel? handcrafter;
+
     String query = '''
-        query User {
-        user(id: "${userId}") {
-            handicrafterProfile {
-                description
-                imageUrl
-                name
-            }
+    query User {
+      user(id: "${userId}") {
+        handicrafterProfile {
+          name
+          imageUrl
+          description
+          averageRating
+          posts {
+            id
+            content
+            postFileUrl
+          }
         }
+      }
     }
-    ''';
+  ''';
+
     final request = {
       'query': query,
     };
+
     try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
@@ -228,42 +237,70 @@ class handcrafterService {
         },
         body: jsonEncode(request),
       );
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        final getCustomer = data['data']['user']['handicrafterProfile'];
+        final profile = data['data']['user']['handicrafterProfile'];
+
+        List<handcrafterPostModel> postList = [];
+        for (var post in profile['posts']) {
+          postList.add(
+            handcrafterPostModel(
+              post['content'],
+              post['postFileUrl'],
+              post['id'],
+            ),
+          );
+        }
+
         handcrafter = handcrafterModel(
-            name: getCustomer['name'],
-            profileURL: getCustomer['imageUrl'],
-            description: getCustomer['description']);
+          name: profile['name'],
+          profileURL: profile['imageUrl'],
+          description: profile['description'],
+          rate: profile['averageRating']?.toDouble() ?? 0.0,
+          posts: postList,
+        );
+
         return handcrafter;
+      } else {
+        print("HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
-      print('Error fetching user: $e');
-      return handcrafter;
+      print('Error fetching handcrafter reels: $e');
     }
+
+    return null;
   }
 
-  Future<handcrafterModel?> getHandcrafterById(String Id) async {
-    print("get user profile");
-    Token token = Token();
 
+  Future<handcrafterModel?> getHandcrafterById(String id) async {
+    print("Fetching handcrafter reels...");
+    Token token = Token();
     handcrafterModel? handcrafter;
+
     String query = '''
-        query User {
-        user(id: "${Id}") {
-            handicrafterProfile {
-                description
-                imageUrl
-                name
-                averageRating
-            }
+    query User {
+      user(id: "$id") {
+        handicrafterProfile {
+          name
+          imageUrl
+          description
+          averageRating
+          posts {
+            id
+            content
+            postFileUrl
+          }
         }
+      }
     }
-    ''';
+  ''';
+
     final request = {
       'query': query,
     };
+
     try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
@@ -275,21 +312,39 @@ class handcrafterService {
         },
         body: jsonEncode(request),
       );
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        final getCustomer = data['data']['user']['handicrafterProfile'];
+        final profile = data['data']['user']['handicrafterProfile'];
+
+        List<handcrafterPostModel> postList = [];
+        for (var post in profile['posts']) {
+          postList.add(
+            handcrafterPostModel(
+              post['content'],
+              post['postFileUrl'],
+              post['id'],
+            ),
+          );
+        }
+
         handcrafter = handcrafterModel(
-            name: getCustomer['name'],
-            profileURL: getCustomer['imageUrl'],
-            description: getCustomer['description'],
-          rate: getCustomer['averageRating'].toDouble(),
+          name: profile['name'],
+          profileURL: profile['imageUrl'],
+          description: profile['description'],
+          rate: profile['averageRating']?.toDouble() ?? 0.0,
+          posts: postList,
         );
+
         return handcrafter;
+      } else {
+        print("HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
-      print('Error fetching user: $e');
-      return handcrafter;
+      print('Error fetching handcrafter reels: $e');
     }
+
+    return null;
   }
 }

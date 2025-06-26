@@ -1,14 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/handcrafterModel.dart';
 import 'package:gp_frontend/ViewModels/handcrafterViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../Providers/ProductProvider.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeButton.dart';
+import 'ReelsView.dart';
 
 class HandcrafterProfileClientView extends StatefulWidget {
   static String id = "HandcrafterProfileClientViewScreen";
@@ -222,6 +221,14 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                       textSize: 14 * SizeConfig.textRatio,
                       width: _calculateButtonWidth("Reels", context),
                       height: 40 * SizeConfig.verticalBlock,
+                      onClickButton: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ReelsView(handcrafter: _handcrafter!)
+                          ),);
+                      },
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                     customizeButton(
