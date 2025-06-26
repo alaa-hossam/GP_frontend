@@ -6,14 +6,18 @@ import 'package:gp_frontend/Models/offerModel.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 
+import '../Models/AddressModel.dart';
 import '../views/PaymentScreen.dart';
+import '../views/chooseAddress.dart';
 import 'Dimensions.dart';
 
 class customOffer extends StatelessWidget {
   offerModel offer;
   String clientId;
   bool match = false;
-  customOffer({super.key, required this.offer, required this.clientId });
+  AddressModel? addressData;
+
+  customOffer({super.key, required this.offer, required this.clientId});
   String? _getValidImageUrl(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) return null;
 
@@ -31,8 +35,7 @@ class customOffer extends StatelessWidget {
     }
   }
 
-
-  Future<bool> checkId()async{
+  Future<bool> checkId() async {
     Token token = Token();
     final idSQL = await token.getUUID('SELECT UUID FROM TOKENS');
     print(idSQL);
@@ -43,6 +46,7 @@ class customOffer extends StatelessWidget {
     }
     return true;
   }
+
   String _getTimeAgo(DateTime createdAt) {
     DateTime now = DateTime.now().toUtc();
     Duration difference = now.difference(createdAt);
@@ -118,23 +122,25 @@ class customOffer extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 10 * SizeConfig.verticalBlock,),
-
+        SizedBox(
+          height: 10 * SizeConfig.verticalBlock,
+        ),
         Container(
           color: Color(0x50E9E9E9),
           child: Padding(
-            padding:  EdgeInsets.all(10.0 * SizeConfig.horizontalBlock),
+            padding: EdgeInsets.all(10.0 * SizeConfig.horizontalBlock),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "${offer.description}",
-                  style:
-                      GoogleFonts.roboto(fontSize: 14 * SizeConfig.textRatio, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.roboto(
+                      fontSize: 14 * SizeConfig.textRatio,
+                      fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20 * SizeConfig.verticalBlock,),
-
-
+                SizedBox(
+                  height: 20 * SizeConfig.verticalBlock,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -146,12 +152,14 @@ class customOffer extends StatelessWidget {
                               "Price: ",
                               style: GoogleFonts.roboto(
                                   fontSize: 12 * SizeConfig.textRatio,
-                                  color: Color(0x50000000),fontWeight: FontWeight.bold),
+                                  color: Color(0x50000000),
+                                  fontWeight: FontWeight.bold),
                             ),
                             Text(
                               "${offer.price} LE",
                               style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio, fontWeight: FontWeight.bold),
+                                  fontSize: 12 * SizeConfig.textRatio,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -162,46 +170,58 @@ class customOffer extends StatelessWidget {
                               "Duration: ",
                               style: GoogleFonts.roboto(
                                   fontSize: 12 * SizeConfig.textRatio,
-                                  color: Color(0x50000000),fontWeight: FontWeight.bold),
+                                  color: Color(0x50000000),
+                                  fontWeight: FontWeight.bold),
                             ),
                             Text(
                               "${offer.duration} days",
                               style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio,fontWeight: FontWeight.bold),
+                                  fontSize: 12 * SizeConfig.textRatio,
+                                  fontWeight: FontWeight.bold),
                             ),
-
                           ],
                         )
                       ],
                     ),
-
-                      FutureBuilder<bool>(
+                    FutureBuilder<bool>(
                         future: checkId(),
-                        builder: (context , child) {
-
-                          if(match){
+                        builder: (context, child) {
+                          if (match) {
                             return customizeButton(
-                              buttonName: "Confirm",
-                              buttonColor: SizeConfig.iconColor,
-                              fontColor: Colors.white,
-                              height: 30 * SizeConfig.verticalBlock,
-                              width: 90 * SizeConfig.horizontalBlock,
-                              onClickButton:() => Navigator.pushNamed(context,Paymentscreen.id , arguments: offer.price),
-                            );
+                                buttonName: "Confirm",
+                                buttonColor: SizeConfig.iconColor,
+                                fontColor: Colors.white,
+                                height: 30 * SizeConfig.verticalBlock,
+                                width: 90 * SizeConfig.horizontalBlock,
+                                onClickButton: () async {
+                                  AddressModel selectedAddress =
+                                      await Navigator.pushNamed(
+                                    context,
+                                    chooseAddress.id,
+                                  ) as AddressModel;
+
+                                  Navigator.pushNamed(context, Paymentscreen.id,
+                                      arguments: {
+                                        'price': offer.price,
+                                        'offerId': offer.id,
+                                        'addressId': selectedAddress.id
+                                      });
+                                });
                           }
-                         return Container();
-                        }
-                      )
+                          return Container();
+                        })
                   ],
                 ),
-
-
               ],
             ),
           ),
         ),
-        SizedBox(height: 20 * SizeConfig.verticalBlock,),
-        Divider(height: 2 * SizeConfig.verticalBlock,)
+        SizedBox(
+          height: 20 * SizeConfig.verticalBlock,
+        ),
+        Divider(
+          height: 2 * SizeConfig.verticalBlock,
+        )
       ],
     );
   }

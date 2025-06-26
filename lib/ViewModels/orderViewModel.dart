@@ -4,6 +4,6 @@ class orderViewModel{
   orderService ApiService = orderService();
 
   createPostOrder(orderModel order)async{
-    await ApiService.createOrderByPost(order);
+    return await ApiService.createOrderByPost(order);
   }
 }

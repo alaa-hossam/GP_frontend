@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/orderModel.dart';
+import 'package:gp_frontend/Providers/orderProvider.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import '../External Services/PaymentAPI.dart';
@@ -19,39 +22,34 @@ class _PaymentscreenState extends State<Paymentscreen> {
   late WebViewController _controller;
   bool isLoading = true;
   late double price;
+  late String offerId, addressId;
   bool _hasInitialized = false;
+  orderProvider myOrderProvider = orderProvider();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_hasInitialized) {
-      final args = ModalRoute.of(context)?.settings.arguments;
-      if (args is double) {
-        price = args;
-      } else {
-        price = 0.0;
-      }
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      price = args['price'] ?? 0;
+      offerId = args['offerId'] ?? "";
+      addressId = args['addressId'] ?? "";
+
       initPayment();
       _hasInitialized = true;
     }
   }
 
   Future<void> _sendTransactionIdToBackend(String transactionId) async {
-    final url = Uri.parse("https://your-api.com/api/save-payment");
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'transaction_id': transactionId,
-        'amount': price,
-      }),
-    );
+    Token token = Token();
+    String id = await token.getUUID('SELECT UUID FROM TOKENS');
 
-    if (response.statusCode == 200) {
-      print("✅ Transaction ID sent to backend successfully");
-    } else {
-      print("❌ Failed to send transaction ID to backend");
-    }
+    final success =await myOrderProvider.createPostOrder(orderModel(
+        addressId: addressId,
+        offerId: offerId,
+        transactionId: transactionId,
+        userId: id));
   }
 
   void _handlePaymentSuccess(String transactionId) {
@@ -78,30 +76,30 @@ class _PaymentscreenState extends State<Paymentscreen> {
     try {
       final token = await paymentService.authenticate();
       final orderId = await paymentService.createOrder(token, price * 100);
-      final paymentKey = await paymentService.generatePaymentKey(token, price * 100, orderId);
+      final paymentKey =
+          await paymentService.generatePaymentKey(token, price * 100, orderId);
       final url = paymentService.getIframeUrl(paymentKey);
 
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setNavigationDelegate(
           NavigationDelegate(
-              onPageFinished: (String url) {
-                if (url.contains("success=true")) {
-                  final Uri uri = Uri.parse(url);
-                  final String? txId = uri.queryParameters['id'];
+            onPageFinished: (String url) {
+              if (url.contains("success=true")) {
+                final Uri uri = Uri.parse(url);
+                final String? txId = uri.queryParameters['id'];
 
-                  if (txId != null && txId.isNotEmpty) {
-                    _handlePaymentSuccess(txId);
-                  } else {
-                    print("! Transaction ID not found in success URL");
-                    _handlePaymentSuccess("unknown");
-                  }
-                } else if (url.contains("fail") || url.contains("cancel")) {
-                  _handlePaymentFailure();
+                if (txId != null && txId.isNotEmpty) {
+                  _handlePaymentSuccess(txId);
+                } else {
+                  print("! Transaction ID not found in success URL");
+                  _handlePaymentSuccess("unknown");
                 }
-              },
-
-              onNavigationRequest: (request) {
+              } else if (url.contains("fail") || url.contains("cancel")) {
+                _handlePaymentFailure();
+              }
+            },
+            onNavigationRequest: (request) {
               print("🌐 Navigating to: ${request.url}");
               return NavigationDecision.navigate;
             },
@@ -156,7 +154,8 @@ class _PaymentscreenState extends State<Paymentscreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+            icon:
+                const Icon(Icons.account_circle_outlined, color: Colors.white),
             onPressed: () {
               Navigator.pushNamed(context, Profile.id);
             },

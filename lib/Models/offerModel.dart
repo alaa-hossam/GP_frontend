@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
 class offerModel{
-  String? profileImage , name , createdAt, description;
+  String? profileImage , name , createdAt, description , id;
   int? duration;
   double? price;
 
@@ -15,7 +15,8 @@ class offerModel{
       this.createdAt,
       this.description,
       this.duration,
-      this.price});
+      this.price,
+      this.id});
 }
 
 class offerService{
@@ -30,6 +31,7 @@ class offerService{
     listOffersForPost(postId: "$postID") {
          description
         createdAt
+        id
         handicrafter {
             handicrafterProfile {
                 imageUrl
@@ -71,7 +73,8 @@ class offerService{
           offers.add(offerModel(createdAt: offer['createdAt'],duration: offer['suggestedOneDuration'],
           price: offer['suggestedOnePrice'].toDouble(),description: offer['description'],
             name: offer['handicrafter']['handicrafterProfile']['name'],
-              profileImage: offer['handicrafter']['handicrafterProfile']['imageUrl']
+              profileImage: offer['handicrafter']['handicrafterProfile']['imageUrl'],
+            id: offer['id']
           ));
         }
 
