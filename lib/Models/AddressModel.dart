@@ -6,7 +6,7 @@ class AddressModel{
   double? latitude, longitude;
   String AddressOwner,City,State, StreetName;
   String? BuildingNum, FloorNum, FlatNum,
-      PostalCode, PhoneNumber;
+      PostalCode, PhoneNumber , id;
   bool? isPrimary;
 
   AddressModel(
@@ -23,6 +23,7 @@ class AddressModel{
       this.isPrimary,
     this.latitude,
     this.longitude,
+    this.id
   });
 }
 
@@ -42,6 +43,7 @@ class AddressService{
         streetName
         state
         city
+        id
     }
 }''';
 
@@ -71,7 +73,7 @@ class AddressService{
         print(addresses);
         for(var address in addresses){
           myAddresses.add(AddressModel(address['addressOwner'], address['city'],
-              address['state']?? "", address['streetName']));
+              address['state']?? "", address['streetName'] , id: address[id]));
         }
         print(myAddresses);
         return myAddresses;

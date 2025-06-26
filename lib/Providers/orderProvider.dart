@@ -6,7 +6,7 @@ class orderProvider{
   orderViewModel orderVM = orderViewModel();
 
   createPostOrder(orderModel order)async{
-    await orderVM.createPostOrder(order);
+    return await orderVM.createPostOrder(order);
 
   }
 }

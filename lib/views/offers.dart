@@ -80,9 +80,6 @@ class _offersState extends State<offers> {
                             return ListView.builder(
                               itemCount: offers.length,
                               itemBuilder: (context, index) {
-                                print("****************************");
-                                print(widget.clientId);
-                                print("****************************");
                                 return customOffer(offer: offers[index] , clientId: widget.clientId ?? "");
                               },
                             );

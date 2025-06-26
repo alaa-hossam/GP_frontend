@@ -48,9 +48,16 @@ class orderService {
         },
         body: jsonEncode(request),
       );
+      print(response.statusCode);
 
       if(response.statusCode == 200){
-        return jsonDecode(response.body)['data']['createPostCustomizedOrder']['id'];
+        // final data = jsonDecode(response.body);
+        // print(data);
+        // List<dynamic> order = data['data']['createPostCustomizedOrder']['id'];
+        // print("......................................................................................");
+        // print("......................................................................................");
+        // return jsonDecode(response.body)['data']['createPostCustomizedOrder']['id'];
+        return "order Created Successfully";
       }
       return "Failed to create order";
 
