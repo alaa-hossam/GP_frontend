@@ -5,18 +5,18 @@ import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 import 'ProductModel.dart';
 
-class BazarModel{
+class BazarModel {
   String? id;
 
   BazarModel({this.id});
 }
 
-class BazarService{
+class BazarService {
   final String apiUrl =
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
 
-  Future<BazarModel> getActiveBazar()async{
+  Future<BazarModel> getActiveBazar() async {
     BazarModel bazar = BazarModel();
 
     String query = '''
@@ -33,34 +33,33 @@ class BazarService{
       'query': query,
     };
 
-    try{
+    try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
-      final respone = await http.post(
-          Uri.parse(apiUrl),
+      final respone = await http.post(Uri.parse(apiUrl),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $myToken',
           },
           body: jsonEncode(request));
 
-      bazar =BazarModel(id: jsonDecode(respone.body)['data']['getActiveBazars'][0]['id']) ;
+      bazar = BazarModel(
+          id: jsonDecode(respone.body)['data']['getActiveBazars'][0]['id']);
       return bazar;
-    }catch(e){
+    } catch (e) {
       print("error in getting packages: ${e}");
       return bazar;
     }
-
   }
 
   Future<List<productModel>> getBazarProducts(String id) async {
-    List<productModel> products= [] ;
-
+    List<productModel> products = [];
 
     String query = '''
    query GetBazzarProducts {
     getBazzarProducts(bazarId: "$id") {
         product {
+        isCustomMade
             imageUrl
             id
             product {
@@ -69,6 +68,7 @@ class BazarService{
                 }
                 name
                 averageRating
+                id
             }
         }
         bazarPrice
@@ -97,17 +97,21 @@ class BazarService{
         body: jsonEncode(request),
       );
 
-      // Debug: Print the response body
       print(response.body);
 
-      // Step 6: Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getBazzarProducts'];
-        for(var pro in prods){
-          products.add(productModel(pro['product']['id'], pro['product']['imageUrl'],
-              pro['product']['product']['name'],pro['bazarPrice'].toDouble(), pro['product']['product']['averageRating'].toDouble(),
-              category: pro['product']['product']['category']['name']));
+        for (var pro in prods) {
+          products.add(productModel(
+              pro['product']['product']['id'],
+              pro['product']['imageUrl'],
+              pro['product']['product']['name'],
+              pro['bazarPrice'].toDouble(),
+              pro['product']['product']['averageRating'].toDouble(),
+              category: pro['product']['product']['category']['name'],
+              custom: pro['product']['isCustomMade'],
+              finalId: pro['product']['id']));
         }
 
         print("Products fetched successfully: $prods");
@@ -120,7 +124,4 @@ class BazarService{
       return products;
     }
   }
-
-
-
 }

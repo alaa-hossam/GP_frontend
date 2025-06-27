@@ -25,6 +25,7 @@ class _checkOutState extends State<checkOut> {
   late int percentage;
   late List<Map<String , dynamic>> products;
   late String type;
+  late bool bazar , custom;
   int? selectedPaymentIndex;
   AddressModel? addressData;
 
@@ -33,12 +34,15 @@ class _checkOutState extends State<checkOut> {
     super.didChangeDependencies();
     final args =
     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    print(args?['products'] );
 
     voucher = args?['voucher'] ?? '';
     price = args?['price']?.toDouble() ?? 0.0;
     percentage = args?['percentage'] ?? 0;
     products = args?['products'] ?? [];
     type = args?['type'] ?? '';
+    bazar = args?['bazar']?? false;
+    custom = args?['custom']?? false;
   }
 
   Widget buildPaymentMethod({
@@ -373,7 +377,9 @@ class _checkOutState extends State<checkOut> {
                         "payment": selectedPaymentIndex == 0
                             ? "assets/images/visa.png"
                             : "assets/images/cash.png",
-                        "address": addressData
+                        "address": addressData,
+                        "bazar": bazar,
+                        "custom":custom
                       },
                     );
                   },

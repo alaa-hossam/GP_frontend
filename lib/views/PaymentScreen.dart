@@ -28,6 +28,7 @@ class _PaymentscreenState extends State<Paymentscreen> {
   List<Map<String, dynamic>> products = [];
   bool _hasInitialized = false;
   bool _paymentStarted = false;
+  bool bazar = false;
 
   orderProvider myOrderProvider = orderProvider();
 
@@ -47,6 +48,7 @@ class _PaymentscreenState extends State<Paymentscreen> {
       } else if (type == "ready" || type == "custom") {
         products = args['products'];
         giftCode = args['giftCode'] ?? "";
+        bazar = args['bazar'];
       }else if (type == "advertisement" ) {
         AdvertisementImage = args['advertisementImage'];
         AdvertisementURL = args['AdvertisementURL'] ?? "";
@@ -90,7 +92,7 @@ print(transactionId);
           products: products,
         ),
         giftCode,
-        false);
+        bazar);
   }
 
   Future<void> _customOrder(String transactionId) async {
@@ -105,7 +107,7 @@ print(transactionId);
           products: products,
         ),
         giftCode,
-        false);
+        bazar);
   }
 
   void _handlePaymentSuccess(String transactionId) {
@@ -137,6 +139,7 @@ print(transactionId);
   }
 
   Future<void> initPayment() async {
+    print(products);
     if (_paymentStarted) return;
     _paymentStarted = true;
 

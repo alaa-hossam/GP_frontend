@@ -59,7 +59,8 @@ class _HomeState extends State<Home> {
       catProvider.fetchCategories(),
       productProv.fetchProducts('0'),
       adsProvider.getAdvertisement(),
-      bazarProvider.getActiveBazar()
+      bazarProvider.getActiveBazar(),
+      productProv.recommendProductsForUser()
     ]);
   }
 
@@ -141,12 +142,12 @@ class _HomeState extends State<Home> {
         SizedBox(height: 10),
         _buildCategories(categoryProvider),
         SizedBox(height: 10),
-        _buildSectionTitle("Best Seller"),
-        _buildProductList(productProv.products),
-        _buildSectionHeader("Recommended For You", onTap: () {
+        _buildSectionTitle("Best Seller" , onTap: () {
           Navigator.pushNamed(context, browseProducts.id);
         }),
         _buildProductList(productProv.products),
+        _buildSectionHeader("Recommended For You"),
+        _buildProductList(productProv.recomendedProducts),
       ],
     );
   }
@@ -324,15 +325,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Text(title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  Widget _buildSectionHeader(String title, {VoidCallback? onTap}) {
+  Widget _buildSectionTitle(String title , {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Row(
@@ -347,10 +340,21 @@ class _HomeState extends State<Home> {
             ),
         ],
       ),
+
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Text(title,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
     );
   }
 
   Widget _buildProductList(List<dynamic> products) {
+    print(products);
     return SizedBox(
       height: 250,
       child: ListView.builder(

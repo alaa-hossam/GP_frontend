@@ -164,9 +164,6 @@ class productService {
     }
   }
 
-
-
-
   Future<String> addFinalProduct({
     required String categoryId,
     required String name,
@@ -248,8 +245,6 @@ class productService {
       return "Exception: $e";
     }
   }
-
-
 
   Future<List<productModel>> getAllProducts(String categoryId) async {
     print("Fetching products from API...");
@@ -498,7 +493,8 @@ class productService {
     }
   }
 
-  Future<String> addProductReview(String comment, String productId, double rate) async {
+  Future<String> addProductReview(
+      String comment, String productId, double rate) async {
     print("Fetching products from API...");
     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
 
@@ -1204,9 +1200,6 @@ class productService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        print("//////////////////////////////////////////");
-        print(productId);
-        print(data['getProductsByIds']);
         print(data);
         for (var variation in data['getProductsByIds']['finalProducts']
             ['finalProductVariation']) {
@@ -1330,6 +1323,74 @@ class productService {
         }
 
         print("Products fetched successfully: $products");
+        return products;
+      } else {
+        throw Exception('Failed to load products: ${response.body}');
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return products;
+    }
+  }
+
+  Future<List<productModel>> getRecommendProducts() async {
+    List<productModel> products = [];
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    String query = '''
+   query RecommendProductsForUser {
+    recommendProductsForUser(userId: "$userId") {
+        averageRating
+        category {
+            name
+        }
+        id
+        imageUrl
+        name
+        lowestCustomPrice
+    }
+}
+
+  ''';
+
+    final request = {
+      'query': query,
+      'variables': {
+        'userId': userId,
+      },
+    };
+
+    try {
+      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> prods = data['data']['recommendProductsForUser'];
+        for (var pro in prods) {
+          products.add(
+            productModel(
+                pro['id'],
+                pro['imageUrl'],
+                pro['name'],
+                pro['lowestCustomPrice'] == null
+                    ? 0
+                    : pro['lowestCustomPrice'].toDouble(),
+                pro['averageRating'] == null
+                    ? 0
+                    : pro['averageRating'].toDouble(),
+                category: pro['category']['name']),
+          );
+        }
+
+        print("Recommended Products fetched successfully: $products");
         return products;
       } else {
         throw Exception('Failed to load products: ${response.body}');

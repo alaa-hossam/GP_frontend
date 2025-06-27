@@ -9,6 +9,8 @@ class productViewModel  extends ChangeNotifier{
   final productService apiServices = productService();
   List<productModel> _products = [];
   List<productModel> get products => _products;
+  List<productModel> _recommendProducts = [];
+  List<productModel> get recommendProducts => _recommendProducts;
   Cart myCart = Cart();
 
   Future<void> fetchProducts(String categoryId) async {
@@ -16,6 +18,16 @@ class productViewModel  extends ChangeNotifier{
       print("Fetching products from API...");
       _products = await apiServices.getAllProducts(categoryId);
       print("Products fetched successfully: $_products");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error fetching products in VM: $e");
+      notifyListeners();
+    }
+  }
+
+  Future<void> recommendProductsForUser() async {
+    try {
+      _recommendProducts = await apiServices.getRecommendProducts();
       notifyListeners();
     } catch (e) {
       debugPrint("Error fetching products in VM: $e");
@@ -120,4 +132,7 @@ class productViewModel  extends ChangeNotifier{
   Future <List<productModel>> getSearchProducts(List<String> ids)async{
     return await apiServices.getSearchProducts(ids);
   }
+
+
+
 }

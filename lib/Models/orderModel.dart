@@ -99,6 +99,8 @@ class orderService {
     }
   ''';
 
+    print(query);
+
     try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
       print("Token retrieved: $myToken");

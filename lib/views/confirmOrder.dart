@@ -26,7 +26,7 @@ class _confirmOrderState extends State<confirmOrder> {
   late List<Map<String, dynamic>> products;
   late AddressModel myAddress;
   productProvider prodProvider = productProvider();
-  late bool isCustom;
+  late bool isCustom , bazar;
 
   @override
   void didChangeDependencies() {
@@ -34,17 +34,21 @@ class _confirmOrderState extends State<confirmOrder> {
 
     final args =
     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
+print(args?['products']);
     payment = args?['payment'] ?? '';
     price = double.tryParse(args?['price']) ?? 0.0;
     products = args?['products'] ?? [];
     myAddress = args?['address'] ?? "";
+    bazar = args?['bazar']?? false;
+    isCustom = args?['custom']??false;
 
     isCustomProducts();
   }
 
   Future<void> isCustomProducts() async {
-    isCustom = await prodProvider.checkCustom();
+    if(!bazar){
+      isCustom = await prodProvider.checkCustom();
+    }
   }
 
   @override
@@ -359,7 +363,8 @@ class _confirmOrderState extends State<confirmOrder> {
                         'type': isCustom ? "custom" : "ready",
                         'price': price,
                         'addressId': myAddress.id,
-                        'products': products
+                        'products': products,
+                        'bazar':bazar
                       },
                     );
                   } else {
