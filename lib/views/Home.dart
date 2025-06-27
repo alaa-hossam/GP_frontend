@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:gp_frontend/Models/BazarModel.dart';
+import 'package:gp_frontend/Models/SearchService.dart';
 import 'package:gp_frontend/Providers/AdvertisementProvider.dart';
 import 'package:gp_frontend/Providers/BazarProvider.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
@@ -51,6 +51,7 @@ class _HomeState extends State<Home> {
         Provider.of<AdvertisementProvider>(context, listen: false);
     final bazarProvider = Provider.of<BazarProvider>(context, listen: false);
 
+
     token = Token();
     role = await token.getRole('SELECT ROLE FROM TOKENS');
 
@@ -65,6 +66,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+    SearchService searchEndPoint = SearchService();
 
     return Scaffold(
       drawer: Mydrawer(),
@@ -134,7 +136,7 @@ class _HomeState extends State<Home> {
 
     return ListView(
       children: [
-        _buildSearchBar(),
+        _buildSearchBar(SearchService()),
         SizedBox(height: 10),
         _buildAdsSection(adsProvider, bazarProvider),
         SizedBox(height: 10),
@@ -150,36 +152,38 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(SearchService searchEndPoint) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, searchView.id);
-              },
+              onTap: () => Navigator.pushNamed(context, searchView.id),
               child: Container(
-
-                child: Row(
-                  children: const [
-                    Icon(Icons.search, color: Colors.grey),
-                    SizedBox(width: 10),
-                    Text("Search"),
-                    Spacer(),
-                    Icon(Icons.camera_alt_outlined, color: Colors.grey),
-                  ],
+                child: MyTextFormField(
+                  onClickFunction: (context) async {
+                    await Navigator.pushNamed(context, searchView.id);
+                  },
+                  controller: search,
+                  hintName: "Search",
+                  icon: Icons.search,
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.camera_alt_outlined),
+                    onPressed: () => searchEndPoint.SearchImage(5)
+                  ),
+                  // onClickFunction:(context) => _navigateToSearch(),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          const Icon(Icons.tune),
+          SizedBox(width: 10),
+          Icon(Icons.tune),
         ],
       ),
     );
   }
+
   Widget _buildAdsSection(AdvertisementProvider provider, BazarProvider bazar) {
     final hasBazar = bazar.activeBazar.id != null;
     final totalItems = provider.ads.length + (hasBazar ? 1 : 0);

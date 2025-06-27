@@ -159,6 +159,10 @@ class productProvider extends ChangeNotifier {
   }
 
 
+  getSearchProductsImage(List<String> ids)async {
+   return await productVM.getSearchProducts(ids);
+  }
+
 
 
 
