@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
@@ -7,7 +7,6 @@ import 'package:gp_frontend/views/signUpView.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
 import 'package:gp_frontend/widgets/messages.dart';
 import '../SqfliteCodes/Token.dart';
-import '../SqfliteCodes/cart.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeButton.dart';
 
@@ -34,11 +33,34 @@ class _logInState extends State<logIn> {
 
   Future<String> logInCustomer() async {
     try {
-      return await cvm.logIn(email: email.text, password: password.text);
+      String response =await cvm.logIn(email: email.text, password: password.text);
+      // await firebaseAnonymousLogin();
+      return response ;
     } catch (e) {
       return e.toString();
     }
   }
+
+  Future<void> firebaseAnonymousLogin() async {
+    var user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      print("User BEFORE sign-in: $user");
+
+      // Perform anonymous sign-in
+      UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
+
+      // Get the updated user after sign-in
+      user = userCredential.user;
+      print("User AFTER sign-in: $user");
+      print("User UID: ${user?.uid}");
+    } else {
+      print("User already signed in: $user");
+      print("User UID: ${user.uid}");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
