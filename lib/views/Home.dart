@@ -157,6 +157,8 @@ class _HomeState extends State<Home> {
         children: [
           Expanded(
             child: MyTextFormField(
+              onClickFunction : () {Navigator.pushNamed(context, searchView.id)},
+
               controller: search,
               hintName: "Search",
               icon: Icons.search,
