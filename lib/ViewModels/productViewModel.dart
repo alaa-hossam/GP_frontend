@@ -21,7 +21,7 @@ class productViewModel  extends ChangeNotifier{
     }
   }
 
-  searchProduct(String word){
+  Future<List<productModel>> searchProduct(String word){
     return apiServices.searchProduct(word);
   }
 

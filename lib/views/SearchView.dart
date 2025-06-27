@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/ViewModels/productViewModel.dart';
+import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:provider/provider.dart';
 import '../Models/SearchService.dart';
 import '../widgets/Dimensions.dart';
@@ -21,7 +22,6 @@ class searchView extends StatefulWidget {
 class _searchState extends State<searchView> {
   late FocusNode _focusNode;
   productViewModel PVM = productViewModel();
-  List<dynamic>? products;
   TextEditingController search = TextEditingController();
   Timer? _debounceTimer;
 
@@ -48,10 +48,22 @@ class _searchState extends State<searchView> {
     }
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
-      products = await PVM.searchProduct(value);
-      setState(() {});
-      print("Products:");
-      print(products);
+      final result = await PVM.searchProduct(value);
+
+      if (context.mounted && result != null && result.isNotEmpty) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => ProductBottomSheet(products: result),
+        );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No products found.")),
+        );
+      }
     });
   }
 
@@ -113,7 +125,7 @@ class _searchState extends State<searchView> {
                         size: 24 * SizeConfig.textRatio,
                       ),
                       onPressed: () async {
-                        ids = await searchEndPoint.SearchImage(5);
+                        ids = await searchEndPoint.SearchImage(6);
                         if (context.mounted) {
                           final myProductProvider = Provider.of<productProvider>(context, listen: false);
                           await myProductProvider.getSearchProductsImage(ids);
@@ -125,8 +137,7 @@ class _searchState extends State<searchView> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                               ),
-                              builder: (context) =>
-                                  ProductBottomSheet(products: myProductProvider.searchProducts),
+                              builder: (context) => ProductBottomSheet(products: myProductProvider.searchProducts),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -162,67 +173,59 @@ class ProductBottomSheet extends StatelessWidget {
   final List<productModel> products;
 
   const ProductBottomSheet({super.key, required this.products});
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 60,
-            height: 5,
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
-            ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      maxChildSize: 0.95,
+      minChildSize: 0.3,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          padding: EdgeInsets.all(16 * SizeConfig.horizontalBlock),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          Text("The Most Similar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 16),
-
-          // Use GridView for 2 items per row
-          GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(), // Prevent internal scroll
-            itemCount: products.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 2.2, // Adjust as needed
-            ),
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to detail if needed
-                },
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(product.name ?? 'Unnamed', style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text(product.description ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
-                        Spacer(),
-                        Text("${product.price ?? 0} EGP", style: TextStyle(color: Colors.green)),
-                      ],
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 60 * SizeConfig.horizontalBlock,
+                    height: 5 * SizeConfig.verticalBlock,
+                    margin: EdgeInsets.only(bottom: 16 * SizeConfig.verticalBlock),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10 * SizeConfig.textRatio),
                     ),
                   ),
                 ),
-              );
-            },
+                Text("The Most Similar", style: TextStyle(fontSize: 18 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16 * SizeConfig.verticalBlock),
+
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: products.map((product) {
+                    return customProduct(
+                      product.imageURL,
+                      product.name,
+                      product.price,
+                      product.rate,
+                      product.id,
+                      false,
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
-
 }

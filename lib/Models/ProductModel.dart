@@ -7,14 +7,19 @@ import '../SqfliteCodes/cart.dart';
 
 class productModel {
   String _imageURL, _name, _id;
-  String? description, handcrafterName, category , handcrafterImage, finalId, handcrafterId;
+  String? description,
+      handcrafterName,
+      category,
+      handcrafterImage,
+      finalId,
+      handcrafterId;
   double _price, _rate;
-  double? stock , duration;
+  double? stock, duration;
   int? ratingCount, Quantity;
   List<dynamic>? finalProducts, variations;
   Map<String, List<dynamic>>? variationsWithIds;
   List<dynamic>? reviews;
-  List<String>? galleryImg , indecatorsId;
+  List<String>? galleryImg, indecatorsId;
   bool custom;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
@@ -32,10 +37,8 @@ class productModel {
       this.duration,
       this.variationsWithIds,
       this.handcrafterId,
-        this.indecatorsId,
+      this.indecatorsId,
       this.custom = false});
-
-
 
   double get rate => _rate;
   double get price => _price;
@@ -43,6 +46,7 @@ class productModel {
   String get imageURL => _imageURL;
   String get id => _id;
 }
+
 class productService {
   final String apiUrl =
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
@@ -227,7 +231,8 @@ class productService {
     }
   }
 
-  Future<List<productModel>> getGifRecommendationProducts(Map<String, String> answers) async {
+  Future<List<productModel>> getGifRecommendationProducts(
+      Map<String, String> answers) async {
     print("Fetching products from API...");
     List<productModel> giftProducts = [];
 
@@ -297,7 +302,6 @@ class productService {
       return []; // Return an empty list in case of error
     }
   }
-
 
   Future<List<productModel>> HistoryProducts() async {
     print("Fetching history products from API...");
@@ -369,7 +373,8 @@ class productService {
     }
   }
 
-  Future<String> addProductReview(String comment, String productId, double rate) async {
+  Future<String> addProductReview(
+      String comment, String productId, double rate) async {
     print("Fetching products from API...");
     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
 
@@ -408,7 +413,8 @@ class productService {
         final data = jsonDecode(response.body);
         print(data);
 
-        if (data['data'] != null && data['data']['createProductReview'] != null) {
+        if (data['data'] != null &&
+            data['data']['createProductReview'] != null) {
           print("Review sent successfully");
           return "review sent successfully";
         } else if (data['errors'] != null) {
@@ -425,8 +431,8 @@ class productService {
     }
   }
 
-  Future<List<dynamic>> searchProduct(String word) async {
-    List<dynamic> products;
+  Future<List<productModel>> searchProduct(String word) async {
+    List<productModel> products = [];
     print("before");
     final request = {
       'query': '''
@@ -436,6 +442,12 @@ class productService {
               name
               imageUrl
               id
+              lowestCustomPrice
+              averageRating
+              category {
+                name
+            }
+            
             }
           }   
       }
@@ -460,8 +472,17 @@ class productService {
         print("products inside the api");
 
         final data = jsonDecode(response.body);
-        products = data['data']['getAllProducts']['data'];
         print(data);
+        List<dynamic> productsData = data['data']['getAllProducts']['data'];
+        for (var product in productsData) {
+          products.add(productModel(
+              product['id'],
+              product['imageUrl'],
+              product['name'],
+              product['lowestCustomPrice'].toDouble(),
+              product['averageRating'].toDouble(),
+              category: product['category']['name']));
+        }
         return products;
       } else {
         throw Exception('Failed to load categories: ${response.body}');
@@ -473,7 +494,6 @@ class productService {
   }
 
   Future<List<dynamic>> getWishProducts() async {
-
     String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
     wishList myWish = wishList();
 
@@ -550,23 +570,22 @@ class productService {
     // Step 1: Fetch product IDs and final IDs from SQLite
     myCart.db;
     List<String> ids =
-    await myCart.getProduct("SELECT * FROM products").then((result) {
+        await myCart.getProduct("SELECT * FROM products").then((result) {
       return result.map<String>((row) => row['id'].toString()).toList();
     });
     List<String> finalIds =
-    await myCart.getProduct("SELECT * FROM products").then((result) {
+        await myCart.getProduct("SELECT * FROM products").then((result) {
       return result.map<String>((row) => row['finalId'].toString()).toList();
     });
-    Map<String , int> numOfIds = {};
+    Map<String, int> numOfIds = {};
 
-    for(var id in finalIds){
+    for (var id in finalIds) {
       if (numOfIds.containsKey(id)) {
         numOfIds[id] = numOfIds[id]! + 1;
       } else {
         numOfIds[id] = 1;
       }
     }
-
 
     print("Product IDs: $finalIds");
 
@@ -620,31 +639,27 @@ class productService {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getFinalProductsByIds'];
 
-
         List<productModel> finalProducts = [];
-
 
         for (var product in prods) {
           try {
             finalProducts.add(productModel(
-              product['product']['id'],
-              product['imageUrl'],
-              product['product']['name'],
-              product['customPrice'].toDouble(),
-              product['product']['averageRating'].toDouble(),
-              category: product['product']['category']['name'],
-              variations: product['finalProductVariation'],
+                product['product']['id'],
+                product['imageUrl'],
+                product['product']['name'],
+                product['customPrice'].toDouble(),
+                product['product']['averageRating'].toDouble(),
+                category: product['product']['category']['name'],
+                variations: product['finalProductVariation'],
                 finalId: product['id'],
-              Quantity: numOfIds[product['id']]
-            ));
-
+                Quantity: numOfIds[product['id']]));
           } catch (e) {
             print("Error adding product: $e"); // Log the error
-            print("Problematic product: $product"); // Log the problematic product
+            print(
+                "Problematic product: $product"); // Log the problematic product
           }
         }
         return finalProducts;
-
       } else {
         throw Exception('Failed to load products: ${response.body}');
       }
@@ -735,19 +750,26 @@ class productService {
         if (getProduct != null) {
           // Access fields in getProduct
           final String name = getProduct['name'] ?? 'No Name';
-          final String description = getProduct['description'] ?? 'No Description';
-          final String imageUrl = getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
-          final double averageRating = getProduct['averageRating'].toDouble() ; // Handle null
-          final double lowestCustomPrice = getProduct['lowestCustomPrice']?.toDouble() ?? 0.0; // Handle null
+          final String description =
+              getProduct['description'] ?? 'No Description';
+          final String imageUrl =
+              getProduct['imageUrl'] ?? 'https://via.placeholder.com/150';
+          final double averageRating =
+              getProduct['averageRating'].toDouble(); // Handle null
+          final double lowestCustomPrice =
+              getProduct['lowestCustomPrice']?.toDouble() ?? 0.0; // Handle null
           final int ratingCount = getProduct['ratingCount'] ?? 0;
           final String id = getProduct['id'] ?? 'No ID';
-          final String handcrafterName = getProduct['handicrafter']['username'] ?? 'No Name';
-          final String handcrafterId = getProduct['handicrafter']['id'] ?? 'No ID';
-          final String categoryName = getProduct['category']['name'] ?? 'No category';
+          final String handcrafterName =
+              getProduct['handicrafter']['username'] ?? 'No Name';
+          final String handcrafterId =
+              getProduct['handicrafter']['id'] ?? 'No ID';
+          final String categoryName =
+              getProduct['category']['name'] ?? 'No category';
           final List<dynamic> finals = getProduct['finalProducts'] ?? [];
 
-          for(var finalpro in finals){
-            if(finalpro['isCustomMade']){
+          for (var finalpro in finals) {
+            if (finalpro['isCustomMade']) {
               custom = true;
             }
           }
@@ -773,28 +795,23 @@ class productService {
           print("Gallery Images: $galleryImages");
 
           productModel myProduct = productModel(
-            id,
-            imageUrl,
-            name,
-            lowestCustomPrice,
-            averageRating.toDouble(),
-            finalProducts: finalProducts,
-            ratingCount: ratingCount,
-            description: description,
-            variations: variations,
-            handcrafterName: handcrafterName,
-            handcrafterId: handcrafterId,
-            reviews: reviews,
-            category: categoryName,
-            galleryImg: galleryImages,
-            custom: custom
-
-          );
+              id, imageUrl, name, lowestCustomPrice, averageRating.toDouble(),
+              finalProducts: finalProducts,
+              ratingCount: ratingCount,
+              description: description,
+              variations: variations,
+              handcrafterName: handcrafterName,
+              handcrafterId: handcrafterId,
+              reviews: reviews,
+              category: categoryName,
+              galleryImg: galleryImages,
+              custom: custom);
 
           return myProduct;
         } else {
           print('getProduct is null');
-          return productModel(" ", " ", " ", 0.0, 0.0); // Provide default values
+          return productModel(
+              " ", " ", " ", 0.0, 0.0); // Provide default values
         }
       } else {
         print('Failed to load product: ${response.statusCode}');
@@ -806,7 +823,7 @@ class productService {
     }
   }
 
-  Future<List<productModel>> getHandcrafterProduct() async{
+  Future<List<productModel>> getHandcrafterProduct() async {
     List<productModel> handcrafterProducts = [];
     final String viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
     String Query = '''
@@ -832,7 +849,7 @@ class productService {
       },
     };
 
-    try{
+    try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
       final response = await http.post(
@@ -843,35 +860,35 @@ class productService {
         },
         body: jsonEncode(request),
       );
-print(response.statusCode);
-      if(response.statusCode == 200){
+      print(response.statusCode);
+      if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         List<dynamic> getProducts = data['data']?['user']['products'];
         print(data);
 
-        for(var product in getProducts){
-          productModel myProduct = productModel(product['id'], product['imageUrl'],
-              product['name'], product['lowestCustomPrice'].toDouble(), product['averageRating'].toDouble(), category: product['category']['name']);
+        for (var product in getProducts) {
+          productModel myProduct = productModel(
+              product['id'],
+              product['imageUrl'],
+              product['name'],
+              product['lowestCustomPrice'].toDouble(),
+              product['averageRating'].toDouble(),
+              category: product['category']['name']);
           handcrafterProducts.add(myProduct);
         }
         print(handcrafterProducts);
         return handcrafterProducts;
-
-      }else{
+      } else {
         print("Error Happen During Fetching");
         return [];
       }
-
-
-    }catch (e) {
+    } catch (e) {
       print('Error fetching product: $e');
       return []; // Provide default values
     }
-
-
   }
 
-  Future<List<productModel>> getHandcrafterProductById(String crafterId) async{
+  Future<List<productModel>> getHandcrafterProductById(String crafterId) async {
     List<productModel> handcrafterProducts = [];
 
     String Query = '''
@@ -897,7 +914,7 @@ print(response.statusCode);
       },
     };
 
-    try{
+    try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
       final response = await http.post(
@@ -908,38 +925,37 @@ print(response.statusCode);
         },
         body: jsonEncode(request),
       );
-print(response.statusCode);
-      if(response.statusCode == 200){
+      print(response.statusCode);
+      if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         List<dynamic> getProducts = data['data']?['user']['products'];
         print(data);
 
-        for(var product in getProducts){
-          productModel myProduct = productModel(product['id'], product['imageUrl'],
-              product['name'], product['lowestCustomPrice'].toDouble(), product['averageRating'].toDouble(), category: product['category']['name']);
+        for (var product in getProducts) {
+          productModel myProduct = productModel(
+              product['id'],
+              product['imageUrl'],
+              product['name'],
+              product['lowestCustomPrice'].toDouble(),
+              product['averageRating'].toDouble(),
+              category: product['category']['name']);
           handcrafterProducts.add(myProduct);
         }
         print(handcrafterProducts);
         return handcrafterProducts;
-
-      }else{
+      } else {
         print("Error Happen During Fetching");
         return [];
       }
-
-
-    }catch (e) {
+    } catch (e) {
       print('Error fetching product: $e');
       return []; // Provide default values
     }
-
-
   }
 
   Future<List<productModel>> getAddedProducts(List<String> productIds) async {
-    List<productModel> products= [] ;
-    Map<String, List<dynamic> > variations= {} ;
-
+    List<productModel> products = [];
+    Map<String, List<dynamic>> variations = {};
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {
@@ -990,25 +1006,29 @@ print(response.statusCode);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
-        for(var pro in prods){
+        for (var pro in prods) {
 // print(pro['finalProducts'][0]['finalProductVariation']);
           List<String> vars = [];
           variations = {};
 
-          for(var finalVariations in pro['finalProducts']){
+          for (var finalVariations in pro['finalProducts']) {
             vars = [];
-            for(var finalVariation in finalVariations['finalProductVariation']){
+            for (var finalVariation
+                in finalVariations['finalProductVariation']) {
               vars.add(finalVariation['productVariation']['variationValue']);
             }
             variations[finalVariations['id']] = vars;
-
           }
 
-          products.add(productModel(pro['id'], pro['imageUrl'], pro['name'],
-              pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name'],
-              variationsWithIds: variations), );
+          products.add(
+            productModel(pro['id'], pro['imageUrl'], pro['name'],
+                pro['lowestCustomPrice'].toDouble(), 0,
+                category: pro['category']['name'],
+                variationsWithIds: variations),
+          );
         }
-        print("Products fetched successfully: ${products[0].variationsWithIds}");
+        print(
+            "Products fetched successfully: ${products[0].variationsWithIds}");
         return products;
       } else {
         throw Exception('Failed to load products: ${response.body}');
@@ -1018,6 +1038,7 @@ print(response.statusCode);
       return products;
     }
   }
+
   Future<List<List<String>>> getFinalProductVariations(String productId) async {
     List<List<String>> variations = [];
 
@@ -1055,8 +1076,7 @@ print(response.statusCode);
         },
         body: jsonEncode(request),
       );
-      print(response.body)
-;
+      print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
@@ -1064,27 +1084,25 @@ print(response.statusCode);
         print(productId);
         print(data['getProductsByIds']);
         print(data);
-        for (var variation in data['getProductsByIds']['finalProducts']['finalProductVariation']){
-            variations.add(variation['productVariation']['variationValue']);
+        for (var variation in data['getProductsByIds']['finalProducts']
+            ['finalProductVariation']) {
+          variations.add(variation['productVariation']['variationValue']);
         }
-
 
         return variations;
       } else {
         print('getProduct is null');
         return []; // Provide default values
       }
-    }catch (e) {
+    } catch (e) {
       print('Error fetching product: $e');
-      return[];
+      return [];
     }
-    }
-
+  }
 
   Future<bool> getproductType(List<String> productIds) async {
     bool custom = false;
-    Map<String, List<dynamic> > variations= {} ;
-
+    Map<String, List<dynamic>> variations = {};
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {
@@ -1121,13 +1139,12 @@ print(response.statusCode);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
-        for(var pro in prods){
-          for(var finalPro in pro['finalProducts']){
-            if(finalPro['isCustomMade']){
+        for (var pro in prods) {
+          for (var finalPro in pro['finalProducts']) {
+            if (finalPro['isCustomMade']) {
               custom = true;
             }
           }
-
         }
         return custom;
       } else {
@@ -1138,11 +1155,8 @@ print(response.statusCode);
     }
   }
 
-
-
   Future<List<productModel>> getSearchProducts(List<String> productIds) async {
-    List<productModel> products= [] ;
-
+    List<productModel> products = [];
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {
@@ -1183,10 +1197,12 @@ print(response.statusCode);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
-        for(var pro in prods){
-          products.add(productModel(pro['id'], pro['imageUrl'], pro['name'],
-              pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name']), );
-
+        for (var pro in prods) {
+          products.add(
+            productModel(pro['id'], pro['imageUrl'], pro['name'],
+                pro['lowestCustomPrice'].toDouble(), 0,
+                category: pro['category']['name']),
+          );
         }
 
         print("Products fetched successfully: $products");
@@ -1199,8 +1215,4 @@ print(response.statusCode);
       return products;
     }
   }
-
-
-  }
-
-
+}

@@ -168,10 +168,6 @@ class _HomeState extends State<Home> {
                   controller: search,
                   hintName: "Search",
                   icon: Icons.search,
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.camera_alt_outlined),
-                    onPressed: () => searchEndPoint.SearchImage(5)
-                  ),
                   // onClickFunction:(context) => _navigateToSearch(),
                 ),
               ),
