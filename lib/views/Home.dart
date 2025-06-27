@@ -156,28 +156,30 @@ class _HomeState extends State<Home> {
       child: Row(
         children: [
           Expanded(
-            child: MyTextFormField(
-              onClickFunction : () {Navigator.pushNamed(context, searchView.id)},
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, searchView.id);
+              },
+              child: Container(
 
-              controller: search,
-              hintName: "Search",
-              icon: Icons.search,
-              suffixIcon: IconButton(
-                icon: Icon(Icons.camera_alt_outlined),
-                onPressed: () {
-                  Navigator.pushNamed(context, searchView.id);
-                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.search, color: Colors.grey),
+                    SizedBox(width: 10),
+                    Text("Search"),
+                    Spacer(),
+                    Icon(Icons.camera_alt_outlined, color: Colors.grey),
+                  ],
+                ),
               ),
-              // onClickFunction:(context) => _navigateToSearch(),
             ),
           ),
-          SizedBox(width: 10),
-          Icon(Icons.tune),
+          const SizedBox(width: 10),
+          const Icon(Icons.tune),
         ],
       ),
     );
   }
-
   Widget _buildAdsSection(AdvertisementProvider provider, BazarProvider bazar) {
     final hasBazar = bazar.activeBazar.id != null;
     final totalItems = provider.ads.length + (hasBazar ? 1 : 0);
