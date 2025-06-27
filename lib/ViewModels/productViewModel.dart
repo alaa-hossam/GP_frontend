@@ -27,7 +27,7 @@ class productViewModel  extends ChangeNotifier{
     return apiServices.searchProduct(word);
   }
 
-  Future<String> addProduct({
+  Future<productModel> addProduct({
     required String categoryId,
     required String name,
     required String description,
@@ -49,7 +49,7 @@ class productViewModel  extends ChangeNotifier{
       return result;
     } catch (e) {
       debugPrint("Error in ViewModel addProduct: $e");
-      return "Failed to create product: $e";
+      rethrow;
     }
   }
 

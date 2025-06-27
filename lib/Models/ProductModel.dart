@@ -58,7 +58,7 @@ class productService {
   Cart myCart = Cart();
   List<productModel> products = [];
 
-  Future<String> addProduct({
+  Future<productModel> addProduct({
     required String categoryId,
     required String name,
     required String description,
@@ -73,9 +73,7 @@ class productService {
     request.headers['Content-Type'] = 'multipart/form-data';
     request.headers['x-apollo-operation-name'] = 'CreateProduct';
     request.headers['Authorization'] = 'Bearer $myToken';
-    // Add headers
 
-    // GraphQL mutation
     final query = '''
     mutation CreateProduct(\$indicatorIds: [String!]!, \$variations: [CreateProductVariationDto!], \$file: Upload!) {
       createProduct(
@@ -89,19 +87,29 @@ class productService {
         },
         file: \$file
       ) {
+        averageRating
+        description
         id
+        imageUrl
+        name
+        ratingCount
+        variations {
+            id
+            sizeUnit
+            variationType
+            variationValue
+        }
+        lowestCustomPrice
       }
     }
   ''';
 
-    // Build the GraphQL variables
     final variables = {
       "indicatorIds": indicatorIds,
       "variations": variations,
-      "file": null
+      "file": null,
     };
 
-    // Set up multipart fields
     request.fields['operations'] = jsonEncode({
       "query": query,
       "variables": variables,
@@ -111,11 +119,7 @@ class productService {
       "0": ["variables.file"]
     });
 
-    // Attach image
-    request.files.add(await http.MultipartFile.fromPath(
-      '0',
-      imageFile.path,
-    ));
+    request.files.add(await http.MultipartFile.fromPath('0', imageFile.path));
 
     try {
       final streamedResponse = await request.send();
@@ -123,22 +127,29 @@ class productService {
 
       print("GraphQL Response: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['errors'] != null) {
-          return "Error: ${data['errors'][0]['message']}";
-        }
-        final created = data['data']['createProduct'];
-        return "Product added: ID = ${created['id']}";
-      } else {
-        final error = jsonDecode(response.body);
-        return "Server Error: ${error['errors']?[0]?['message'] ?? 'Unknown error'}";
+      final data = jsonDecode(response.body);
+      if (data['errors'] != null) {
+        throw Exception(data['errors'][0]['message']);
       }
+
+      final productData = data['data']['createProduct'];
+
+      return productModel(
+        productData['id'],
+        productData['imageUrl'] ?? "",
+        productData['name'] ?? "",
+        (productData['lowestCustomPrice'] ?? 0).toDouble(),
+        (productData['averageRating'] ?? 0).toDouble(),
+        description: productData['description'],
+        ratingCount: productData['ratingCount'],
+        variations: productData['variations'],
+      );
     } catch (e) {
       print("Exception: $e");
-      return "Exception: $e";
+      rethrow;
     }
   }
+
 
   Future<String> addFinalProduct({
     required String categoryId,
@@ -311,9 +322,8 @@ class productService {
             product['imageUrl'],
             product['name'],
             category: product['category']['name'],
-            // Convert to double to avoid type errors
-            product['lowestCustomPrice'].toDouble(),
-            product['averageRating'].toDouble(),
+            (product['lowestCustomPrice'] ?? 0).toDouble(),
+            (product['averageRating'] ?? 0).toDouble(),
             description: product['description'],
             stock: product['stockQuantity'],
           ));
@@ -472,8 +482,7 @@ class productService {
     }
   }
 
-  Future<String> addProductReview(
-      String comment, String productId, double rate) async {
+  Future<String> addProductReview(String comment, String productId, double rate) async {
     print("Fetching products from API...");
     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
 
@@ -970,8 +979,8 @@ class productService {
               product['id'],
               product['imageUrl'],
               product['name'],
-              product['lowestCustomPrice'].toDouble(),
-              product['averageRating'].toDouble(),
+              (product['lowestCustomPrice'] ?? 0).toDouble(),
+              (product['averageRating'] ?? 0).toDouble(),
               category: product['category']['name']);
           handcrafterProducts.add(myProduct);
         }

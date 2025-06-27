@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Models/indecatorModel.dart';
 import 'package:gp_frontend/ViewModels/indecatorViewModel.dart';
 import 'package:gp_frontend/ViewModels/productViewModel.dart';
@@ -13,6 +14,8 @@ import '../Providers/CategoryProvider.dart';
 import '../widgets/customizeButton.dart';
 import '../widgets/messages.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
+import 'finalProducts.dart';
 
 class AddProduct extends StatefulWidget {
   static String id = "AddProductScreen";
@@ -74,7 +77,7 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
-  Future<String> _saveData() async {
+  Future<productModel> _saveData() async {
     try {
       setState(() {
         _isLoading = true;
@@ -142,26 +145,26 @@ class _AddProductState extends State<AddProduct> {
 
       final catProvider = Provider.of<CategoryProvider>(context, listen: false);
 
-      // String result = await PVM.addProduct(
-      //   categoryId: catProvider.selectedCategoryId!,
-      //   name: productName.text.trim(),
-      //   description: description.text.trim(),
-      //   indicatorIds: selectedTags.map((e) => e.id).toList(),
-      //   variations: variations,
-      //   imageFile: productImage!,
-      // );
+      productModel result = await PVM.addProduct(
+        categoryId: catProvider.selectedCategoryId!,
+        name: productName.text.trim(),
+        description: description.text.trim(),
+        indicatorIds: selectedTags.map((e) => e.id).toList(),
+        variations: variations,
+        imageFile: productImage!,
+      );
 
 
       setState(() {
         _isLoading = false;
       });
 
-      return "success";
+      return result;
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      return "An error occurred: $e";
+      rethrow;
     }
   }
 
@@ -1210,13 +1213,14 @@ class _AddProductState extends State<AddProduct> {
                           // Now call _saveData
                           final result = await _saveData();
 
-                          // // Show result to user
-                          // showCustomPopup(
-                          //   context,
-                          //   result.contains("Product added") ? "Success" : "Error",
-                          //   result,
-                          //   [],
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  FinalProduct(product: result),
+                            ),
+                          );                          // // Show result to user
+
                         },
                       ),
                     ),
