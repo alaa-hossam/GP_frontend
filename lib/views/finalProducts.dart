@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/views/addFinalProduct.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+
+import '../widgets/messages.dart';
 
 class FinalProduct extends StatefulWidget {
   static String id = "AddFinalProductScreen";
@@ -67,7 +70,8 @@ class _FinalProductState extends State<FinalProduct> {
           vertical: 10 * SizeConfig.verticalBlock,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 10 * SizeConfig.verticalBlock,
           children: [
             if( widget.product.finalProducts == null) ...[
               Text("There are no final products yet.",
@@ -89,7 +93,27 @@ class _FinalProductState extends State<FinalProduct> {
                   foregroundColor: Colors.white,
                   child: IconButton(
                     icon: Icon(Icons.add, size: SizeConfig.horizontalBlock * 20),
-                    onPressed: (){},
+                    onPressed: (){
+                      if (widget.product.variationsWithIds != null) {
+                        print(widget.product.variationsWithIds!.length);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddFinalProduct(
+                              variations: widget.product.variationsWithIds,
+                            ),
+                          ),
+                        );
+                      } else {
+                        showCustomPopup(
+                          context,
+                          "Missing Data",
+                          "No variations found for this product.",
+                          [],
+                        );
+                      }
+
+                    },
                   ),
                 ),
                 Text("Add final product",

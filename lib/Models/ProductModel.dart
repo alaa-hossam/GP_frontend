@@ -94,10 +94,10 @@ class productService {
         name
         ratingCount
         variations {
-            id
-            sizeUnit
-            variationType
-            variationValue
+          id
+          sizeUnit
+          variationType
+          variationValue
         }
         lowestCustomPrice
       }
@@ -133,6 +133,19 @@ class productService {
       }
 
       final productData = data['data']['createProduct'];
+      final List<dynamic> returnedVariations = productData['variations'] ?? [];
+      Map<String, List<dynamic>> variationMap = {};
+
+      for (var variation in returnedVariations) {
+        final id = variation['id'];
+        final value = variation['variationValue'];
+
+        if (!variationMap.containsKey(id)) {
+          variationMap[id] = [];
+        }
+
+        variationMap[id]?.add(value);
+      }
 
       return productModel(
         productData['id'],
@@ -142,13 +155,16 @@ class productService {
         (productData['averageRating'] ?? 0).toDouble(),
         description: productData['description'],
         ratingCount: productData['ratingCount'],
-        variations: productData['variations'],
+        variations: returnedVariations,
+        variationsWithIds: variationMap,
       );
     } catch (e) {
       print("Exception: $e");
       rethrow;
     }
   }
+
+
 
 
   Future<String> addFinalProduct({
