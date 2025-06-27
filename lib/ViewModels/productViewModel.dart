@@ -88,7 +88,7 @@ class productViewModel  extends ChangeNotifier{
     return await apiServices.getproductType(ids);
   }
 
-  getSearchProducts(List<String> ids)async{
+  Future <List<productModel>> getSearchProducts(List<String> ids)async{
     return await apiServices.getSearchProducts(ids);
   }
 }

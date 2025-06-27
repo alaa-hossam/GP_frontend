@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/ViewModels/productViewModel.dart';
+import 'package:provider/provider.dart';
+import '../Models/SearchService.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
-import 'ProfileView.dart';
-import 'dart:async'; // Import Timer
+import 'dart:async';
 
 class searchView extends StatefulWidget {
   static String id = "searchScreen";
@@ -20,7 +23,7 @@ class _searchState extends State<searchView> {
   productViewModel PVM = productViewModel();
   List<dynamic>? products;
   TextEditingController search = TextEditingController();
-  Timer? _debounceTimer; // Timer for debouncing
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -35,21 +38,18 @@ class _searchState extends State<searchView> {
   void dispose() {
     _focusNode.dispose();
     search.dispose();
-    _debounceTimer?.cancel(); // Cancel the timer when the widget is disposed
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
-  // Function to handle debounced search
   void _onSearchTextChanged(String value) {
     if (_debounceTimer?.isActive ?? false) {
-      _debounceTimer?.cancel(); // Cancel the previous timer if it's active
+      _debounceTimer?.cancel();
     }
 
-    // Start a new timer
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
-      // This code runs only if the user hasn't typed anything new within 500ms
       products = await PVM.searchProduct(value);
-      setState(() {}); // Update the UI with the new results
+      setState(() {});
       print("Products:");
       print(products);
     });
@@ -57,104 +57,172 @@ class _searchState extends State<searchView> {
 
   @override
   Widget build(BuildContext context) {
+    SearchService searchEndPoint = SearchService();
+    List<String> ids = [];
+
     return Scaffold(
       appBar: AppBar(
-
-        toolbarHeight: 119 * SizeConfig.verticalBlock, // Set the height of the AppBar
+        toolbarHeight: 119 * SizeConfig.verticalBlock,
         flexibleSpace: Container(
-          height: 119,
-          decoration:const BoxDecoration(
+          height: 140,
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF223F4A), // Start color
-                Color(0xFF5095B0), // End color
+                Color(0xFF223F4A),
+                Color(0xFF5095B0),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
-
           ),
-          child:
-          Padding(
-            padding:  EdgeInsets.only(left: 8.0 * SizeConfig.textRatio , bottom: 8.0 * SizeConfig.textRatio ),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 18.0 * SizeConfig.textRatio),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                MyTextFormField(
-
-                  autofocus: true,
-                  focusNode: _focusNode,
-                  controller: search,
-                  hintName: "Search",
-                  icon: Icons.search,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      Icons.camera_alt_outlined,
-                      color: SizeConfig.iconColor,
-                      size: 24 * SizeConfig.textRatio,
-                    ),
-                    onPressed: () {
-                      // Handle camera icon press
-                    },
-                  ),
-                  width: 336 * SizeConfig.horizontalBlock,
-                  height: 45 * SizeConfig.verticalBlock,
-                  onChanged: (value) {
-                    _onSearchTextChanged(value); // Pass the value to the debounced function
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
                   },
+                  icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
-            ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12 * SizeConfig.textRatio),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10 * SizeConfig.textRatio,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: MyTextFormField(
+                    borderRadius: 5 * SizeConfig.textRatio,
+                    fillColor: Colors.white,
+                    height: 45 * SizeConfig.verticalBlock,
+                    width: 336 * SizeConfig.horizontalBlock,
+                    controller: search,
+                    hintName: "Search",
+                    icon: Icons.search,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.camera_alt_outlined,
+                        color: SizeConfig.iconColor,
+                        size: 24 * SizeConfig.textRatio,
+                      ),
+                      onPressed: () async {
+                        ids = await searchEndPoint.SearchImage(5);
+                        if (context.mounted) {
+                          final myProductProvider = Provider.of<productProvider>(context, listen: false);
+                          await myProductProvider.getSearchProductsImage(ids);
+
+                          if (myProductProvider.searchProducts.isNotEmpty) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              builder: (context) =>
+                                  ProductBottomSheet(products: myProductProvider.searchProducts),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("No products found.")),
+                            );
+                          }
+                        }
+                      },
+                    ),
+                    onChanged: (value) => _onSearchTextChanged(value.toString()),
+                  ),
+                ),
+              ],
             ),
           ),
-
         ),
-        leading: Padding(
-          padding:  EdgeInsets.only(right: 20.0 * SizeConfig.textRatio , bottom: 12.0 * SizeConfig.textRatio),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              size: SizeConfig.textRatio * 15,
+        automaticallyImplyLeading: false,
+      ),
+      body: Consumer<productProvider>(
+        builder: (context, provider, _) {
+          if (provider.loading) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return Center(child: Text("Search with the camera or type to search."));
+          }
+        },
+      ),
+    );
+  }
+}
+
+class ProductBottomSheet extends StatelessWidget {
+  final List<productModel> products;
+
+  const ProductBottomSheet({super.key, required this.products});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 60,
+            height: 5,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(10),
             ),
-            onPressed: () {
-              Navigator.pop(context);
+          ),
+          Text("The Most Similar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
+
+          // Use GridView for 2 items per row
+          GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(), // Prevent internal scroll
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 2.2, // Adjust as needed
+            ),
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  // Navigate to detail if needed
+                },
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(product.name ?? 'Unnamed', style: TextStyle(fontWeight: FontWeight.bold)),
+                        SizedBox(height: 4),
+                        Text(product.description ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
+                        Spacer(),
+                        Text("${product.price ?? 0} EGP", style: TextStyle(color: Colors.green)),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             },
           ),
-        ),
-
-
-      ),
-
-      body: ListView(
-        children: [
-          SizedBox(height: 20 * SizeConfig.verticalBlock), // Add some spacing
-          if (products != null && products!.isNotEmpty)
-            ListView.builder(
-              shrinkWrap: true, // Ensure the ListView takes only the required space
-              physics: NeverScrollableScrollPhysics(), // Disable scrolling inside ListView
-              itemCount: products!.length,
-              itemBuilder: (context, index) {
-                final product = products![index];
-                return ListTile(
-                  title: Text(product['name'] ?? 'No Name'),
-                  leading: product['imageUrl'] != null
-                      ? Image.network(product['imageUrl'], width: 45, height: 45) // Replace 'imageUrl' with your product's image field
-                      : Icon(Icons.image),
-                  onTap: () {
-                    // Handle product tap (e.g., navigate to product details)
-                  },
-                );
-              },
-            )
-          else if (products != null && products!.isEmpty)
-            Center(
-              child: Text(
-                "No products found.",
-                style: TextStyle(fontSize: 16 * SizeConfig.textRatio),
-              ),
-            ),
         ],
       ),
     );
   }
+
 }

@@ -1100,7 +1100,6 @@ print(response.statusCode);
 
   Future<List<productModel>> getSearchProducts(List<String> productIds) async {
     List<productModel> products= [] ;
-    Map<String, List<dynamic> > variations= {} ;
 
 
     const String query = '''
@@ -1130,7 +1129,6 @@ print(response.statusCode);
     try {
       final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
 
-      // Step 5: Send the request
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
@@ -1140,32 +1138,16 @@ print(response.statusCode);
         body: jsonEncode(request),
       );
 
-      // Debug: Print the response body
-      // print(response.body);
-
-      // Step 6: Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
         for(var pro in prods){
-// print(pro['finalProducts'][0]['finalProductVariation']);
-          List<String> vars = [];
-          variations = {};
-
-          for(var finalVariations in pro['finalProducts']){
-            vars = [];
-            for(var finalVariation in finalVariations['finalProductVariation']){
-              vars.add(finalVariation['productVariation']['variationValue']);
-            }
-            variations[finalVariations['id']] = vars;
-
-          }
-
           products.add(productModel(pro['id'], pro['imageUrl'], pro['name'],
-              pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name'],
-              variationsWithIds: variations), );
+              pro['lowestCustomPrice'].toDouble(), 0 , category: pro['category']['name']), );
+
         }
-        print("Products fetched successfully: ${products[0].variationsWithIds}");
+
+        print("Products fetched successfully: $products");
         return products;
       } else {
         throw Exception('Failed to load products: ${response.body}');

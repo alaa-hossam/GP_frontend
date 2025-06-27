@@ -133,7 +133,7 @@ class MyTextFormField extends StatelessWidget {
                     prefixIcon: icon != null
                         ? Icon(
                       icon,
-                      size: SizeConfig.textRatio * 25,
+                      size: SizeConfig.textRatio * 24,
                       color: const Color(0xFF5095B0),
                     )
                         : null, // Set null if no icon is provided

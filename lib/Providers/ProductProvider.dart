@@ -14,12 +14,16 @@ class productProvider extends ChangeNotifier {
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
   List<productModel> _historyProducts = [];
   List<productModel> get historyProducts => _historyProducts;
+  List<productModel> _searchProducts = [];
+  List<productModel> get searchProducts => _searchProducts;
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
   final wishList _wishListObj = wishList();
   final Token token = Token();
   Set<String> _wishlistItems = {};
+
+  bool loading = false;
 
   productProvider() {
     print("ProductProvider initialized");
@@ -160,7 +164,12 @@ class productProvider extends ChangeNotifier {
 
 
   getSearchProductsImage(List<String> ids)async {
-   return await productVM.getSearchProducts(ids);
+    loading = true;
+    notifyListeners();
+    _searchProducts = await productVM.getSearchProducts(ids);
+    loading = false;
+    notifyListeners();
+
   }
 
 

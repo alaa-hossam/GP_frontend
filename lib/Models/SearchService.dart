@@ -47,7 +47,7 @@ class SearchService {
         print(responseBody);
         final data = json.decode(responseBody);
 
-        print(data['images']);
+        // print(data['images']);
         for(var product in data['images']){
           products.add(product['id']);
         }
