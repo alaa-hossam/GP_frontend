@@ -20,13 +20,7 @@ class _categoriesState extends State<categories> {
     await CVM.fetchAllCatefories();
     return CVM.allCategories;
   }
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CategoryProvider>(context, listen: false).clearSelectedCategory();
-    });
-  }
+
 
   double _calculateButtonWidth(String text, BuildContext context) {
     final textPainter = TextPainter(

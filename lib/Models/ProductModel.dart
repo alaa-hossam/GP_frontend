@@ -14,7 +14,7 @@ class productModel {
   List<dynamic>? finalProducts, variations;
   Map<String, List<dynamic>>? variationsWithIds;
   List<dynamic>? reviews;
-  List<String>? galleryImg;
+  List<String>? galleryImg , indecatorsId;
   bool custom;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
@@ -32,6 +32,7 @@ class productModel {
       this.duration,
       this.variationsWithIds,
       this.handcrafterId,
+        this.indecatorsId,
       this.custom = false});
 
 
@@ -50,35 +51,75 @@ class productService {
   Cart myCart = Cart();
   List<productModel> products = [];
 
-  Future<String> addProduct(productModel product) async {
-    final request = {
-      'query': '''
-        ''',
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(request),
-      );
-
-      print("Response: ${response.body}"); // Debugging the response
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['errors'] != null) {
-          return data['errors'][0]['message'];
-        }
-        return "User added successfully";
-      } else {
-        return jsonDecode(response.body)['errors'][0]['message'];
-      }
-    } catch (e) {
-      print("Exception: $e");
-      return e.toString();
-    }
-  }
+//   Future<String> addProduct(productModel product) async {
+//     final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+//     print("Token in getCartProducts: $myToken");
+//     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+//     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+//
+//     // Add headers
+//     request.headers['Content-Type'] = 'multipart/form-data';
+//     request.headers['x-apollo-operation-name'] = 'RequestToBeHandicrafter';
+//     request.headers['Authorization'] = 'Bearer $myToken';
+//
+//     final query= '''
+//       mutation CreateProduct (\$indicatorIds: [String!]! ,\$file: Upload!){
+//     createProduct(
+//         createProductDto: {
+//             categoryId: "${product.category}",
+//             description: "${product.description}",
+//             handicrafterId: "${userId}",
+//             name: "${product.name}",
+//             indicatorIds: \$indicatorIds,
+//             variations: null
+//         }
+//         file: \$file,
+//     ) {
+//         id
+//     }
+// }
+//         ''';
+//     request.fields['operations'] = jsonEncode({
+//       'query': query,
+//       'variables': {
+//         'indicatorIds': product.indecatorsId,
+//         'file': null,
+//       },
+//     });
+//
+//     // Add the file map
+//     request.fields['map'] = jsonEncode({
+//       '0': ['variables.file'],
+//     });
+//
+//     // Add files to the request
+//     request.files.add(await http.MultipartFile.fromPath(
+//       '0',
+//       product.profileImage!.path,
+//     ));
+//     try {
+//       final response = await http.post(
+//         Uri.parse(apiUrl),
+//         headers: {'Content-Type': 'application/json'},
+//         body: jsonEncode(request),
+//       );
+//
+//       print("Response: ${response.body}"); // Debugging the response
+//
+//       if (response.statusCode == 200) {
+//         final data = jsonDecode(response.body);
+//         if (data['errors'] != null) {
+//           return data['errors'][0]['message'];
+//         }
+//         return "User added successfully";
+//       } else {
+//         return jsonDecode(response.body)['errors'][0]['message'];
+//       }
+//     } catch (e) {
+//       print("Exception: $e");
+//       return e.toString();
+//     }
+//   }
 
   Future<List<productModel>> getAllProducts(String categoryId) async {
     print("Fetching products from API...");
@@ -829,6 +870,7 @@ print(response.statusCode);
 
 
   }
+
   Future<List<productModel>> getHandcrafterProductById(String crafterId) async{
     List<productModel> handcrafterProducts = [];
 
