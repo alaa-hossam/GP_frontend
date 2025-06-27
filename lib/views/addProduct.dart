@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/indecatorModel.dart';
 import 'package:gp_frontend/ViewModels/indecatorViewModel.dart';
+import 'package:gp_frontend/ViewModels/productViewModel.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:gp_frontend/widgets/catgories.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
@@ -22,6 +23,7 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
+  productViewModel PVM = productViewModel();
   final TextEditingController productName = TextEditingController();
   final TextEditingController description = TextEditingController();
   final IndecatorViewModel IVM = IndecatorViewModel();
@@ -35,6 +37,7 @@ class _AddProductState extends State<AddProduct> {
   List<VolumeGroup> volumeGroups = [];
   List<TextEditingController> materialControllers = [TextEditingController()];
   List<TextEditingController> otherControllers = [TextEditingController()];
+  List<Map<String, dynamic>> variations = [];
   final List<String> allVariations = [
     'Size',
     'Volume',
@@ -68,6 +71,97 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         productImage = File(pickedImage.path);
       });
+    }
+  }
+
+  Future<String> _saveData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      for (var group in sizeGroups) {
+        for (var controller in group.valueControllers) {
+          final value = controller.text.trim();
+          if (value.isNotEmpty && group.selectedUnit != null) {
+            variations.add({
+              "variationType": "Size",
+              "variationValue": value,
+              "sizeUnit": group.selectedUnit,
+            });
+          }
+        }
+      }
+
+      // Add volume variations
+      for (var group in volumeGroups) {
+        for (var controller in group.valueControllers) {
+          final value = controller.text.trim();
+          if (value.isNotEmpty && group.selectedUnit != null) {
+            variations.add({
+              "variationType": "Volume",
+              "variationValue": value,
+              "sizeUnit": group.selectedUnit,
+            });
+          }
+        }
+      }
+
+      // Add color variations
+      for (var hex in selectedColorHexes) {
+        variations.add({
+          "variationType": "Color",
+          "variationValue": hex,
+          "sizeUnit": "Other",
+        });
+      }
+
+      // Add material variations
+      for (var controller in materialControllers) {
+        final value = controller.text.trim();
+        if (value.isNotEmpty) {
+          variations.add({
+            "variationType": "Material",
+            "variationValue": value,
+            "sizeUnit": "Other",
+          });
+        }
+      }
+
+      // Add other variations
+      for (var controller in otherControllers) {
+        final value = controller.text.trim();
+        if (value.isNotEmpty) {
+          variations.add({
+            "variationType": "Other",
+            "variationValue": value,
+            "sizeUnit": "Other",
+          });
+        }
+      }
+
+      final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+
+      // String result = await PVM.addProduct(
+      //   categoryId: catProvider.selectedCategoryId!,
+      //   name: productName.text.trim(),
+      //   description: description.text.trim(),
+      //   indicatorIds: selectedTags.map((e) => e.id).toList(),
+      //   variations: variations,
+      //   imageFile: productImage!,
+      // );
+
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      return "success";
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      return "An error occurred: $e";
     }
   }
 
@@ -1074,79 +1168,55 @@ class _AddProductState extends State<AddProduct> {
                         fontColor: const Color(0xFFF5F5F5),
                         width: 200 * SizeConfig.horizontalBlock,
                         height: 50 * SizeConfig.verticalBlock,
-                        onClickButton: () {
+                        onClickButton: () async {
                           if (selectedTags.length < 1) {
                             showCustomPopup(
                               context,
                               "Warning",
-                              "Choose at least 1 tags",
+                              "Choose at least 1 tag",
                               [],
                             );
-
+                            return; // Prevent proceeding
                           }
-                          // Print all input data to terminal
+
+                          // Optional: Validate other required fields
+                          if (productName.text.trim().isEmpty || description.text.trim().isEmpty) {
+                            showCustomPopup(
+                              context,
+                              "Missing Info",
+                              "Product name and description are required.",
+                              [],
+                            );
+                            return;
+                          }
+
+                          if (productImage == null) {
+                            showCustomPopup(
+                              context,
+                              "Missing Image",
+                              "Please select a product image.",
+                              [],
+                            );
+                            return;
+                          }
+
+                          // Optional debug logs
                           print('\n\n===== PRODUCT INPUT DATA =====');
-                          print('Basic Information:');
                           print('- Product Name: ${productName.text}');
                           print('- Description: ${description.text}');
-                          print('- Selected Tab Index: $selectedTabIndex');
+                          print('- Selected Tags: ${selectedTags.map((e) => e.name).toList()}');
+                          print('- Selected Variations: $selectedVariations');
 
-                          print('\nSelected Tags:');
-                          for (var tag in selectedTags) {
-                            print('- ${tag.name}');
-                          }
+                          // Now call _saveData
+                          final result = await _saveData();
 
-                          print('\nSelected Variations:');
-                          for (var variation in selectedVariations) {
-                            print('- $variation');
-                          }
-
-                          if (selectedVariations.contains("Size")) {
-                            print('\nSize Variations:');
-                            for (int i = 0; i < sizeGroups.length; i++) {
-                              print('  Group ${i + 1}:');
-                              print('  - Unit: ${sizeGroups[i].selectedUnit}');
-                              print('  - Values:');
-                              for (var controller in sizeGroups[i].valueControllers) {
-                                print('    - ${controller.text}');
-                              }
-                            }
-                          }
-
-                          if (selectedVariations.contains("Color")) {
-                            print('\nColor Variations:');
-                            for (var hex in selectedColorHexes) {
-                              print('- $hex');
-                            }
-                          }
-
-                          if (selectedVariations.contains("Material")) {
-                            print('\nMaterial Variations:');
-                            for (int i = 0; i < materialControllers.length; i++) {
-                              print('- ${materialControllers[i].text}');
-                            }
-                          }
-
-                          if (selectedVariations.contains("Volume")) {
-                            print('\nVolume Variations:');
-                            for (int i = 0; i < volumeGroups.length; i++) {
-                              print('  Group ${i + 1}:');
-                              print('  - Unit: ${volumeGroups[i].selectedUnit}');
-                              print('  - Values:');
-                              for (var controller in volumeGroups[i].valueControllers) {
-                                print('    - ${controller.text}');
-                              }
-                            }
-                          }
-
-                          if (selectedVariations.contains("Other")) {
-                            print('\nOther Variations:');
-                            for (int i = 0; i < otherControllers.length; i++) {
-                              print('- ${otherControllers[i].text}');
-                            }
-                          }
-
-                          print('=============================\n\n');
+                          // // Show result to user
+                          // showCustomPopup(
+                          //   context,
+                          //   result.contains("Product added") ? "Success" : "Error",
+                          //   result,
+                          //   [],
+                          // );
                         },
                       ),
                     ),

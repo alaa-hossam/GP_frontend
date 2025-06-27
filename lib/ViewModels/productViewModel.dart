@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/SqfliteCodes/cart.dart';
 
@@ -24,6 +26,33 @@ class productViewModel  extends ChangeNotifier{
   Future<List<productModel>> searchProduct(String word){
     return apiServices.searchProduct(word);
   }
+
+  Future<String> addProduct({
+    required String categoryId,
+    required String name,
+    required String description,
+    required List<String> indicatorIds,
+    required List<Map<String, dynamic>> variations,
+    required File imageFile,
+  }) async {
+    try {
+      print("Calling addProduct in ViewModel...");
+      final result = await apiServices.addProduct(
+        categoryId: categoryId,
+        name: name,
+        description: description,
+        indicatorIds: indicatorIds,
+        variations: variations,
+        imageFile: imageFile,
+      );
+      print("Product creation result: $result");
+      return result;
+    } catch (e) {
+      debugPrint("Error in ViewModel addProduct: $e");
+      return "Failed to create product: $e";
+    }
+  }
+
 
   wishProducts(){
     return apiServices.getWishProducts();

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
@@ -21,6 +22,7 @@ class productModel {
   List<dynamic>? reviews;
   List<String>? galleryImg, indecatorsId;
   bool custom;
+  File? productImage;
   productModel(this._id, this._imageURL, this._name, this._price, this._rate,
       {this.description,
       this.stock,
@@ -38,6 +40,7 @@ class productModel {
       this.variationsWithIds,
       this.handcrafterId,
       this.indecatorsId,
+      this.productImage,
       this.custom = false});
 
   double get rate => _rate;
@@ -55,75 +58,171 @@ class productService {
   Cart myCart = Cart();
   List<productModel> products = [];
 
-//   Future<String> addProduct(productModel product) async {
-//     final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-//     print("Token in getCartProducts: $myToken");
-//     final userId = await token.getUUID('SELECT UUID FROM TOKENS');
-//     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-//
-//     // Add headers
-//     request.headers['Content-Type'] = 'multipart/form-data';
-//     request.headers['x-apollo-operation-name'] = 'RequestToBeHandicrafter';
-//     request.headers['Authorization'] = 'Bearer $myToken';
-//
-//     final query= '''
-//       mutation CreateProduct (\$indicatorIds: [String!]! ,\$file: Upload!){
-//     createProduct(
-//         createProductDto: {
-//             categoryId: "${product.category}",
-//             description: "${product.description}",
-//             handicrafterId: "${userId}",
-//             name: "${product.name}",
-//             indicatorIds: \$indicatorIds,
-//             variations: null
-//         }
-//         file: \$file,
-//     ) {
-//         id
-//     }
-// }
-//         ''';
-//     request.fields['operations'] = jsonEncode({
-//       'query': query,
-//       'variables': {
-//         'indicatorIds': product.indecatorsId,
-//         'file': null,
-//       },
-//     });
-//
-//     // Add the file map
-//     request.fields['map'] = jsonEncode({
-//       '0': ['variables.file'],
-//     });
-//
-//     // Add files to the request
-//     request.files.add(await http.MultipartFile.fromPath(
-//       '0',
-//       product.profileImage!.path,
-//     ));
-//     try {
-//       final response = await http.post(
-//         Uri.parse(apiUrl),
-//         headers: {'Content-Type': 'application/json'},
-//         body: jsonEncode(request),
-//       );
-//
-//       print("Response: ${response.body}"); // Debugging the response
-//
-//       if (response.statusCode == 200) {
-//         final data = jsonDecode(response.body);
-//         if (data['errors'] != null) {
-//           return data['errors'][0]['message'];
-//         }
-//         return "User added successfully";
-//       } else {
-//         return jsonDecode(response.body)['errors'][0]['message'];
-//       }
-//     } catch (e) {
-//       print("Exception: $e");
-//       return e.toString();
-//     }
-//   }
+  Future<String> addProduct({
+    required String categoryId,
+    required String name,
+    required String description,
+    required List<String> indicatorIds,
+    required List<Map<String, dynamic>> variations,
+    required File imageFile,
+  }) async {
+    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+    request.headers['Content-Type'] = 'multipart/form-data';
+    request.headers['x-apollo-operation-name'] = 'CreateProduct';
+    request.headers['Authorization'] = 'Bearer $myToken';
+    // Add headers
+
+    // GraphQL mutation
+    final query = '''
+    mutation CreateProduct(\$indicatorIds: [String!]!, \$variations: [CreateProductVariationDto!], \$file: Upload!) {
+      createProduct(
+        createProductDto: {
+          categoryId: "$categoryId",
+          description: "$description",
+          handicrafterId: "$userId",
+          name: "$name",
+          indicatorIds: \$indicatorIds,
+          variations: \$variations
+        },
+        file: \$file
+      ) {
+        id
+      }
+    }
+  ''';
+
+    // Build the GraphQL variables
+    final variables = {
+      "indicatorIds": indicatorIds,
+      "variations": variations,
+      "file": null
+    };
+
+    // Set up multipart fields
+    request.fields['operations'] = jsonEncode({
+      "query": query,
+      "variables": variables,
+    });
+
+    request.fields['map'] = jsonEncode({
+      "0": ["variables.file"]
+    });
+
+    // Attach image
+    request.files.add(await http.MultipartFile.fromPath(
+      '0',
+      imageFile.path,
+    ));
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print("GraphQL Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['errors'] != null) {
+          return "Error: ${data['errors'][0]['message']}";
+        }
+        final created = data['data']['createProduct'];
+        return "Product added: ID = ${created['id']}";
+      } else {
+        final error = jsonDecode(response.body);
+        return "Server Error: ${error['errors']?[0]?['message'] ?? 'Unknown error'}";
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return "Exception: $e";
+    }
+  }
+
+  Future<String> addFinalProduct({
+    required String categoryId,
+    required String name,
+    required String description,
+    required List<String> indicatorIds,
+    required List<Map<String, dynamic>> variations,
+    required File imageFile,
+  }) async {
+    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+    request.headers['Content-Type'] = 'multipart/form-data';
+    request.headers['x-apollo-operation-name'] = 'CreateProduct';
+    request.headers['Authorization'] = 'Bearer $myToken';
+    // Add headers
+
+    // GraphQL mutation
+    final query = '''
+    mutation CreateProduct(\$indicatorIds: [String!]!, \$variations: [CreateProductVariationDto!], \$file: Upload!) {
+      createProduct(
+        createProductDto: {
+          categoryId: "$categoryId",
+          description: "$description",
+          handicrafterId: "$userId",
+          name: "$name",
+          indicatorIds: \$indicatorIds,
+          variations: \$variations
+        },
+        file: \$file
+      ) {
+        id
+      }
+    }
+  ''';
+
+    // Build the GraphQL variables
+    final variables = {
+      "indicatorIds": indicatorIds,
+      "variations": variations,
+      "file": null
+    };
+
+    // Set up multipart fields
+    request.fields['operations'] = jsonEncode({
+      "query": query,
+      "variables": variables,
+    });
+
+    request.fields['map'] = jsonEncode({
+      "0": ["variables.file"]
+    });
+
+    // Attach image
+    request.files.add(await http.MultipartFile.fromPath(
+      '0',
+      imageFile.path,
+    ));
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print("GraphQL Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['errors'] != null) {
+          return "Error: ${data['errors'][0]['message']}";
+        }
+        final created = data['data']['createProduct'];
+        return "Product added: ID = ${created['id']}";
+      } else {
+        final error = jsonDecode(response.body);
+        return "Server Error: ${error['errors']?[0]?['message'] ?? 'Unknown error'}";
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return "Exception: $e";
+    }
+  }
+
+
 
   Future<List<productModel>> getAllProducts(String categoryId) async {
     print("Fetching products from API...");
