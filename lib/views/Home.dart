@@ -66,7 +66,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    SearchService searchEndPoint = SearchService();
 
     return Scaffold(
       drawer: Mydrawer(),

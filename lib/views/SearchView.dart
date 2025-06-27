@@ -24,6 +24,7 @@ class _searchState extends State<searchView> {
   productViewModel PVM = productViewModel();
   TextEditingController search = TextEditingController();
   Timer? _debounceTimer;
+  bool _isBottomSheetOpen = false; // Track state
 
   @override
   void initState() {
@@ -48,24 +49,38 @@ class _searchState extends State<searchView> {
     }
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
+      if (value.trim().isEmpty) return;
+
       final result = await PVM.searchProduct(value);
 
-      if (context.mounted && result != null && result.isNotEmpty) {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          builder: (context) => ProductBottomSheet(products: result),
-        );
-      } else if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No products found.")),
-        );
+      if (context.mounted) {
+        if (_isBottomSheetOpen) {
+          Navigator.pop(context);
+          _isBottomSheetOpen = false;
+        }
+
+        if (result != null && result.isNotEmpty) {
+          _isBottomSheetOpen = true;
+
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) => ProductBottomSheet(products: result),
+          ).whenComplete(() {
+            _isBottomSheetOpen = false;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("No products found.")),
+          );
+        }
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
