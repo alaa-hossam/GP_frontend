@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '684091793203',
     projectId: 'san3a-ee8fe',
     storageBucket: 'san3a-ee8fe.firebasestorage.app',
+    iosClientId: '684091793203-rj0jjp2rv9a2ukqhpvq1t97s45n15ji5.apps.googleusercontent.com',
     iosBundleId: 'com.example.gpFrontend',
   );
+
 }

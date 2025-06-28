@@ -34,7 +34,7 @@ class _logInState extends State<logIn> {
   Future<String> logInCustomer() async {
     try {
       String response =await cvm.logIn(email: email.text, password: password.text);
-      // await firebaseAnonymousLogin();
+      await firebaseAnonymousLogin();
       return response ;
     } catch (e) {
       return e.toString();

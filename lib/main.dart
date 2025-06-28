@@ -7,6 +7,7 @@ import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/Providers/postProvider.dart';
 import 'package:gp_frontend/Providers/voucherProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/ViewModels/messageViewModel.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
 import 'package:gp_frontend/views/AdvertisementsPackages.dart';
 import 'package:gp_frontend/views/BazarProductsReview.dart';
@@ -90,6 +91,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => postProvider()),
         ChangeNotifierProvider(create: (_) => offerProvider()),
         ChangeNotifierProvider(create: (_) => voucherProvider()),
+        ChangeNotifierProvider(create: (_) => ChatViewModel()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),

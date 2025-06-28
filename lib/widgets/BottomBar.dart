@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/messageView.dart';
 import 'package:gp_frontend/views/posts.dart';
 import 'package:gp_frontend/views/showOrders.dart';
@@ -80,29 +81,50 @@ class BottomBarState extends State<BottomBar> {
 class buttonProvider extends ChangeNotifier {
   int _selectedIndex = 0;
   int? _oldselected;
-  static List<Widget> _widgetOptions = <Widget>[
-    Home(),
-    AIChat(),
-    posts(),
-    ChatScreen(currentUserId: "93e6e7a7-588a-43d4-8462-a65bdea4c9ed", otherUserId: "a5b0a4ac-3951-421e-8e6c-67eac233089f")
-  ];
+
   int get selectedIndex => _selectedIndex;
 
-  void updateIndex(BuildContext context,int index) {
+  void updateIndex(BuildContext context, int index) async {
     _oldselected = _selectedIndex;
     _selectedIndex = index;
-    if(_oldselected != _selectedIndex) {
+
+    if (_oldselected != _selectedIndex) {
+      Widget screen;
+
+      switch (index) {
+        case 0:
+          screen = Home();
+          break;
+        case 1:
+          screen = AIChat();
+          break;
+        case 2:
+          screen = posts();
+          break;
+        case 3:
+          String id = await getId(); // 👈 Now you're awaiting correctly
+          screen = ChatScreen(
+            currentUserId: id,
+            otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
+          );
+          break;
+        default:
+          screen = Home();
+      }
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => _widgetOptions[index] ,
-        settings: RouteSettings(
-          arguments:1,
-        ),),
-
-
+          builder: (context) => screen,
+        ),
       );
     }
+
     notifyListeners();
+  }
+
+  Future<String> getId() async {
+    Token token = Token();
+    return await token.getUUID('SELECT UUID FROM TOKENS');
   }
 }

@@ -23,6 +23,7 @@ import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
 import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
+import 'messageView.dart';
 
 class Home extends StatefulWidget {
   static String id = "homeScreen";
@@ -38,10 +39,16 @@ class _HomeState extends State<Home> {
   late Token token;
   late String role;
 
+
   @override
   void initState() {
     super.initState();
     _initialization = _fetchInitialData();
+  }
+
+  Future<String> getId() async {
+    Token token = Token();
+    return await token.getUUID('SELECT UUID FROM TOKENS');
   }
 
   Future<void> _fetchInitialData() async {
@@ -68,6 +75,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
+
     return Scaffold(
       drawer: Mydrawer(),
       appBar: _buildAppBar(context),
@@ -90,9 +98,21 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.transparent,
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            String id = await getId();
+            Widget screen = ChatScreen(
+              currentUserId: id,
+              otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
+            );
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => screen),
+            );
+          },
           icon: Icon(Icons.notifications_none, size: 24),
         ),
+
         IconButton(
           onPressed: () => Navigator.pushNamed(context, cartScreen.id),
           icon: Icon(Icons.shopping_cart_outlined, size: 24),
