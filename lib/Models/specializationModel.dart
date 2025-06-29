@@ -34,7 +34,7 @@ class specializtionService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {

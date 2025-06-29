@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Providers/AddressProvider.dart';
 import 'package:gp_frontend/Providers/BackagesProvider.dart';
+import 'package:gp_frontend/Providers/SearchProvider.dart';
 import 'package:gp_frontend/Providers/eventProvider.dart';
 import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/Providers/postProvider.dart';
@@ -66,11 +67,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize databases
-  Token token = Token();
   wishList wish = wishList();
   Cart myCart = Cart();
 
-  await token.db;
   await wish.db; // Initialize Wishlist database
   await myCart.db; // Initialize Cart database
 
@@ -79,7 +78,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
-        ChangeNotifierProvider(create: (_) => buttonProvider()),
         ChangeNotifierProvider(create: (_) => productProvider()),
         ChangeNotifierProvider(create: (_) => detailsProvider()),
         ChangeNotifierProvider(create: (_) => cartProvider()),
@@ -92,6 +90,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => offerProvider()),
         ChangeNotifierProvider(create: (_) => voucherProvider()),
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
       ],
       child: DevicePreview(
         builder: (context) => MyApp(),

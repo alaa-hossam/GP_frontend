@@ -24,7 +24,7 @@ class _offersState extends State<offers> {
 
 
   checkRole()async{
-    final roleSQL = await token.getRole('SELECT ROLE FROM TOKENS');
+    final roleSQL = await token.getRole();
     if (roleSQL == 'Handicrafter') {
       handcrafter = true;
     } else if (roleSQL == 'Client') {

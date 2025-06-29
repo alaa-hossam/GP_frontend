@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
-import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/logInView.dart';
 import 'package:gp_frontend/views/resetPassword.dart';
 import 'package:gp_frontend/widgets/customizeTextFormField.dart';
@@ -15,7 +13,7 @@ class Getotp extends StatefulWidget {
 
   final String email;
   final int back;
-  Getotp(this.email,this.back);
+  Getotp(this.email, this.back);
 
   @override
   State<Getotp> createState() => _GetotpState();
@@ -37,11 +35,10 @@ class _GetotpState extends State<Getotp> {
   FocusNode focusNode5 = FocusNode();
   FocusNode focusNode6 = FocusNode();
 
-  int remainingTime = 60; // Initial countdown time in seconds
-  bool isButtonEnabled = true; // Verify button state
+  int remainingTime = 60;
+  bool isButtonEnabled = true;
   Timer? countdownTimer;
-  bool _isLoading = false; // Loading state
-
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -52,32 +49,18 @@ class _GetotpState extends State<Getotp> {
   @override
   void dispose() {
     countdownTimer?.cancel();
-    code1.dispose();
-    code2.dispose();
-    code3.dispose();
-    code4.dispose();
-    code5.dispose();
-    code6.dispose();
-    focusNode1.dispose();
-    focusNode2.dispose();
-    focusNode3.dispose();
-    focusNode4.dispose();
-    focusNode5.dispose();
-    focusNode6.dispose();
+    [code1, code2, code3, code4, code5, code6].forEach((c) => c.dispose());
+    [focusNode1, focusNode2, focusNode3, focusNode4, focusNode5, focusNode6].forEach((f) => f.dispose());
     super.dispose();
   }
 
   void startCountdownTimer() {
     countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (remainingTime > 0) {
-        setState(() {
-          remainingTime--;
-        });
+        setState(() => remainingTime--);
       } else {
         timer.cancel();
-        setState(() {
-          isButtonEnabled = false; // Disable the verify button
-        });
+        setState(() => isButtonEnabled = false);
       }
     });
   }
@@ -94,7 +77,6 @@ class _GetotpState extends State<Getotp> {
       isButtonEnabled = true;
     });
     startCountdownTimer();
-
     return await customer.resendCode(email);
   }
 
@@ -103,13 +85,7 @@ class _GetotpState extends State<Getotp> {
   }
 
   Future<String> verfiyResetPassCode(String code) async {
-    try {
-      return await customer.verfiyResetPassCode(
-          email: widget.email, code: code
-      );
-    } catch (e) {
-      return e.toString();
-    }
+    return await customer.verfiyResetPassCode(email: widget.email, code: code);
   }
 
   Future<String> getCode() async {
@@ -118,13 +94,7 @@ class _GetotpState extends State<Getotp> {
       isButtonEnabled = true;
     });
     startCountdownTimer();
-    try {
-      return await customer.forgetPassCode(
-          email: widget.email
-      );
-    } catch (e) {
-      return e.toString();
-    }
+    return await customer.forgetPassCode(email: widget.email);
   }
 
   @override
@@ -140,184 +110,164 @@ class _GetotpState extends State<Getotp> {
             color: Color(0xFF292929),
             size: SizeConfig.textRatio * 15,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          ListView(
             children: [
-              SizedBox(height: SizeConfig.horizontalBlock * 50),
-              Container(
-                width: SizeConfig.horizontalBlock * 363,
-                child: Column(
-                  children: [
-                    Text(
-                      'Enter code',
-                      style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontSize: SizeConfig.textRatio * 24,
-                        fontFamily: 'title-bold',
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
-                    Text(
-                      'Please enter the 6-digit code sent to your email.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0x803C3C3C),
-                        fontSize: SizeConfig.textRatio * 16,
-                        fontFamily: 'caption-regular',
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 30),
-                    Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: SizeConfig.horizontalBlock * 50),
+                  Container(
+                    width: SizeConfig.horizontalBlock * 363,
+                    child: Column(
                       children: [
-                        buildOTPField(code1, focusNode1, focusNode2),
-                        SizedBox(width: SizeConfig.horizontalBlock * 10),
-                        buildOTPField(code2, focusNode2, focusNode3),
-                        SizedBox(width: SizeConfig.horizontalBlock * 10),
-                        buildOTPField(code3, focusNode3, focusNode4),
-                        SizedBox(width: SizeConfig.horizontalBlock * 20),
-                        buildOTPField(code4, focusNode4, focusNode5),
-                        SizedBox(width: SizeConfig.horizontalBlock * 10),
-                        buildOTPField(code5, focusNode5, focusNode6),
-                        SizedBox(width: SizeConfig.horizontalBlock * 10),
-                        buildOTPField(code6, focusNode6, null),
+                        Text(
+                          'Enter code',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: SizeConfig.textRatio * 24,
+                            fontFamily: 'title-bold',
+                          ),
+                        ),
+                        SizedBox(height: SizeConfig.verticalBlock * 10),
+                        Text(
+                          'Please enter the 6-digit code sent to your email.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0x803C3C3C),
+                            fontSize: SizeConfig.textRatio * 16,
+                            fontFamily: 'caption-regular',
+                          ),
+                        ),
+                        SizedBox(height: SizeConfig.verticalBlock * 30),
+                        Row(
+                          children: [
+                            buildOTPField(code1, focusNode1, focusNode2),
+                            SizedBox(width: SizeConfig.horizontalBlock * 10),
+                            buildOTPField(code2, focusNode2, focusNode3),
+                            SizedBox(width: SizeConfig.horizontalBlock * 10),
+                            buildOTPField(code3, focusNode3, focusNode4),
+                            SizedBox(width: SizeConfig.horizontalBlock * 20),
+                            buildOTPField(code4, focusNode4, focusNode5),
+                            SizedBox(width: SizeConfig.horizontalBlock * 10),
+                            buildOTPField(code5, focusNode5, focusNode6),
+                            SizedBox(width: SizeConfig.horizontalBlock * 10),
+                            buildOTPField(code6, focusNode6, null),
+                          ],
+                        ),
+                        SizedBox(height: SizeConfig.verticalBlock * 10),
+                        Text(
+                          formatTime(remainingTime),
+                          style: TextStyle(
+                            color: Color(0xFFB36995),
+                            fontSize: SizeConfig.textRatio * 15,
+                          ),
+                        ),
+                        SizedBox(height: SizeConfig.verticalBlock * 10),
+                        GestureDetector(
+                          onTap: () async {
+                            if (remainingTime == 0) {
+                              String response = widget.back == 0
+                                  ? await resendCode(widget.email)
+                                  : await getCode();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(response)),
+                              );
+                            }
+                          },
+                          child: Text(
+                            'Resend Code',
+                            style: TextStyle(
+                              color: remainingTime == 0
+                                  ? Color(0xFF5095B0)
+                                  : Colors.grey,
+                              fontSize: SizeConfig.textRatio * 16,
+                              fontFamily: 'Roboto-medium',
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: SizeConfig.verticalBlock * 16),
+                        customizeButton(
+                          buttonName: "Verify",
+                          buttonColor: isButtonEnabled
+                              ? SizeConfig.iconColor
+                              : Colors.grey,
+                          fontColor: Colors.white,
+                          onClickButton: () async {
+                            if (!isButtonEnabled) return;
+
+                            final code = code1.text +
+                                code2.text +
+                                code3.text +
+                                code4.text +
+                                code5.text +
+                                code6.text;
+
+                            setState(() => _isLoading = true);
+
+                            if (widget.back == 0) {
+                              String response =
+                              await verifyCustomer(code, widget.email);
+
+                              setState(() => _isLoading = false);
+
+                              if (response == "User verified successfully") {
+                                final wish = wishList(); // Singleton instance
+                                await wish.db; // Ensure DB is initialized
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response)),
+                                );
+                                Navigator.pushReplacementNamed(
+                                    context, logIn.id);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response)),
+                                );
+                              }
+                            } else if (widget.back == 1) {
+                              String response =
+                              await verfiyResetPassCode(code);
+
+                              setState(() => _isLoading = false);
+
+                              if (response == "Code Verified Successfully") {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response)),
+                                );
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        resetPassword(widget.email),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response)),
+                                );
+                              }
+                            }
+                          },
+                        ),
                       ],
                     ),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
-                    Text(
-                      formatTime(remainingTime),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFB36995),
-                        fontSize: SizeConfig.textRatio * 15,
-                        fontFamily: 'Roboto-regular',
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
-                    GestureDetector(
-                      onTap: () async {
-                        if (remainingTime == 0) {
-                          if(widget.back == 0){
-                            String response = await resendCode(widget.email);
-
-                            if (response == "Code Resend successfully") {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Code Resend successfully")),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("${response}")),
-                              );
-                            }
-                          }else if(widget.back == 1){
-                            String response = await getCode();
-
-                            if (response == "Code Resend successfully") {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Code Resend successfully")),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("${response}")),
-                              );
-                            }
-                          }
-
-                        }
-                      },
-                      child: Text(
-                        'Resend Code',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: remainingTime == 0
-                              ? Color(0xFF5095B0)
-                              : Colors.grey,
-                          fontSize: SizeConfig.textRatio * 16,
-                          fontFamily: 'Roboto-medium',
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 16),
-                    customizeButton(
-                      buttonName: "Verify",
-                      buttonColor: isButtonEnabled
-                          ? SizeConfig.iconColor
-                          : Colors.grey, // Change button color based on state
-                      fontColor: Color(0xFFF5F5F5),
-                      onClickButton: () async {
-                        if (isButtonEnabled) {
-                          String code = code1.text +
-                              code2.text +
-                              code3.text +
-                              code4.text +
-                              code5.text +
-                              code6.text;
-                          setState(() {
-                            _isLoading = true; // Set loading to true
-                          });
-                          if(widget.back == 0){
-                            String response = await verifyCustomer(code, widget.email);
-
-                            setState(() {
-                              _isLoading = false; // Set loading to true
-                            });
-
-                            if (response == "User verified successfully") {
-                              wishList wish = wishList();
-                              wish.initialDB();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("User verified successfully")),
-                              );
-                              Navigator.pushReplacementNamed(context, logIn.id);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("${response}")),
-                              );
-                            }
-                          } else if(widget.back == 1){
-                            String response = await verfiyResetPassCode(code);
-
-                            setState(() {
-                              _isLoading = false;
-                            });
-
-                            if (response == "Code Verified Successfully") {
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Code Verified Successfully")),
-                              );
-                              Navigator.pushReplacement(context,
-                                  MaterialPageRoute(builder: (context) =>
-                                      resetPassword(widget.email),));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("${response}")),
-                              );
-                            }
-                          }
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
           if (_isLoading)
             Container(
               color: Colors.black54,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             ),
         ],
-
       ),
     );
   }
@@ -325,7 +275,7 @@ class _GetotpState extends State<Getotp> {
   Widget buildOTPField(TextEditingController controller, FocusNode currentNode,
       FocusNode? nextNode) {
     return MyTextFormField(
-      type: TextInputType.numberWithOptions(),
+      type: TextInputType.number,
       controller: controller,
       focusNode: currentNode,
       width: SizeConfig.horizontalBlock * 50,

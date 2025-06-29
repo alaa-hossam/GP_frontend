@@ -35,7 +35,7 @@ class AddressService{
   Future<List<AddressModel>> getAddresses()async{
     List<AddressModel> myAddresses = [];
 
-    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    final id = await token.getUUID();
     String Query = '''
     query GetUserAddresses {
     getUserAddresses(userId:  "${id}") {
@@ -55,7 +55,7 @@ class AddressService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(ApiUrl),
@@ -90,7 +90,7 @@ class AddressService{
 
   }
   Future<String> addAddresses(AddressModel address) async {
-    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    String id = await token.getUUID() ?? "";
     String Query = '''
       mutation CreateUserAddress {
         createUserAddress(
@@ -117,7 +117,7 @@ class AddressService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(ApiUrl),

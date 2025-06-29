@@ -31,7 +31,8 @@ class _cartScreenState extends State<cartScreen> {
   TextEditingController voucher = TextEditingController();
   String? _selectedOption;
   voucherProvider? _voucherProvider;
-
+  Token token = Token();
+  String userId = "";
 
   final List<String> _options = [
     'Choose',
@@ -43,16 +44,19 @@ class _cartScreenState extends State<cartScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _voucherProvider ??= Provider.of<voucherProvider>(context, listen: false); // Safe access
+    _voucherProvider ??= Provider.of<voucherProvider>(context, listen: false);
+
   }
 
   @override
   void initState() {
     super.initState();
 
-    Future.microtask(() {
+    Future.microtask(() async{
       final cartProv = context.read<cartProvider>();
       fetchCartProducts(cartProv);
+      userId = await token.getUUID() ?? "";
+
     });
 
     _selectedOption = "Choose";
@@ -84,7 +88,8 @@ class _cartScreenState extends State<cartScreen> {
 
   void insertProductData(String id, String finalId) async {
     Cart myCart = Cart();
-    await myCart.addProduct(id, finalId);
+
+    await myCart.addProduct(id: id,finalId:  finalId , userId: userId);
   }
 
   @override
@@ -239,7 +244,8 @@ class _cartScreenState extends State<cartScreen> {
                                 product.Quantity = (product.Quantity ?? 0) - 1;
                                 myCart.deleteCartProduct(product.finalId ?? "");
                               } else {
-                                cart.deleteAllProduct(product.finalId ?? "");
+                                Token token = Token();
+                                cart.deleteAllUserProducts(userId);
                                 fetchCartProducts(myCart);
                               }
                             });

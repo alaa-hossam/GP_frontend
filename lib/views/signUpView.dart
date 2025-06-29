@@ -34,7 +34,6 @@ Token token=Token();
   void togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-      token.recreateTokensTable();
     });
   }
 

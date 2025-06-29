@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
@@ -17,9 +16,9 @@ class AdvertisementApiServices {
   Token token = Token();
 
   Future<String> addAdvertisement(File? image, String? url, String? packageId, String? transactionId) async {
-    Token tokenTable = Token();
-    String id = await tokenTable.getUUID("SELECT UUID FROM TOKENS");
-    String myToken = await tokenTable.getToken('SELECT TOKEN FROM TOKENS');
+    Token token = Token();
+    String id = await token.getUUID() ?? "";
+    String myToken = await token.getToken() ?? "";
 
     try {
       // Create a multipart request
@@ -107,7 +106,7 @@ print(responseBody);
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       // Step 5: Send the request
       final response = await http.post(

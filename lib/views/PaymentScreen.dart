@@ -62,7 +62,7 @@ class _PaymentscreenState extends State<Paymentscreen> {
 
   Future<void> _offerPost(String transactionId) async {
     Token token = Token();
-    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    String id = await token.getUUID()??"";
 
     await myOrderProvider.createPostOrder(orderModel(
       addressId: addressId,
@@ -82,7 +82,7 @@ print(transactionId);
 
   Future<void> _readyOrder(String transactionId) async {
     Token token = Token();
-    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    String id = await token.getUUID() ?? "";
 
     await myOrderProvider.createReadyOrder(
         orderModel(
@@ -97,7 +97,7 @@ print(transactionId);
 
   Future<void> _customOrder(String transactionId) async {
     Token token = Token();
-    String id = await token.getUUID('SELECT UUID FROM TOKENS');
+    String id = await token.getUUID()??"";
 
     await myOrderProvider.createCustomOrder(
         orderModel(

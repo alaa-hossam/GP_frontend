@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/Providers/detailsProvider.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/widgets/messages.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +40,9 @@ class _variationScreenState extends State<variationScreen> {
   }
 
   Future<bool> checkCartEmpty()async{
-    return await myCart.isCartEmpty();
+    Token token = Token();
+    String userId = await token.getUUID()??"";
+    return await myCart.isCartEmpty(userId);
   }
 
   Map<String, List<String>> _getVariationMap() {
@@ -61,9 +64,10 @@ class _variationScreenState extends State<variationScreen> {
 
 
   void insertProductData(String id, String finalId) async {
-
+    Token token = Token();
+    String userId = await token.getUUID()??"";
     print("insert product in cart");
-    await myCart.addProduct(id, finalId);
+    await myCart.addProduct(id: id, finalId: finalId , userId:userId );
     print('Product data inserted!');
 
   }

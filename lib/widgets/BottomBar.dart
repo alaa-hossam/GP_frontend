@@ -1,130 +1,98 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gp_frontend/SqfliteCodes/Token.dart';
-import 'package:gp_frontend/views/messageView.dart';
+import 'package:gp_frontend/views/cartView.dart';
+import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/posts.dart';
-import 'package:gp_frontend/views/showOrders.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
-import 'package:http/http.dart';
-import 'package:provider/provider.dart';
+
 import '../views/Home.dart';
-import '../views/ProfileView.dart';
-import '../views/chatBot.dart';
 
 class BottomBar extends StatefulWidget {
-  final int selectedIndex;
-  final bool isVisible;
+  final int currentIndex;
 
-
-  BottomBar({this.selectedIndex = 0 , required this.isVisible} );
+  const BottomBar({
+    Key? key,
+    required this.currentIndex,
+  }) : super(key: key);
 
   @override
-  BottomBarState createState() => BottomBarState();
+  State<BottomBar> createState() =>
+      _BottomBarState();
 }
 
-class BottomBarState extends State<BottomBar> {
-  late int selectedIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedIndex = widget.selectedIndex;
-  }
-
-
+class _BottomBarState extends State<BottomBar> {
+  List<String> pages = [Home.id ,AIChat.id , posts.id , cartScreen.id];
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildItem(icon: Icons.home_outlined, index: 0),
+          _buildItem(icon: Icons.android, index: 1),
+          _buildItem(icon: Icons.post_add, index: 2),
+          _buildItem(icon: Icons.shopping_cart_outlined, index: 3),
+        ],
+      ),
+    );
+  }
 
-    return Consumer<buttonProvider>(
-      builder: (context, buttonProvider, child) {
-        return Visibility(
-          visible: widget.isVisible,
-          child: BottomNavigationBar(
-            currentIndex: buttonProvider.selectedIndex,
-            selectedItemColor: SizeConfig.iconColor,
-            unselectedItemColor: SizeConfig.fontColor,
-            iconSize: SizeConfig.textRatio * 24,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            onTap: (index) {
-              buttonProvider.updateIndex(context,index);
-            },
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: '',
+  Widget _buildItem({required IconData icon, required int index}) {
+    bool isSelected = widget.currentIndex == index;
 
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          final String routeName = pages[index];
+          final currentRoute = ModalRoute.of(context)?.settings.name;
+          if (currentRoute != routeName) {
+            Navigator.pushNamed(context, routeName);
+          }
+        },
+        child: SizedBox(
+          height: 60 * SizeConfig.verticalBlock,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? SizeConfig.iconColor :SizeConfig.fontColor,
+                size: 24 * SizeConfig.textRatio,
               ),
-              BottomNavigationBarItem(
-                icon: Icon(FontAwesomeIcons.android),
-                label: '',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.checkroom),
-                label: '',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart_outlined),
-                label: '',
+              SizedBox(height: 4 * SizeConfig.verticalBlock),
+              Text(
+                _getLabelText(index),
+                style: TextStyle(
+                  fontSize: 12 * SizeConfig.textRatio,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? SizeConfig.iconColor  : Colors.black,
+                ),
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
-}
-
-
-class buttonProvider extends ChangeNotifier {
-  int _selectedIndex = 0;
-  int? _oldselected;
-
-  int get selectedIndex => _selectedIndex;
-
-  void updateIndex(BuildContext context, int index) async {
-    _oldselected = _selectedIndex;
-    _selectedIndex = index;
-
-    if (_oldselected != _selectedIndex) {
-      Widget screen;
-
-      switch (index) {
-        case 0:
-          screen = Home();
-          break;
-        case 1:
-          screen = AIChat();
-          break;
-        case 2:
-          screen = posts();
-          break;
-        case 3:
-          String id = await getId(); // 👈 Now you're awaiting correctly
-          screen = ChatScreen(
-            currentUserId: id,
-            otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
-          );
-          break;
-        default:
-          screen = Home();
-      }
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => screen,
-        ),
-      );
+  String _getLabelText(int index) {
+    switch (index) {
+      case 0:
+        return "home";
+      case 1:
+        return "AIChat";
+      case 2:
+        return "Posts";
+      case 3:
+        return "Cart";
+      default:
+        return '';
     }
-
-    notifyListeners();
-  }
-
-  Future<String> getId() async {
-    Token token = Token();
-    return await token.getUUID('SELECT UUID FROM TOKENS');
   }
 }

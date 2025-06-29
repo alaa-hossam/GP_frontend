@@ -29,7 +29,7 @@ class generateImageServices {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -81,7 +81,7 @@ class generateImageServices {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),

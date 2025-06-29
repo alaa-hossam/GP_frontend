@@ -37,7 +37,7 @@ class customOffer extends StatelessWidget {
 
   Future<bool> checkId() async {
     Token token = Token();
-    final idSQL = await token.getUUID('SELECT UUID FROM TOKENS');
+    final idSQL = await token.getUUID();
     print(idSQL);
     if (idSQL == clientId) {
       match = true;

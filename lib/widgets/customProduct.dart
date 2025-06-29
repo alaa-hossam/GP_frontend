@@ -1,197 +1,150 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
-import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:provider/provider.dart';
 import '../Models/ProductModel.dart';
-import '../Providers/ProductProvider.dart';
 import '../SqfliteCodes/wishList.dart';
 import '../views/productDetails.dart';
 import 'Dimensions.dart';
-import '../Providers/ProductProvider.dart';
 
 class customProduct extends StatefulWidget {
-  String imageURL, Name, id;
-  double Price, rate;
-  bool showCompare;
-  int? comparedNum;
-  String? Category ;
+  final String imageURL, Name, id;
+  final double Price, rate;
+  final bool showCompare;
+  final int? comparedNum;
+  final String? Category;
   final Function(productModel)? onComparePressed;
 
-  customProduct(this.imageURL, this.Name, this.Price, this.rate,
-      this.id, this.showCompare,
-      {this.onComparePressed, this.comparedNum , this.Category });
+  const customProduct(this.imageURL, this.Name, this.Price, this.rate, this.id, this.showCompare,
+      {this.onComparePressed, this.comparedNum, this.Category, super.key});
 
   @override
-  State<customProduct> createState() => _customProductState(
-      this.imageURL,
-      this.Name,
-      this.Price,
-      this.rate,
-      this.id,
-      this.showCompare,
-      onComparePressed: this.onComparePressed,
-      comparNum: this.comparedNum,
-  Category:this.Category);
+  State<customProduct> createState() => _customProductState();
 }
 
 class _customProductState extends State<customProduct> {
-  String imageURL, Name, id;
-  double Price, rate;
-  wishList wishListObj = wishList();
-  bool? showCompare , bazar;
-  int? comparNum;
-  String? Category,compareName;
-  final Function(productModel)? onComparePressed;
-  bool isTapped = true , exist = false;
-  customerViewModel customer = customerViewModel();
-  Token myToken = Token();
-  bool? isFavorite;
+  final wishList wishListObj = wishList();
+  final Token myToken = Token();
 
+  bool isTapped = true;
+  bool isFavorite = false;
+  String email = '';
 
-
-  _customProductState(this.imageURL, this.Name, this.Price,
-      this.rate, this.id, this.showCompare,
-      {this.onComparePressed, this.comparNum , this.Category , this.compareName ,this.bazar });
-
-
-
-
-
-  toggleFavourite() async {
-    String email = await myToken.getEmail('SELECT EMAIL FROM TOKENS');
-    if (isFavorite == true) {
-      await wishListObj.deleteProduct('''
-        DELETE FROM WISHLIST 
-        WHERE ID = "${widget.id}" AND EMAIL = "$email"
-      ''');
-    } else {
-      await wishListObj.addProduct('''
-        INSERT INTO WISHLIST(ID, EMAIL) 
-        VALUES ("${widget.id}", "$email")
-      ''');
-    }
-    setState(() {
-      isFavorite = !isFavorite!;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _loadEmailAndFavorite();
   }
-  void _loadFavoriteStatus() async {
-    bool exists = await wishListObj.doesIdExist(widget.id);
+
+  Future<void> _loadEmailAndFavorite() async {
+    email = await myToken.getEmail() ?? "";
+    final exists = await wishListObj.doesIdExist(widget.id, email);
     if (mounted) {
       setState(() {
         isFavorite = exists;
       });
     }
   }
-  @override
-  void initState() {
-    super.initState();
-    _loadFavoriteStatus();
+
+  Future<void> toggleFavourite() async {
+    if (isFavorite) {
+      await wishListObj.deleteProduct(widget.id, email);
+    } else {
+      await wishListObj.addProduct(id: widget.id, email: email);
+      print(await wishListObj.getProductIdsByEmail(email));
+    }
+    setState(() {
+      isFavorite = !isFavorite;
+    });
   }
 
-  Tapping() {
-
+  void _handleCompareTap() {
     if (widget.comparedNum == 2 && isTapped) {
-
-      if (widget.onComparePressed != null) {
-
-        productModel product = productModel(
-          widget.id,
-          widget.imageURL,
-          widget.Name,
-          category: widget.Category,
-          widget.Price,
-          widget.rate,
-        );
-        widget.onComparePressed!(product);
-      }
+      _sendProductToCompare();
     } else {
       setState(() {
         isTapped = !isTapped;
       });
-      if (widget.onComparePressed != null) {
-        productModel product = productModel(
-          widget.id,
-          widget.imageURL,
-          widget.Name,
-          category:widget.Category,
-          widget.Price,
-          widget.rate,
-        );
-        widget.onComparePressed!(product);
-      }
+      _sendProductToCompare();
+    }
+  }
+
+  void _sendProductToCompare() {
+    if (widget.onComparePressed != null) {
+      final product = productModel(
+        widget.id,
+        widget.imageURL,
+        widget.Name,
+        category: widget.Category,
+        widget.Price,
+        widget.rate,
+      );
+      widget.onComparePressed!(product);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, productDetails.id, arguments: widget.id);
+      },
       child: Container(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.all(5),
         width: 170 * SizeConfig.horizontalBlock,
         height: 250 * SizeConfig.verticalBlock,
         decoration: BoxDecoration(
-            borderRadius:
-                BorderRadius.all(Radius.circular(5 * SizeConfig.textRatio)),
-            // color: SizeConfig.iconColor,
-            border: Border.all(width: 2, color: SizeConfig.iconColor)),
+          borderRadius: BorderRadius.circular(5 * SizeConfig.textRatio),
+          border: Border.all(width: 2, color: SizeConfig.iconColor),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      5 * SizeConfig.textRatio), // Set the border radius
+                  borderRadius: BorderRadius.circular(5 * SizeConfig.textRatio),
                   child: Image.network(
-                    imageURL,
+                    widget.imageURL,
                     width: 160 * SizeConfig.horizontalBlock,
                     height: 165 * SizeConfig.verticalBlock,
-                    fit: BoxFit.cover, // Ensures the image fills the space
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Positioned(
-                    top: 5,
-                    right: 5,
-                    child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
-                              Icons.favorite,
-                              size: 25 * SizeConfig.textRatio,
-                              color: isFavorite == true ? Colors.red : SizeConfig.fontColor,
-                            ),
-                            onPressed: () {
-                              toggleFavourite();
-                            },
-                          ),
-                        )
-
+                  top: 5,
+                  right: 5,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.favorite,
+                        size: 25 * SizeConfig.textRatio,
+                        color: isFavorite ? Colors.red : SizeConfig.fontColor,
+                      ),
+                      onPressed: toggleFavourite,
+                    ),
+                  ),
                 ),
                 if (widget.showCompare)
                   Positioned(
-                      bottom: 5,
-                      right: 5,
-                      child: GestureDetector(
-                        child: Container(
-                          width: 75 * SizeConfig.horizontalBlock,
-                          height: 32 * SizeConfig.verticalBlock,
-                          decoration: BoxDecoration(
-                              color: !isTapped
-                                  ? SizeConfig.iconColor
-                                  : Color(0x50E9E9E9),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Center(child: Text('Compare')),
+                    bottom: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: _handleCompareTap,
+                      child: Container(
+                        width: 75 * SizeConfig.horizontalBlock,
+                        height: 32 * SizeConfig.verticalBlock,
+                        decoration: BoxDecoration(
+                          color: isTapped ? const Color(0x50E9E9E9) : SizeConfig.iconColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        onTap: () {
-                          Tapping();
-                        },
-                      ))
+                        child: const Center(child: Text('Compare')),
+                      ),
+                    ),
+                  ),
               ],
             ),
             Row(
@@ -199,64 +152,58 @@ class _customProductState extends State<customProduct> {
               children: [
                 Flexible(
                   child: Text(
-                    Name, // Remember to use quotes around the string
+                    widget.Name,
                     style: TextStyle(fontSize: 14 * SizeConfig.textRatio),
-                    overflow: TextOverflow.ellipsis, // Optional: handle overflow
-                    maxLines: 1, // Optional: limit to one line
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 Row(
                   children: [
                     Icon(
                       Icons.star,
-                      color: Color(0xFFD4931C),
+                      color: const Color(0xFFD4931C),
                       size: 10 * SizeConfig.textRatio,
                     ),
                     SizedBox(width: 5 * SizeConfig.horizontalBlock),
                     Text(
-                      '${rate}',
+                      '${widget.rate}',
                       style: TextStyle(fontSize: 11 * SizeConfig.textRatio),
                     ),
                   ],
-                )
+                ),
               ],
             ),
             Text(
-              Category?.isNotEmpty == true ? Category! : "No Category",
+              widget.Category?.isNotEmpty == true ? widget.Category! : "No Category",
               style: TextStyle(fontSize: 11 * SizeConfig.textRatio),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$${Price}',
+                  '\$${widget.Price}',
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16 * SizeConfig.textRatio),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16 * SizeConfig.textRatio,
+                  ),
                 ),
                 Container(
                   width: 30 * SizeConfig.horizontalBlock,
                   height: 24 * SizeConfig.verticalBlock,
                   decoration: BoxDecoration(
                     color: SizeConfig.iconColor,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    borderRadius: BorderRadius.circular(5),
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      size: 14 * SizeConfig.textRatio,
-                      color: Colors.white,
-                    ),
+                  child: const Center(
+                    child: Icon(Icons.add, color: Colors.white, size: 14),
                   ),
                 )
               ],
-            )
+            ),
           ],
         ),
       ),
-      onTap:() {
-        Navigator.pushNamed(context,productDetails.id , arguments: widget.id);
-      },
     );
   }
 }

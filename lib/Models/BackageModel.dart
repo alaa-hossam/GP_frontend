@@ -35,7 +35,7 @@ class BackagesServices{
       'query': query,
     };
     try{
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final respone = await http.post(
         Uri.parse(apiUrl),

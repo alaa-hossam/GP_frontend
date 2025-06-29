@@ -134,7 +134,7 @@ class _BrowseProductsState extends State<browseProducts> {
               IconButton(
                 onPressed: () async{
                   final token = Token();
-                  final role = await token.getRole('SELECT ROLE FROM TOKENS');
+                  final role = await token.getRole();
                   print(role);
                   // Navigate to the appropriate profile based on the role
                   if (role == 'Handicrafter') {
@@ -374,7 +374,6 @@ class _BrowseProductsState extends State<browseProducts> {
             )
         ],
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: !showCompare),
     );
   }
 }

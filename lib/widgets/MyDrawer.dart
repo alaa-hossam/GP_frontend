@@ -74,7 +74,7 @@ class _MydrawerState extends State<Mydrawer> {
                       sideButton("My Account", Icons.account_circle_outlined,
                           SizeConfig.iconColor, () async{
                             final token = Token();
-                            final role = await token.getRole('SELECT ROLE FROM TOKENS');
+                            final role = await token.getRole();
                             print(role);
                             // Navigate to the appropriate profile based on the role
                             if (role == 'Handicrafter') {

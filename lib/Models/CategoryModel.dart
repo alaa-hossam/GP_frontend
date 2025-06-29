@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:http/http.dart' as http;
 
-import 'ProductModel.dart';
 
 class CategoryModel {
   final String id;
@@ -29,7 +28,7 @@ class CategoryService {
     };
     try {
 
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -77,7 +76,7 @@ class CategoryService {
     };
     try {
 
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -123,7 +122,7 @@ class CategoryService {
     };
     try {
 
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -174,7 +173,7 @@ class CategoryService {
     };
     try {
 
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final response = await http.post(
         Uri.parse(apiUrl),

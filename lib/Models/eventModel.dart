@@ -22,7 +22,7 @@ class eventService {
 
   Future<List<eventModel>> getAllEvents() async {
     print("Fetching events from API...");
-    final userId = await Token().getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     final request = {
       'query': '''
@@ -38,7 +38,7 @@ class eventService {
     };
 
     try {
-      final myToken = await Token().getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -77,7 +77,7 @@ class eventService {
 
   Future<String> addEvent(eventModel event) async {
     print("added event from API...");
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     final request = {
       'query': '''
@@ -96,7 +96,7 @@ class eventService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response;
       response = await http.post(
@@ -136,7 +136,7 @@ class eventService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response;
       response = await http.post(
@@ -172,7 +172,7 @@ class eventService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response;
       response = await http.post(

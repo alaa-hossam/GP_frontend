@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/Models/SearchModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
+import 'package:gp_frontend/Providers/SearchProvider.dart';
+import 'package:gp_frontend/ViewModels/SearchViewModel.dart';
 import 'package:gp_frontend/ViewModels/productViewModel.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +25,7 @@ class searchView extends StatefulWidget {
 class _searchState extends State<searchView> {
   late FocusNode _focusNode;
   productViewModel PVM = productViewModel();
+  SearchViewModel SVM = SearchViewModel();
   TextEditingController search = TextEditingController();
   Timer? _debounceTimer;
   bool _isBottomSheetOpen = false; // Track state
@@ -51,7 +55,7 @@ class _searchState extends State<searchView> {
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       if (value.trim().isEmpty) return;
 
-      final result = await PVM.searchProduct(value);
+      final result = await SVM.searchProduct(value);
 
       if (context.mounted) {
         if (_isBottomSheetOpen) {
@@ -84,7 +88,7 @@ class _searchState extends State<searchView> {
 
   @override
   Widget build(BuildContext context) {
-    SearchService searchEndPoint = SearchService();
+    SearchServiceAI searchEndPoint = SearchServiceAI();
     List<String> ids = [];
 
     return Scaffold(
@@ -142,17 +146,17 @@ class _searchState extends State<searchView> {
                       onPressed: () async {
                         ids = await searchEndPoint.SearchImage(6);
                         if (context.mounted) {
-                          final myProductProvider = Provider.of<productProvider>(context, listen: false);
-                          await myProductProvider.getSearchProductsImage(ids);
+                          final mySearchProvider = Provider.of<SearchProvider>(context, listen: false);
+                          await mySearchProvider.getSearchProductsImage(ids);
 
-                          if (myProductProvider.searchProducts.isNotEmpty) {
+                          if (mySearchProvider.searchProducts.isNotEmpty) {
                             showModalBottomSheet(
                               context: context,
                               isScrollControlled: true,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                               ),
-                              builder: (context) => ProductBottomSheet(products: myProductProvider.searchProducts),
+                              builder: (context) => ProductBottomSheet(products: mySearchProvider.searchProducts),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +189,7 @@ class _searchState extends State<searchView> {
 }
 
 class ProductBottomSheet extends StatelessWidget {
-  final List<productModel> products;
+  final List<SearchModel> products;
 
   const ProductBottomSheet({super.key, required this.products});
 
@@ -227,11 +231,11 @@ class ProductBottomSheet extends StatelessWidget {
                   runSpacing: 10,
                   children: products.map((product) {
                     return customProduct(
-                      product.imageURL,
-                      product.name,
-                      product.price,
-                      product.rate,
-                      product.id,
+                      product.imageUrl ?? "",
+                      product.name ?? "",
+                      product.lowestCustomPrice ?? 0,
+                      product.averageRating ?? 0,
+                      product.id ?? "",
                       false,
                     );
                   }).toList(),

@@ -110,6 +110,7 @@ class customerServices {
         }
         user {
             id
+            role
         }
     }
 }
@@ -137,22 +138,10 @@ class customerServices {
         final String expireAt =
             data['data']['verifyUserForSignUp']['token']['expireAt'];
         final UUID = data['data']['verifyUserForSignUp']['user']['id'];
-        String insertQuery = '''
-                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED)
-                              VALUES ("$UUID", "$accessToken", "$expireAt")
-                             ''';
-        String updateQuery = '''
-                                UPDATE TOKENS
-                                SET TOKEN = "$accessToken", 
-                                 EXPIRED = "$expireAt"
-                        
-                       ''';
+        final role = data['data']['verifyUserForSignUp']['user']['role'];
 
-        if (await token.isTokensTableEmpty()) {
-          await token.addToken(insertQuery);
-        } else {
-          await token.updateToken(updateQuery);
-        }
+        await token.saveTokenData(uuid: UUID , token: accessToken , expired: expireAt, email: email , role: role);
+
         return "User verified successfully";
       } else {
         return jsonDecode(response.body)['errors'][0]['message'];
@@ -245,26 +234,8 @@ class customerServices {
         final UUID = data['data']['login']['user']['id'];
         final Role = data['data']['login']['user']['role'];
         final email = data['data']['login']['user']['email'];
-        print("+++++++++++++++++++++++++++++++++++$Role");
-        String insertQuery = '''
-                              INSERT INTO TOKENS (UUID, TOKEN, EXPIRED , ROLE , email)
-                              VALUES ("$UUID", "$accessToken", "$expireAt" , "$Role" , "$email")
-                             ''';
-        String updateQuery = '''
-                                UPDATE TOKENS
-                                SET TOKEN = "$accessToken", 
-                                 EXPIRED = "$expireAt",
-                                 UUID = "$UUID",
-                                 ROLE = "$Role",
-                                 EMAIL = "$email"
-                        
-                       ''';
 
-        if (await token.isTokensTableEmpty()) {
-          await token.addToken(insertQuery);
-        } else {
-          await token.updateToken(updateQuery);
-        }
+        await token.saveTokenData(uuid: UUID , token: accessToken , expired: expireAt, email: email , role: Role);
 
         return "User Log In Successfully";
       } else {
@@ -417,7 +388,7 @@ class customerServices {
       },
     };
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -445,7 +416,7 @@ class customerServices {
   Future<CustomerModel?> getUserProfile() async {
     print("get user profile");
     Token token = Token();
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     CustomerModel? customer;
     String query = '''
@@ -464,7 +435,7 @@ class customerServices {
       'query': query,
     };
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -495,7 +466,7 @@ class customerServices {
 
   Future<String> getUserEmail() async {
     Token token = Token();
-    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final viewerId = await token.getUUID();
 
     String query = '''
     query User {
@@ -512,7 +483,7 @@ class customerServices {
       },
     };
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),

@@ -1,117 +1,54 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Token {
-  static Database? _db;
+  static const _uuidKey = 'UUID';
+  static const _tokenKey = 'TOKEN';
+  static const _expiredKey = 'EXPIRED';
+  static const _roleKey = 'ROLE';
+  static const _emailKey = 'EMAIL';
 
-  Future<Database?> get db async {
-    if (_db == null) {
-      _db = await initialDB();
-      return _db;
-    } else {
-      return _db;
-    }
+  Future<void> saveTokenData({
+    required String uuid,
+    required String token,
+    required String expired,
+    required String role,
+    required String email,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_uuidKey, uuid);
+    await prefs.setString(_tokenKey, token);
+    await prefs.setString(_expiredKey, expired);
+    await prefs.setString(_roleKey, role);
+    await prefs.setString(_emailKey, email);
   }
 
-  initialDB() async {
-    print("initialize token");
-    String databasePath = await getDatabasesPath();
-    String path = join(databasePath, 'token.db');
-    Database myToken = await openDatabase(path, version: 1, onCreate: _createDB);
-    return myToken;
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
   }
 
-  _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE TOKENS(
-      UUID TEXT ,
-      TOKEN TEXT ,
-      EXPIRED TEXT,
-      ROLE TEXT,
-      EMAIL TEXT
-      )
-        ''');
+  Future<String?> getUUID() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_uuidKey);
   }
 
-  // Add Token
-  Future<int> addToken(String query) async {
-    Database? myToken = await db; // Initialize the database
-    int response = await myToken!.rawInsert(query);
-    return response;
+  Future<String?> getEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_emailKey);
   }
 
-  // Get Token
-  Future<String> getToken(String query) async {
-    Database? myToken = await db; // Initialize the database
-    List<Map> response = await myToken!.rawQuery(query);
-    return response[0]['TOKEN'];
+  Future<String?> getRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_roleKey);
   }
 
-  Future<String> getUUID(String query) async {
-    Database? myToken = await db;
-    List<Map> response = await myToken!.rawQuery(query);
-    return response[0]['UUID'];
+  Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 
-  Future<String> getEmail(String query) async {
-    Database? myToken = await db; // Initialize the database
-    List<Map> response = await myToken!.rawQuery(query);
-    return response[0]['EMAIL'];
-  }
-
-  Future<String> getRole(String query) async {
-    Database? myToken = await db; // Initialize the database
-    List<Map> response = await myToken!.rawQuery(query);
-    return response[0]['ROLE'];
-  }
-
-
-  // Update Token
-  Future<int> updateToken(String query) async {
-    Database? myToken = await db; // Initialize the database
-    int response = await myToken!.rawUpdate(query);
-    return response;
-  }
-
-  // Delete Token
-  Future<int> deleteToken(String query) async {
-    Database? myToken = await db; // Initialize the database
-    int response = await myToken!.rawDelete(query);
-    return response;
-  }
-
-  Future<void> recreateTokensTable() async {
-    Database? myToken = await db; // Initialize the database
-
-    // Drop the table if it exists
-    await myToken!.execute('DROP TABLE IF EXISTS TOKENS');
-    print("TOKENS table dropped successfully");
-
-    // Recreate the table
-    await _createDB(myToken, 1); // Use the same version as before
-    print("TOKENS table recreated successfully");
-  }
-
-  Future<void> dropTable() async {
-    Database? myToken = await db; // Initialize the database
-
-    // Drop the table if it exists
-    await myToken!.execute('DROP TABLE IF EXISTS TOKENS');
-    print("TOKENS table dropped successfully");
-
-  }
-
-  Future<bool> isTokensTableEmpty() async {
-    Database? myToken = await db; // Initialize the database
-
-    // Query to count the number of rows in the TOKENS table
-    List<Map> result = await myToken!.rawQuery('SELECT COUNT(*) as count FROM TOKENS');
-
-    // Get the count from the result
-    int count = result[0]['count'] as int;
-
-    // If count is 0, the table is empty
-    return count == 0;
+  Future<bool> isEmpty() async {
+    final prefs = await SharedPreferences.getInstance();
+    return !prefs.containsKey(_tokenKey);
   }
 }
-

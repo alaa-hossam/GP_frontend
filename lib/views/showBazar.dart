@@ -79,7 +79,7 @@ class _showBazarState extends State<showBazar> {
 
   Future<void> _fetchInitialData() async {
     token = Token();
-    role = await token.getRole('SELECT ROLE FROM TOKENS');
+    role = await token.getRole()?? "";
   }
 
   Future<void> _handleCategorySelection(CategoryModel category) async {
@@ -407,10 +407,7 @@ class _showBazarState extends State<showBazar> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomBar(
-        selectedIndex: 0,
-        isVisible: false,
-      ),
+
     );
   }
 

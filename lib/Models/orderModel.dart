@@ -46,7 +46,7 @@ class orderService {
     print(request);
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -102,7 +102,7 @@ class orderService {
     print(query);
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
 
       final response = await http.post(
@@ -147,7 +147,7 @@ class orderService {
   ''';
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
 
       final response = await http.post(

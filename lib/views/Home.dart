@@ -16,6 +16,7 @@ import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
+import '../SqfliteCodes/cart.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -48,7 +49,7 @@ class _HomeState extends State<Home> {
 
   Future<String> getId() async {
     Token token = Token();
-    return await token.getUUID('SELECT UUID FROM TOKENS');
+    return await token.getUUID() ?? "";
   }
 
   Future<void> _fetchInitialData() async {
@@ -60,7 +61,7 @@ class _HomeState extends State<Home> {
 
 
     token = Token();
-    role = await token.getRole('SELECT ROLE FROM TOKENS');
+    role = await token.getRole()?? "";
 
     await Future.wait<void>([
       catProvider.fetchCategories(),
@@ -89,7 +90,7 @@ class _HomeState extends State<Home> {
           return _buildHomeContent();
         },
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: true),
+      bottomNavigationBar: BottomBar(currentIndex: 0,),
     );
   }
 
@@ -99,16 +100,17 @@ class _HomeState extends State<Home> {
       actions: [
         IconButton(
           onPressed: () async {
-            String id = await getId();
-            Widget screen = ChatScreen(
-              currentUserId: id,
-              otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
-            );
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => screen),
-            );
+            // await Cart().deleteDatabaseFile();
+            // String id = await getId();
+            // Widget screen = ChatScreen(
+            //   currentUserId: id,
+            //   otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
+            // );
+            //
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => screen),
+            // );
           },
           icon: Icon(Icons.notifications_none, size: 24),
         ),
@@ -156,7 +158,7 @@ class _HomeState extends State<Home> {
 
     return ListView(
       children: [
-        _buildSearchBar(SearchService()),
+        _buildSearchBar(SearchServiceAI()),
         SizedBox(height: 10),
         _buildAdsSection(adsProvider, bazarProvider),
         SizedBox(height: 10),
@@ -172,7 +174,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildSearchBar(SearchService searchEndPoint) {
+  Widget _buildSearchBar(SearchServiceAI searchEndPoint) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(

@@ -18,6 +18,8 @@ class cartProvider with ChangeNotifier {
     notifyListeners();
     try {
        _cartProducts = await productVM.cartProducts();
+       print("//////////////////////////////");
+       print(cartProducts);
        _isLoading = false;
       notifyListeners();
     } catch (e) {

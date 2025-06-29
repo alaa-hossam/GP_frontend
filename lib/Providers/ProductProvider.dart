@@ -3,7 +3,6 @@ import 'package:gp_frontend/SqfliteCodes/cart.dart';
 import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import '../Models/ProductModel.dart';
 import '../SqfliteCodes/Token.dart';
-import '../ViewModels/customerViewModel.dart';
 import '../ViewModels/productViewModel.dart';
 
 class productProvider extends ChangeNotifier {
@@ -15,8 +14,7 @@ class productProvider extends ChangeNotifier {
   List<productModel> get giftRecommendProducts => _giftRecommendProducts;
   List<productModel> _historyProducts = [];
   List<productModel> get historyProducts => _historyProducts;
-  List<productModel> _searchProducts = [];
-  List<productModel> get searchProducts => _searchProducts;
+
   wishList wishListSql = wishList();
   List<dynamic> wishListProducts = [];
   productModel productDetails = productModel("","", "",0,0);
@@ -38,8 +36,6 @@ class productProvider extends ChangeNotifier {
   Future<void> recommendProductsForUser() async {
     await productVM.recommendProductsForUser();
     _recomendedProducts = productVM.recommendProducts.map((product) => product).toList();
-    print("prooooooooooooooov");
-    print(_recomendedProducts);
     notifyListeners();
   }
 
@@ -66,10 +62,6 @@ class productProvider extends ChangeNotifier {
     }
   }
 
-  getSearchProducts(String word) {
-    productVM.searchProduct(word);
-    _products = productVM.products.map((product) => product).toList();
-  }
 
 
 
@@ -87,19 +79,14 @@ class productProvider extends ChangeNotifier {
   }
 
   Future<void> toggleFavorite(String productId) async {
-    final email = await token.getEmail('SELECT EMAIL FROM TOKENS');
+    final email = await token.getEmail() ?? "";
+    final id = await token.getUUID() ?? "";
 
     if (_wishlistItems.contains(productId)) {
-      await _wishListObj.deleteProduct('''
-        DELETE FROM WISHLIST 
-        WHERE ID = "$productId" AND EMAIL = "$email"
-      ''');
+      await _wishListObj.deleteProduct(id , email);
       _wishlistItems.remove(productId);
     } else {
-      await _wishListObj.addProduct('''
-        INSERT INTO WISHLIST(ID,EMAIL) 
-        VALUES ("$productId","$email")
-      ''');
+      await _wishListObj.addProduct(id: id , email: email);
       _wishlistItems.add(productId);
     }
     notifyListeners();
@@ -115,20 +102,12 @@ class productProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteProduct(String id) async {
-    // Delete the product from the database
-    // customerViewModel customer = customerViewModel();
-    String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
 
+  Future<void> deleteProduct(String productId) async {
+    String email = await token.getEmail() ?? "";
 
-    await wishList().deleteProduct('''
-      DELETE FROM WISHLIST 
-        WHERE ID = "$id" AND EMAIL = "$email"
-    ''');
-
-    // Remove the product from the wishListProducts list
-    wishListProducts.removeWhere((product) => product.id == id);
-    // Notify listeners to rebuild the UI
+    await wishList().deleteProduct(productId, email);
+    wishListProducts.removeWhere((product) => product['id'] == productId);
     notifyListeners();
   }
 
@@ -158,10 +137,10 @@ class productProvider extends ChangeNotifier {
   Future<List<String>> getCartIds()async{
     Cart myCart = Cart();
     myCart.db;
+    final id =await token.getUUID() ?? "";
+
     List<String> ids =
-        await myCart.getProduct("SELECT * FROM products").then((result) {
-      return result.map<String>((row) => row['id'].toString()).toList();
-    });
+        await myCart.getProductIdsByUser(id);
     return ids;
   }
 
@@ -171,14 +150,7 @@ class productProvider extends ChangeNotifier {
   }
 
 
-  getSearchProductsImage(List<String> ids)async {
-    loading = true;
-    notifyListeners();
-    _searchProducts = await productVM.getSearchProducts(ids);
-    loading = false;
-    notifyListeners();
 
-  }
 
 
 

@@ -1,12 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/handicrafterProfileClientView.dart';
 import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/variationsDetails.dart';
-import '../SqfliteCodes/wishList.dart';
 import '../widgets/Dimensions.dart';
 
 class productDetails extends StatefulWidget {
@@ -18,26 +20,37 @@ class productDetails extends StatefulWidget {
 }
 
 class _productDetailsState extends State<productDetails> {
-  wishList wishListObj = wishList();
-  bool isExpanded = false;
-  int maxLength = 50;
+  final wishList wishListObj = wishList();
+  final Cart cart = Cart();
+  final customerViewModel customer = customerViewModel();
+  Token token = Token();
 
-  void toggleFavourite(String color, String id) async {
-    bool exists = await wishListObj.doesIdExist(id);
-    setState(() {
-      if (exists) {
-        wishListObj.deleteProduct('''
-          DELETE FROM wishList 
-          WHERE ID = '$id'
-        ''');
-      } else {
-        wishListObj.addProduct('''
-          INSERT INTO WISHLIST(ID) 
-          VALUES ('$id')
-        ''');
-      }
-    });
+  late String email = '';
+  late String userId = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _initUserInfo();
   }
+
+  Future<void> _initUserInfo() async {
+    email = await token.getEmail()?? "";
+    userId = await token.getUUID() ?? "";
+    setState(() {}); // To refresh UI once values are loaded
+  }
+
+  void toggleFavourite(String productId) async {
+    bool exists = await wishListObj.doesIdExist(productId, email);
+    if (exists) {
+      await wishListObj.deleteProduct(productId, email);
+    } else {
+      await wishListObj.addProduct(id: productId, email: email);
+    }
+    setState(() {});
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,20 +62,18 @@ class _productDetailsState extends State<productDetails> {
         future: productDetails.getProductDetails(arguments),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error loading product details"));
+            return const Center(child: Text("Error loading product details"));
           } else {
             productModel myProduct = productDetails.productDetails;
 
             return ListView(
               children: [
-                // Product Image Section
                 Column(
                   children: [
                     Padding(
-                      padding:
-                      EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Stack(
                         children: [
                           Container(
@@ -70,13 +81,11 @@ class _productDetailsState extends State<productDetails> {
                             width: 361 * SizeConfig.horizontalBlock,
                             decoration: BoxDecoration(
                               color: SizeConfig.iconColor,
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                             child: Center(
                               child: ClipRRect(
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(15)),
+                                borderRadius: BorderRadius.circular(15),
                                 child: Image.network(
                                   myProduct.imageURL,
                                   width: 359 * SizeConfig.horizontalBlock,
@@ -90,28 +99,18 @@ class _productDetailsState extends State<productDetails> {
                             top: 15,
                             right: 25,
                             child: FutureBuilder<bool>(
-                              future: wishListObj.doesIdExist(myProduct.id),
+                              future: wishListObj.doesIdExist(myProduct.id, email),
                               builder: (context, snapshot) {
                                 bool exists = snapshot.data ?? false;
                                 return CircleAvatar(
                                   backgroundColor: Colors.white,
                                   child: IconButton(
-                                    padding: EdgeInsets.zero,
                                     icon: Icon(
                                       Icons.favorite,
                                       size: 25 * SizeConfig.textRatio,
-                                      color: exists
-                                          ? Colors.red
-                                          : SizeConfig.fontColor,
+                                      color: exists ? Colors.red : SizeConfig.fontColor,
                                     ),
-                                    onPressed: () {
-                                      toggleFavourite(
-                                        exists
-                                            ? "red"
-                                            : "${SizeConfig.fontColor}",
-                                        myProduct.id,
-                                      );
-                                    },
+                                    onPressed: () => toggleFavourite(myProduct.id),
                                   ),
                                 );
                               },
@@ -123,7 +122,6 @@ class _productDetailsState extends State<productDetails> {
                             child: CircleAvatar(
                               backgroundColor: const Color(0xFFD9D9D9),
                               child: IconButton(
-                                padding: EdgeInsets.zero,
                                 icon: Icon(
                                   Icons.arrow_back_ios_new,
                                   size: 20 * SizeConfig.textRatio,
@@ -139,17 +137,13 @@ class _productDetailsState extends State<productDetails> {
                       ),
                     ),
                     SizedBox(height: 10 * SizeConfig.verticalBlock),
-
-                    // Product Details Section
                     Padding(
-                      padding:
-                      EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Container(
-                        width: 361 * SizeConfig.horizontalBlock, // Fixed width
+                        width: 361 * SizeConfig.horizontalBlock,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(10 * SizeConfig.textRatio)),
-                          color: Color(0X50E9E9E9),
+                          borderRadius: BorderRadius.circular(10 * SizeConfig.textRatio),
+                          color: const Color(0X50E9E9E9),
                           border: Border.all(color: SizeConfig.iconColor),
                         ),
                         child: Padding(
@@ -158,29 +152,27 @@ class _productDetailsState extends State<productDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              HandcrafterProfileClientView(handCrafterId: myProduct.handcrafterId!),
-                                        ),);
+                                          builder: (context) => HandcrafterProfileClientView(
+                                              handCrafterId: myProduct.handcrafterId!),
+                                        ),
+                                      );
                                     },
                                     child: Row(
                                       children: [
-                                        Icon(Icons.person_outline),
-                                        SizedBox(
-                                            width:
-                                            5 * SizeConfig.horizontalBlock),
+                                        const Icon(Icons.person_outline),
+                                        SizedBox(width: 5 * SizeConfig.horizontalBlock),
                                         Text(
                                           '${myProduct.handcrafterName}',
                                           style: GoogleFonts.roboto(
                                             fontSize: 12 * SizeConfig.textRatio,
-                                            color: Color(0x703C3C3C),
+                                            color: const Color(0x703C3C3C),
                                           ),
                                         ),
                                       ],
@@ -188,14 +180,8 @@ class _productDetailsState extends State<productDetails> {
                                   ),
                                   Row(
                                     children: [
-                                      Icon(
-                                        Icons.star,
-                                        color: Color(0xFFD4931C),
-                                        size: 21 * SizeConfig.textRatio,
-                                      ),
-                                      SizedBox(
-                                          width:
-                                          5 * SizeConfig.horizontalBlock),
+                                      const Icon(Icons.star, color: Color(0xFFD4931C)),
+                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
                                       Text("${myProduct.rate}"),
                                     ],
                                   ),
@@ -206,7 +192,7 @@ class _productDetailsState extends State<productDetails> {
                                 "${myProduct.name}",
                                 style: GoogleFonts.rubik(
                                   fontSize: 24 * SizeConfig.textRatio,
-                                  color: Color(0X80000000),
+                                  color: const Color(0X80000000),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -216,7 +202,6 @@ class _productDetailsState extends State<productDetails> {
                                 style: GoogleFonts.roboto(
                                   fontSize: 14 * SizeConfig.textRatio,
                                   color: const Color(0X50000000),
-                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 10 * SizeConfig.verticalBlock),
@@ -225,21 +210,17 @@ class _productDetailsState extends State<productDetails> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      print(myProduct.reviews);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => Productreviews(
-                                              reviews: myProduct.reviews!,
-                                              rate: myProduct
-                                                  .rate), // Ensure myProduct.reviews is not null
+                                            reviews: myProduct.reviews ?? [],
+                                            rate: myProduct.rate,
+                                          ),
                                         ),
                                       );
                                     },
-                                    icon: const Icon(
-                                      Icons.chat,
-                                      color: SizeConfig.iconColor,
-                                    ),
+                                    icon: const Icon(Icons.chat, color: SizeConfig.iconColor),
                                   ),
                                   SizedBox(width: 5 * SizeConfig.verticalBlock),
                                   Text(
@@ -258,11 +239,9 @@ class _productDetailsState extends State<productDetails> {
                     ),
                     SizedBox(height: 10 * SizeConfig.verticalBlock),
 
-                    SizedBox(
-                      height: 10 * SizeConfig.verticalBlock,
-                    ),
-                    // Text('${myProduct.finalProducts}'),
-                    variationScreen(myProduct)
+                    // ✅ Variations + Add to Cart Button
+                    variationScreen(myProduct),
+
                   ],
                 ),
               ],

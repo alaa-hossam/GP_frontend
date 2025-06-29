@@ -54,7 +54,7 @@ class offerService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
@@ -91,7 +91,7 @@ class offerService{
   }
   Future<bool> addOffer(offerModel offer , String postId)async{
     Token token = Token();
-    final String handcrafterId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final String handcrafterId = await token.getUUID() ?? "";
     String query = '''
     mutation CreateOffer {
     createOffer(
@@ -113,7 +113,7 @@ class offerService{
       },
     };
     try{
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       final response = await http.post(
           Uri.parse(apiUrl),
         headers: {

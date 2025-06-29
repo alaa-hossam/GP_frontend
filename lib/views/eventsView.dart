@@ -170,7 +170,6 @@ class _EventsViewState extends State<EventsView> {
           ),
         ]
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: true),
     );
   }
 }

@@ -34,7 +34,7 @@ class postService{
   Token token = Token();
 
   Future<List<postModel>> getClientPosts() async {
-    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final viewerId = await token.getUUID();
     List<postModel> posts = [];
     String query = '''
     query GetPostsByClient {
@@ -72,7 +72,7 @@ class postService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
@@ -123,7 +123,7 @@ class postService{
   }
 
   Future<List<postModel>> getAllPosts() async {
-    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final viewerId = await token.getUUID();
     List<postModel> posts = [];
     String query = '''
    query GetPosts {
@@ -161,7 +161,7 @@ class postService{
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
@@ -210,8 +210,8 @@ class postService{
 
   Future<String> addPost(postModel post, String specializationId, File? image) async {
     Token tokenTable = Token();
-    String id = await tokenTable.getUUID("SELECT UUID FROM TOKENS");
-    String myToken = await tokenTable.getToken('SELECT TOKEN FROM TOKENS');
+    String id = await tokenTable.getUUID()??"";
+    String myToken = await tokenTable.getToken() ?? "";
 
 
     try {

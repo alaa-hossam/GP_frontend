@@ -34,7 +34,7 @@ class BazarService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       final respone = await http.post(Uri.parse(apiUrl),
           headers: {
@@ -85,7 +85,7 @@ class BazarService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      String myToken = await token.getToken() ?? "";
 
       // Step 5: Send the request
       final response = await http.post(

@@ -91,6 +91,7 @@ class _wishListViewState extends State<wishListView> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
                     print("try");
+                    print(wishProvider.wishListProducts);
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
@@ -114,7 +115,6 @@ class _wishListViewState extends State<wishListView> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomBar(selectedIndex: 0, isVisible: true),
 
     );
   }

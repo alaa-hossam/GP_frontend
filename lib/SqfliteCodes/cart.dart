@@ -2,118 +2,78 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class Cart {
+  static final Cart _instance = Cart._internal();
+  factory Cart() => _instance;
+  Cart._internal();
+
   static Database? _db;
 
-  Future<Database?> get db async {
-    if (_db == null) {
-      _db = await initialDB();
-    }
-    return _db;
+  Future<Database> get db async {
+    return _db ??= await _initDB();
   }
 
-  Future<Database> initialDB() async {
-    print("initialize cart");
+  Future<Database> _initDB() async {
     String databasePath = await getDatabasesPath();
     String path = join(databasePath, 'cart.db');
-    Database myCart = await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
-    return myCart;
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future<void> _createDB(Database db, int version) async {
-    print('Creating database tables...'); // Debug log
-
-    // Create the products table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS products(
         id TEXT,
-        finalId TEXT
+        finalId TEXT,
+        userId TEXT
       )
     ''');
-    //
-    // // Create the variations table
-    // await db.execute('''
-    //   CREATE TABLE IF NOT EXISTS variations(
-    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //     product_id TEXT,
-    //     variationType TEXT,
-    //     variationValue TEXT
-    //   )
-    // ''');
-    //
-    // // Create the finalProducts table
-    // await db.execute('''
-    //   CREATE TABLE IF NOT EXISTS finalProducts(
-    //     id TEXT PRIMARY KEY,
-    //     product_id TEXT,
-    //     customPrice REAL,
-    //     ImageUrl TEXT
-    //   )
-    // ''');
-
-    print('Database tables created successfully'); // Debug log
   }
 
-  Future<int> addProduct(String id, String finalId) async {
-    Database? myCart = await db;
-
-    int response = await myCart!.rawInsert('''
-      INSERT INTO products(id, finalId) 
-      VALUES (?, ?)
-    ''', [id , finalId]);
-
-    return response;
-  }
-
-  Future<List<Map>> getProduct(String query) async {
-    Database? myCart = await db; // Initialize the database
-    List<Map> response = await myCart!.rawQuery(query);
-    return response;
-  }
-
-
-  Future<void> recreateProductsTable() async {
-    Database? product = await db; // Initialize the database
-
-    // Drop the table if it exists
-    await product!.execute('DROP TABLE IF EXISTS products');
-    print("products table dropped successfully");
-
-    // Recreate the table
-    await _createDB(product, 1);
-    print("products table recreated successfully");
-  }
-
-  Future<int> deleteProduct(String finalId) async {
+  Future<int> addProduct({required String id, required String finalId, required String userId}) async {
     final myCart = await db;
-    return await myCart!.rawDelete(
-      '''
-    DELETE FROM products
-    WHERE ROWID = (
-      SELECT ROWID FROM products
-      WHERE finalId = ?
-      LIMIT 1
-    )
-    ''',
-      [finalId], // Arguments for the WHERE clause
+    print(await getProductIdsByUser(userId));
+    print("******************");
+    return await myCart.insert('products', {
+      'id': id,
+      'finalId': finalId,
+      'userId': userId,
+    });
+  }
+
+  Future<List<String>> getProductIdsByUser(String userId) async {
+    final myCart = await db;
+    print("............................");
+    final result = await myCart.query(
+      'products',
+      columns: ['finalId'], // only fetch the `id` column
+      where: 'userId = ?',
+      whereArgs: [userId],
     );
-  }
-  Future<int> deleteAllProduct(String finalId) async {
 
+    return result.map((row) => row['finalId'].toString()).toList();
+  }
+  Future<int> deleteProduct(String finalId, String userId) async {
     final myCart = await db;
-    return await myCart!.delete(
-      'products', // Table name
-      where: 'finalId = ?', // WHERE clause
-      whereArgs: [finalId], // Arguments for the WHERE clause
+    return await myCart.delete(
+      'products',
+      where: 'finalId = ? AND userId = ?',
+      whereArgs: [finalId, userId],
     );
   }
 
-  Future<bool> isCartEmpty() async {
+  Future<int> deleteAllUserProducts(String userId) async {
     final myCart = await db;
-    List<Map<String, dynamic>> result = await myCart!.query('products');
+    return await myCart.delete('products', where: 'userId = ?', whereArgs: [userId]);
+  }
+
+  Future<bool> isCartEmpty(String userId) async {
+    final myCart = await db;
+    final result = await myCart.query('products', where: 'userId = ?', whereArgs: [userId]);
     return result.isEmpty;
   }
+
+  Future<void> deleteDatabaseFile() async {
+    String path = join(await getDatabasesPath(), 'cart.db');
+    await deleteDatabase(path);
+  }
+
 }

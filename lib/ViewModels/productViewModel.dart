@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:gp_frontend/Models/SearchModel.dart';
+import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:gp_frontend/SqfliteCodes/cart.dart';
 
 import '../Models/ProductModel.dart';
@@ -35,9 +37,6 @@ class productViewModel  extends ChangeNotifier{
     }
   }
 
-  Future<List<productModel>> searchProduct(String word){
-    return apiServices.searchProduct(word);
-  }
 
   Future<productModel> addProduct({
     required String categoryId,
@@ -102,7 +101,9 @@ class productViewModel  extends ChangeNotifier{
   }
 
   deleteCartProduct(String finalId) async{
-    return await myCart.deleteProduct(finalId);
+    Token token = Token();
+    String id =await token.getUUID() ?? "";
+    return await myCart.deleteProduct(finalId , id);
   }
 
   productDetails(String productId){
@@ -129,9 +130,6 @@ class productViewModel  extends ChangeNotifier{
     return await apiServices.getproductType(ids);
   }
 
-  Future <List<productModel>> getSearchProducts(List<String> ids)async{
-    return await apiServices.getSearchProducts(ids);
-  }
 
 
 

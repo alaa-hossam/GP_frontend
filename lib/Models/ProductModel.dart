@@ -66,8 +66,8 @@ class productService {
     required List<Map<String, dynamic>> variations,
     required File imageFile,
   }) async {
-    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final myToken = await token.getToken();
+    final userId = await token.getUUID();
 
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.headers['Content-Type'] = 'multipart/form-data';
@@ -172,8 +172,8 @@ class productService {
     required List<Map<String, dynamic>> variations,
     required File imageFile,
   }) async {
-    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final myToken = await token.getToken();
+    final userId = await token.getUUID();
 
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.headers['Content-Type'] = 'multipart/form-data';
@@ -296,7 +296,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response;
       if (categoryId == '0') {
@@ -385,7 +385,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -427,7 +427,7 @@ class productService {
     print("Fetching history products from API...");
     List<productModel> historyProducts = [];
 
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     final query = '''
         query GetUserHistory {
@@ -451,7 +451,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -496,7 +496,7 @@ class productService {
   Future<String> addProductReview(
       String comment, String productId, double rate) async {
     print("Fetching products from API...");
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     final query = '''
     mutation CreateProductReview {
@@ -518,7 +518,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token retrieved: $myToken");
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -551,70 +551,9 @@ class productService {
     }
   }
 
-  Future<List<productModel>> searchProduct(String word) async {
-    List<productModel> products = [];
-    print("before");
-    final request = {
-      'query': '''
-      query GetAllProducts {
-          getAllProducts(options: { search: "${word}" }) {
-            data {
-              name
-              imageUrl
-              id
-              lowestCustomPrice
-              averageRating
-              category {
-                name
-            }
-            
-            }
-          }   
-      }
-
-      ''',
-    };
-    print("after");
-
-    try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $myToken',
-        },
-        body: jsonEncode(request),
-      );
-      print("response status:");
-      print(response.statusCode);
-      if (response.statusCode == 200) {
-        print("products inside the api");
-
-        final data = jsonDecode(response.body);
-        print(data);
-        List<dynamic> productsData = data['data']['getAllProducts']['data'];
-        for (var product in productsData) {
-          products.add(productModel(
-              product['id'],
-              product['imageUrl'],
-              product['name'],
-              product['lowestCustomPrice'].toDouble(),
-              product['averageRating'].toDouble(),
-              category: product['category']['name']));
-        }
-        return products;
-      } else {
-        throw Exception('Failed to load categories: ${response.body}');
-      }
-    } catch (e) {
-      print("Error fetching products: $e");
-      return [];
-    }
-  }
 
   Future<List<dynamic>> getWishProducts() async {
-    String email = await token.getEmail('SELECT EMAIL FROM TOKENS');
+    String email = await token.getEmail() ?? "";
     wishList myWish = wishList();
 
     List<String> ids = await myWish.getProductIdsByEmail(email);
@@ -642,7 +581,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       // Step 5: Send the request
       final response = await http.post(
@@ -663,17 +602,6 @@ class productService {
         List<dynamic> prods = data['data']['getProductsByIds'];
         print(prods);
 
-        // Step 7: Map the response to productModel objects
-        // for (var product in prods) {
-        //   products.add(productModel(
-        //     product['id'],
-        //     product['imageUrl'],
-        //     product['name'],
-        //     product['category']['name'],
-        //     product['lowestCustomPrice'],
-        //     product['averageRating'],
-        //   ));
-        // }
 
         print("Products fetched successfully: $prods");
         return prods;
@@ -687,16 +615,11 @@ class productService {
   }
 
   Future<List<productModel>> getCartProducts() async {
-    // Step 1: Fetch product IDs and final IDs from SQLite
+    final id =await token.getUUID() ?? "";
     myCart.db;
-    List<String> ids =
-        await myCart.getProduct("SELECT * FROM products").then((result) {
-      return result.map<String>((row) => row['id'].toString()).toList();
-    });
+
     List<String> finalIds =
-        await myCart.getProduct("SELECT * FROM products").then((result) {
-      return result.map<String>((row) => row['finalId'].toString()).toList();
-    });
+        await myCart.getProductIdsByUser(id);
     Map<String, int> numOfIds = {};
 
     for (var id in finalIds) {
@@ -742,7 +665,7 @@ class productService {
 
     try {
       // Step 3: Get the authentication token
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
       print("Token in getCartProducts: $myToken");
 
       // Step 4: Send the request to the API
@@ -789,7 +712,7 @@ class productService {
   }
 
   Future<productModel> getProductDetails(String productId) async {
-    final viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final viewerId = await token.getUUID();
     bool custom = false;
     String query = '''
     query GetProduct {
@@ -851,7 +774,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -945,7 +868,7 @@ class productService {
 
   Future<List<productModel>> getHandcrafterProduct() async {
     List<productModel> handcrafterProducts = [];
-    final String viewerId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final String viewerId = await token.getUUID() ?? "";
     String Query = '''
     query User {
     user(id:"${viewerId}") {
@@ -970,7 +893,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -1035,7 +958,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -1107,7 +1030,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       // Step 5: Send the request
       final response = await http.post(
@@ -1119,15 +1042,11 @@ class productService {
         body: jsonEncode(request),
       );
 
-      // Debug: Print the response body
-      // print(response.body);
 
-      // Step 6: Handle the response
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         List<dynamic> prods = data['data']['getProductsByIds'];
         for (var pro in prods) {
-// print(pro['finalProducts'][0]['finalProductVariation']);
           List<String> vars = [];
           variations = {};
 
@@ -1186,7 +1105,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -1219,7 +1138,6 @@ class productService {
 
   Future<bool> getproductType(List<String> productIds) async {
     bool custom = false;
-    Map<String, List<dynamic>> variations = {};
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {
@@ -1239,7 +1157,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -1272,70 +1190,10 @@ class productService {
     }
   }
 
-  Future<List<productModel>> getSearchProducts(List<String> productIds) async {
-    List<productModel> products = [];
-
-    const String query = '''
-    query GetProductsByIds(\$productIds: [String!]!) {
-      getProductsByIds(productIds: \$productIds) {
-         
-        category {
-            name
-        }
-        id
-        imageUrl
-        name
-        lowestCustomPrice
-        averageRating
-
-      }
-    }
-  ''';
-
-    final request = {
-      'query': query,
-      'variables': {
-        'productIds': productIds,
-      },
-    };
-
-    try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
-
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $myToken',
-        },
-        body: jsonEncode(request),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        List<dynamic> prods = data['data']['getProductsByIds'];
-        for (var pro in prods) {
-          products.add(
-            productModel(pro['id'], pro['imageUrl'], pro['name'],
-                pro['lowestCustomPrice'].toDouble(), 0,
-                category: pro['category']['name']),
-          );
-        }
-
-        print("Products fetched successfully: $products");
-        return products;
-      } else {
-        throw Exception('Failed to load products: ${response.body}');
-      }
-    } catch (e) {
-      print("Error fetching products: $e");
-      return products;
-    }
-  }
 
   Future<List<productModel>> getRecommendProducts() async {
     List<productModel> products = [];
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     String query = '''
    query RecommendProductsForUser {
@@ -1361,7 +1219,7 @@ class productService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),

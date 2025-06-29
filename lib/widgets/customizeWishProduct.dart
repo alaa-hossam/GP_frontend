@@ -112,9 +112,9 @@ class _customizeWishProuctState extends State<customizeWishProuct> {
                         size: 30 * SizeConfig.textRatio,
                         color: Colors.red,
                       ),
-                      onPressed: () {
-                        // Call deleteProduct from the provider
-                        wishProvider.deleteProduct(widget.id);
+                      onPressed: () async{
+                        print("LLLLLLLLLLLLLLLLLLLLLLL");
+                        await wishProvider.deleteProduct(widget.id);
                       },
                     ),
                     SizedBox(height: 10 * SizeConfig.verticalBlock), // Add spacing

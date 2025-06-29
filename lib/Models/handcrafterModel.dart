@@ -37,11 +37,11 @@ class handcrafterService {
 
     // Retrieve the user ID from the token
     Token token = Token();
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
     if (userId == null) {
       return "Error: User ID not found.";
     }
-    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+    final myToken = await token.getToken();
     print("Token in getCartProducts: $myToken");
     // Create a multipart request
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
@@ -126,11 +126,11 @@ class handcrafterService {
 
     // Retrieve the user ID from the token
     Token token = Token();
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
     if (userId == null) {
       return "Error: User ID not found.";
     }
-    final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+    final myToken = await token.getToken();
     print("Token in addHandcrafterReel: $myToken");
     // Create a multipart request
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
@@ -200,7 +200,7 @@ class handcrafterService {
   Future<handcrafterModel?> getHandcrafter() async {
     print("Fetching handcrafter reels...");
     Token token = Token();
-    final userId = await token.getUUID('SELECT UUID FROM TOKENS');
+    final userId = await token.getUUID();
 
     handcrafterModel? handcrafter;
 
@@ -227,7 +227,7 @@ class handcrafterService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -301,7 +301,7 @@ class handcrafterService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -362,7 +362,7 @@ class handcrafterService {
     };
 
     try {
-      final myToken = await token.getToken('SELECT TOKEN FROM TOKENS');
+      final myToken = await token.getToken();
 
       final response = await http.post(
         Uri.parse(apiUrl),
