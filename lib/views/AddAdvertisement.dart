@@ -97,19 +97,19 @@ class _AddadvertisementState extends State<Addadvertisement> {
                             width: 100 * SizeConfig.horizontalBlock,
                             decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
+                              BorderRadius.all(Radius.circular(5)),
                               border: Border.all(
                                   width: 1, color: SizeConfig.iconColor),
                               color: const Color(0x80E9E9E9),
                             ),
                             child: AdvertisementImage == null
                                 ? Icon(Icons.file_upload_outlined,
-                                    color: SizeConfig.iconColor,
-                                    size: 30 * SizeConfig.textRatio)
+                                color: SizeConfig.iconColor,
+                                size: 30 * SizeConfig.textRatio)
                                 : Image.file(
-                                    File(AdvertisementImage!.path),
-                                    fit: BoxFit.cover,
-                                  ),
+                              File(AdvertisementImage!.path),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
