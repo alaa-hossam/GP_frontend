@@ -15,7 +15,8 @@ import '../widgets/Dimensions.dart';
 
 class addPost extends StatefulWidget {
   static String id = "addPost";
-  const addPost({super.key});
+  final String? image;
+  const addPost({super.key, this.image});
 
   @override
   State<addPost> createState() => _addPostState();
@@ -61,12 +62,15 @@ class _addPostState extends State<addPost> {
 
     // Wait until the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
       if (args != null && args['type'] == "update") {
         final post = args['post'] as postModel;
-        final addPostProvider = Provider.of<postProvider>(context, listen: false);
-        final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+        final addPostProvider =
+            Provider.of<postProvider>(context, listen: false);
+        final catProvider =
+            Provider.of<CategoryProvider>(context, listen: false);
 
         setState(() {
           isUpdate = true;
@@ -88,16 +92,15 @@ class _addPostState extends State<addPost> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     final addPostProvider = Provider.of<postProvider>(context);
     final catProvider = Provider.of<CategoryProvider>(context, listen: false);
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-
-    Future<bool> submitOrder(postModel post, String specialization, File? image) async {
+    Future<bool> submitOrder(
+        postModel post, String specialization, File? image) async {
       if (isUpdate) {
         await myPostProvider.updatePost(post);
       } else {
@@ -152,12 +155,18 @@ class _addPostState extends State<addPost> {
                         labelText: "Title",
                       ),
                     ),
-                    incrementDecrementButtons("price", "0.00", addPostProvider.price,
+                    incrementDecrementButtons(
+                        "price",
+                        "0.00",
+                        addPostProvider.price,
                         "ًWrite an estimated price that suits you for the whole."),
-                    incrementDecrementButtons("Duration", "0.00", addPostProvider.duration,
+                    incrementDecrementButtons(
+                        "Duration",
+                        "0.00",
+                        addPostProvider.duration,
                         "Write an estimated time you can wait for the order to be completed."),
-                    incrementDecrementButtons("Quantity", "0.00", addPostProvider.quantity,
-                        "Write the number you want."),
+                    incrementDecrementButtons("Quantity", "0.00",
+                        addPostProvider.quantity, "Write the number you want."),
                     Padding(
                       padding: EdgeInsets.only(
                         left: 20 * SizeConfig.horizontalBlock,
@@ -179,7 +188,8 @@ class _addPostState extends State<addPost> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
+                      padding: EdgeInsets.only(
+                          left: 16 * SizeConfig.horizontalBlock),
                       child: Text(
                         "Upload post Image (Max 5MB, JPG, PNG) ",
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -189,24 +199,28 @@ class _addPostState extends State<addPost> {
                       child: GestureDetector(
                         onTap: () => _pickImage(ImageSource.gallery),
                         child: Container(
-                          margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
+                          margin: EdgeInsets.only(
+                              top: 10 * SizeConfig.verticalBlock),
                           height: 100 * SizeConfig.horizontalBlock,
                           width: 100 * SizeConfig.horizontalBlock,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(width: 1, color: SizeConfig.iconColor),
+                            border: Border.all(
+                                width: 1, color: SizeConfig.iconColor),
                             color: const Color(0x80E9E9E9),
                           ),
-                          child: imagePath != null
-                              ? Image.network(imagePath!)
-                              : postImage == null
-                              ? Icon(Icons.file_upload_outlined,
-                              color: SizeConfig.iconColor,
-                              size: 30 * SizeConfig.textRatio)
-                              : Image.file(
-                            File(postImage!.path),
-                            fit: BoxFit.cover,
-                          ),
+                          child: widget.image != null
+                              ? Image.network(widget.image!)
+                              : imagePath != null
+                                  ? Image.network(imagePath!)
+                                  : postImage == null
+                                      ? Icon(Icons.file_upload_outlined,
+                                          color: SizeConfig.iconColor,
+                                          size: 30 * SizeConfig.textRatio)
+                                      : Image.file(
+                                          File(postImage!.path),
+                                          fit: BoxFit.cover,
+                                        ),
                         ),
                       ),
                     ),
@@ -240,7 +254,8 @@ class _addPostState extends State<addPost> {
 
                     setState(() => _isLoading = true);
 
-                    final selectedSpecialization = catProvider.selectedSpecializationId!;
+                    final selectedSpecialization =
+                        catProvider.selectedSpecializationId!;
 
                     try {
                       final post = postModel(
@@ -252,13 +267,15 @@ class _addPostState extends State<addPost> {
                         quantity: int.parse(addPostProvider.quantity.text),
                       );
 
-                      final success = await submitOrder(post, selectedSpecialization, postImage);
+                      final success = await submitOrder(
+                          post, selectedSpecialization, postImage);
 
                       if (success && mounted) {
                         clearFields(addPostProvider);
                         Navigator.pop(context, true);
                       } else {
-                        showCustomPopup(context, "Post", "Failed to add post", []);
+                        showCustomPopup(
+                            context, "Post", "Failed to add post", []);
                       }
                     } catch (e) {
                       showCustomPopup(context, "Post", e.toString(), []);

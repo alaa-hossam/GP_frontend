@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/views/addPost.dart';
 import '../Models/generateImageModel.dart';
 import '../ViewModels/generateImageViewModel.dart';
 import '../widgets/Dimensions.dart';
@@ -172,20 +173,23 @@ class _AIChatState extends State<AIChat> {
               ),
               child: chatItems.isEmpty
                   ? Center( // Wrap the content with a Center widget
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-                  crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
-                  children: [
-                    Image.asset(
-                      'assets/images/robot.png',
-                      width: SizeConfig.verticalBlock * 65,
-                      height: SizeConfig.verticalBlock * 65,
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 20),
-                    _buildInfoContainer("Generate all the craft images you want."),
-                    _buildInfoContainer("Answer all your questions about handicraft"),
-                    _buildInfoContainer("Conversational AI (I can only send a photos)"),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    spacing: 10,
+                    mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                    crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+                    children: [
+                      Image.asset(
+                        'assets/images/robot.png',
+                        width: SizeConfig.verticalBlock * 65,
+                        height: SizeConfig.verticalBlock * 65,
+                      ),
+                      SizedBox(height: SizeConfig.verticalBlock * 20),
+                      _buildInfoContainer("Generate all the craft images you want."),
+                      _buildInfoContainer("Answer all your questions about handicraft"),
+                      _buildInfoContainer("Conversational AI (I can only send a photos)"),
+                    ],
+                  ),
                 ),
               )
                   : Stack(
@@ -373,7 +377,9 @@ class _AIChatState extends State<AIChat> {
                     color: SizeConfig.iconColor,
                     size: SizeConfig.textRatio * 20,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => addPost(image: chatItems[index].imageUrl,),));
+                  },
                 ),
               ),
             ],
