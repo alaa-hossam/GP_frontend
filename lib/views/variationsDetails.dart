@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/CommomnFunctions/validImage.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/Providers/detailsProvider.dart';
@@ -107,11 +108,14 @@ class _variationScreenState extends State<variationScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                galleryProvider.galleryImages[index]['imageUrl'],
+                              child: Image(
+                                image: ValidateImage().getValidImageUrl(galleryProvider.galleryImages[index]['imageUrl']) != null
+                                    ? NetworkImage(ValidateImage().getValidImageUrl(galleryProvider.galleryImages[index]['imageUrl'])!)
+                                    : AssetImage("assets/images/logo.png") as ImageProvider,
                                 fit: BoxFit.cover,
                               ),
                             ),
+
                           );
                         },
                       );

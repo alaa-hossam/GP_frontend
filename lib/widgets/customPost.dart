@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gp_frontend/CommomnFunctions/validImage.dart';
 import 'package:gp_frontend/Models/postModel.dart';
 import 'package:gp_frontend/views/offers.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
@@ -11,9 +12,6 @@ class customPost extends StatelessWidget {
   const customPost(this.post, {Key? key}) : super(key: key);
 
   String _getTimeAgo(DateTime createdAt) {
-    print("--------------------------**");
-    print(post.clientId);
-    print("--------------------------**");
     DateTime now = DateTime.now().toUtc();
     Duration difference = now.difference(createdAt);
 
@@ -31,22 +29,6 @@ class customPost extends StatelessWidget {
     }
   }
 
-  String? _getValidImageUrl(String? imageUrl) {
-    if (imageUrl == null || imageUrl.isEmpty) return null;
-
-    try {
-      final uri = Uri.parse(imageUrl);
-      if (uri.hasAbsolutePath && !imageUrl.contains('http', 10)) {
-        return imageUrl;
-      } else {
-        print("Invalid image URL detected: $imageUrl");
-        return null;
-      }
-    } catch (e) {
-      print("Failed to parse image URL: $imageUrl");
-      return null;
-    }
-  }
 
   void _handleMenuSelection(int value) {
     print("Selected option: $value");
@@ -62,8 +44,8 @@ class customPost extends StatelessWidget {
     }
 
     final String timeAgo = _getTimeAgo(createdAt);
-    final String? validImageUrl = _getValidImageUrl(post.postImage);
-    final String? validProfileImageUrl = _getValidImageUrl(post.clientImage);
+    final String? validImageUrl = ValidateImage().getValidImageUrl(post.postImage);
+    final String? validProfileImageUrl = ValidateImage().getValidImageUrl(post.clientImage);
 
     return Container(
       width: 385 * SizeConfig.horizontalBlock,

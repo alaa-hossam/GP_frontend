@@ -54,7 +54,13 @@ class _BottomBarState extends State<BottomBar> {
           final String routeName = pages[index];
           final currentRoute = ModalRoute.of(context)?.settings.name;
           if (currentRoute != routeName) {
-            Navigator.pushNamed(context, routeName);
+
+            if(index == 2){
+              Navigator.pushNamed(context, posts.id, arguments: 1);
+            }
+            else{
+              Navigator.pushNamed(context, routeName ,arguments: 0);
+            }
           }
         },
         child: SizedBox(
