@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:gp_frontend/Models/postModel.dart';
-import 'package:image_picker/image_picker.dart';
 
-class postViewModel  extends ChangeNotifier{
+class postViewModel extends ChangeNotifier {
   final postService apiServices = postService();
 
   Future<List<postModel>> fetchClientPosts() async {
@@ -15,10 +14,17 @@ class postViewModel  extends ChangeNotifier{
     return await apiServices.getAllPosts();
   }
 
-  Future<void> addPost(postModel order, String specializationId, File? image) async{
-     await apiServices.addPost(order, specializationId, image);
+  Future<void> addPost(
+      postModel order, String specializationId, File? image) async {
+    await apiServices.addPost(order, specializationId, image);
   }
 
+  Future<void> deletePost(String postId) async {
+    await apiServices.deletePost(postId);
+  }
 
-
+  Future<void> updatePost(
+     postModel post) async {
+    await apiServices.updatePost(post);
+  }
 }

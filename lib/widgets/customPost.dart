@@ -1,57 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/CommomnFunctions/validImage.dart';
 import 'package:gp_frontend/Models/postModel.dart';
 import 'package:gp_frontend/views/offers.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+import 'package:provider/provider.dart';
+import '../Providers/postProvider.dart';
+import '../SqfliteCodes/Token.dart';
 
-class customPost extends StatelessWidget {
+class customPost extends StatefulWidget {
   final postModel post;
 
   const customPost(this.post, {Key? key}) : super(key: key);
 
+  @override
+  State<customPost> createState() => _CustomPostState();
+}
+
+class _CustomPostState extends State<customPost> {
+  bool match = false;
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    checkId();
+  }
+
+  Future<void> checkId() async {
+    Token token = Token();
+    final idSQL = await token.getUUID();
+    setState(() {
+      match = (idSQL == widget.post.clientId);
+      loading = false;
+    });
+  }
+
   String _getTimeAgo(DateTime createdAt) {
-    DateTime now = DateTime.now().toUtc();
-    Duration difference = now.difference(createdAt);
+    final now = DateTime.now().toUtc();
+    final difference = now.difference(createdAt);
 
     if (difference.inHours > 8640) {
-      int years = (difference.inHours / 8760).toInt();
-      return "$years yrs";
+      return "${(difference.inHours / 8760).toInt()} yrs";
     } else if (difference.inHours > 720) {
-      int months = (difference.inHours / 720).toInt();
-      return "$months mos";
+      return "${(difference.inHours / 720).toInt()} mos";
     } else if (difference.inHours > 24) {
-      int days = (difference.inHours / 24).toInt();
-      return "$days days";
+      return "${(difference.inHours / 24).toInt()} days";
     } else {
       return "${difference.inHours} hrs";
     }
   }
 
-
-  void _handleMenuSelection(int value) {
-    print("Selected option: $value");
-  }
-
   @override
   Widget build(BuildContext context) {
-    DateTime createdAt;
-    try {
-      createdAt = DateTime.parse(post.createdAt ?? "");
-    } catch (e) {
-      createdAt = DateTime.now();
-    }
-
-    final String timeAgo = _getTimeAgo(createdAt);
-    final String? validImageUrl = ValidateImage().getValidImageUrl(post.postImage);
-    final String? validProfileImageUrl = ValidateImage().getValidImageUrl(post.clientImage);
+    final post = widget.post;
+    DateTime createdAt = DateTime.tryParse(post.createdAt ?? "") ?? DateTime.now();
+    final timeAgo = _getTimeAgo(createdAt);
+    final validImageUrl = ValidateImage().getValidImageUrl(post.postImage);
+    final validProfileImageUrl = ValidateImage().getValidImageUrl(post.clientImage);
 
     return Container(
       width: 385 * SizeConfig.horizontalBlock,
       decoration: BoxDecoration(
         color: const Color(0x50E9E9E9),
-        borderRadius: BorderRadius.all(Radius.circular(5)),
+        borderRadius: const BorderRadius.all(Radius.circular(5)),
         border: Border.all(color: SizeConfig.iconColor),
       ),
       margin: EdgeInsets.symmetric(vertical: 5.0 * SizeConfig.verticalBlock),
@@ -66,79 +78,75 @@ class customPost extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      if (validProfileImageUrl != null)
-                        Padding(
-                          padding:
-                          EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
-                          child: CircleAvatar(
-                            backgroundImage:
-                            NetworkImage(validProfileImageUrl),
-                            backgroundColor: Colors.transparent,
-                            radius: 20 * SizeConfig.horizontalBlock,
-                          ),
-                        )
-                      else
-                        Padding(
-                          padding:
-                          EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey[300],
-                            radius: 20 * SizeConfig.horizontalBlock,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.grey[600],
-                              size: 20 * SizeConfig.textRatio,
-                            ),
-                          ),
+                      Padding(
+                        padding: EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
+                        child: CircleAvatar(
+                          backgroundImage: validProfileImageUrl != null
+                              ? NetworkImage(validProfileImageUrl)
+                              : null,
+                          backgroundColor: Colors.grey[300],
+                          radius: 20 * SizeConfig.horizontalBlock,
+                          child: validProfileImageUrl == null
+                              ? Icon(Icons.person, color: Colors.grey[600], size: 20 * SizeConfig.textRatio)
+                              : null,
                         ),
+                      ),
                       SizedBox(width: 10 * SizeConfig.horizontalBlock),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "${post.userName}",
-                            style: GoogleFonts.roboto(
-                                fontSize: 10 * SizeConfig.textRatio,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            timeAgo,
-                            style: GoogleFonts.roboto(
-                                fontSize: 8 * SizeConfig.textRatio,
-                                color: const Color(0x503C3C3C)),
-                          ),
+                          Text("${post.userName}", style: GoogleFonts.roboto(fontSize: 10 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                          Text(timeAgo, style: GoogleFonts.roboto(fontSize: 8 * SizeConfig.textRatio, color: const Color(0x503C3C3C))),
                         ],
-                      )
+                      ),
                     ],
                   ),
-                  PopupMenuButton<int>(
-                    onSelected: _handleMenuSelection,
-                    itemBuilder: (BuildContext context) => const [
-                      PopupMenuItem(value: 1, child: Text("Option 1")),
-                      PopupMenuItem(value: 2, child: Text("Option 2")),
-                      PopupMenuItem(value: 3, child: Text("Option 3")),
-                    ],
-                    icon: const Icon(Icons.more_vert),
-                  )
+                  if (!loading && match)
+                    PopupMenuButton<int>(
+                      onSelected: (value) async {
+                        if (value == 1) {
+                          print("Update Post");
+                        } else if (value == 2) {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Delete Post"),
+                              content: const Text("Are you sure you want to delete this post?"),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                                TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete")),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            final myPostProvider = Provider.of<postProvider>(context, listen: false);
+                            await myPostProvider.deletePost(widget.post.id!);
+                            await myPostProvider.getAllPosts();
+
+                          }
+                        }
+                      },
+
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: 1, child: Text("Update Post")),
+                        PopupMenuItem(value: 2, child: Text("Delete Post")),
+                      ],
+                      icon: const Icon(Icons.more_vert),
+                    ),
                 ],
               ),
 
               // Title
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 10 * SizeConfig.horizontalBlock),
-                child: Text("${post.title}",
-                    style: GoogleFonts.roboto(
-                        fontSize: 12, fontWeight: FontWeight.bold)),
+                padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock),
+                child: Text("${post.title}", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
-              SizedBox(
-                height: 10 * SizeConfig.verticalBlock,
-              ),
+              SizedBox(height: 10 * SizeConfig.verticalBlock),
 
               // Description
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 15 * SizeConfig.horizontalBlock),
+                padding: EdgeInsets.symmetric(horizontal: 15 * SizeConfig.horizontalBlock),
                 child: Text("${post.description}"),
               ),
 
@@ -151,71 +159,44 @@ class customPost extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text("Price:",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0x503C3C3C))),
+                    Text("Price:", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0x503C3C3C))),
                     SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                    Text("${post.price} LE",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("${post.price} LE", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
                     SizedBox(width: 15 * SizeConfig.horizontalBlock),
-                    Text("Duration:",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0x503C3C3C))),
+                    Text("Duration:", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0x503C3C3C))),
                     SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                    Text("${post.duration}",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("${post.duration}", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
                     SizedBox(width: 15 * SizeConfig.horizontalBlock),
-                    Text("Quantity:",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0x503C3C3C))),
+                    Text("Quantity:", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0x503C3C3C))),
                     SizedBox(width: 5 * SizeConfig.horizontalBlock),
-                    Text("${post.quantity}",
-                        style: GoogleFonts.roboto(
-                            fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text("${post.quantity}", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
 
-              // Conditionally render post image
               if (validImageUrl != null)
                 Container(
                   height: 201 * SizeConfig.verticalBlock,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5 * SizeConfig.textRatio),
-                    ),
-                  ),
                   clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5 * SizeConfig.textRatio)),
                   child: Image.network(
                     validImageUrl,
                     fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Center(child: Text("Image failed to load")),
+                    errorBuilder: (_, __, ___) => const Center(child: Text("Image failed to load")),
                   ),
                 ),
             ],
           ),
           Positioned(
-            bottom: 0 * SizeConfig.verticalBlock,
+            bottom: 0,
             right: 10 * SizeConfig.horizontalBlock,
             child: Row(
               children: [
-                offers(postId: post.id ?? "" , clientId: post.clientId ?? ""),
+                offers(postId: post.id ?? "", clientId: post.clientId ?? ""),
                 Text(
-                  "${post.offersIds != null ? post.offersIds!.length : 0}",
-                  style: GoogleFonts.roboto(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
+                  "${post.offersIds?.length ?? 0}",
+                  style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ],
             ),

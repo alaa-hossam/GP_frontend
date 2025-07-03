@@ -21,6 +21,7 @@ import 'package:gp_frontend/views/MyHandcrafterProfile.dart';
 import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
+import 'package:gp_frontend/views/UpdatePost.dart';
 import 'package:gp_frontend/views/addAddress.dart';
 import 'package:gp_frontend/views/addCrafterReel.dart';
 import 'package:gp_frontend/views/addOffer.dart';
@@ -149,6 +150,7 @@ class MyApp extends StatelessWidget {
         AddProduct.id : (BuildContext context) => AddProduct(),
         ChatView.id : (BuildContext context) => ChatView(),
         ChatDetails.id : (BuildContext context) => ChatDetails(),
+        UpdatePost.id : (BuildContext context) => UpdatePost(),
       },
     );
   }

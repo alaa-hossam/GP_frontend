@@ -3,32 +3,35 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
-
-
-class postModel{
-  String? userName , clientImage , description , postImage, title, createdAt, id, clientId;
-  int? quantity , duration;
-  double?  price;
+class postModel {
+  String? userName,
+      clientImage,
+      description,
+      postImage,
+      title,
+      createdAt,
+      id,
+      clientId;
+  int? quantity, duration;
+  double? price;
   List<String>? offersIds;
 
   postModel(
-      {
-        this.clientId,
-        this.id,
-        this.userName,
-        this.clientImage,
-        this.description,
-        this.postImage,
-        this.quantity,
-        this.duration,
-        this.price,
-        this.title,
-        this.createdAt,
-        this.offersIds});
+      {this.clientId,
+      this.id,
+      this.userName,
+      this.clientImage,
+      this.description,
+      this.postImage,
+      this.quantity,
+      this.duration,
+      this.price,
+      this.title,
+      this.createdAt,
+      this.offersIds});
 }
 
-
-class postService{
+class postService {
   final String apiUrl =
       "https://octopus-app-n9t68.ondigitalocean.app/sanaa/api/graphql";
   Token token = Token();
@@ -82,37 +85,37 @@ class postService{
         body: jsonEncode(request),
       );
 
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         final List<dynamic> getPosts = data['data']['getPostsByClient'];
 
-        for(var post in getPosts){
+        for (var post in getPosts) {
           List<String>? ids = [];
-          for(var offer in post['offers']){
-            if(post['offers'] != null){
+          for (var offer in post['offers']) {
+            if (post['offers'] != null) {
               ids.add(offer['id']);
             }
           }
-          posts.add(postModel(userName: post['customer']['username'] ?? "" ,
-              clientImage:post['customer']['clientProfile'],
+          posts.add(postModel(
+              userName: post['customer']['username'] ?? "",
+              clientImage: post['customer']['clientProfile'],
               id: post['id'],
-              description: post['description'],postImage:  post['gallery'][0]['fileURL']
-              ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
-              , price: post['suggestedOnePrice'].toDouble(),
-              title:  post['title'] ?? "" , createdAt: post['createdAt'],
-              offersIds: ids, clientId: post['customer']['id']
-
-          ));
+              description: post['description'],
+              postImage: post['gallery'][0]['fileURL'],
+              quantity: post['suggestedQuantity'],
+              duration: post['suggestedOneDuration'],
+              price: post['suggestedOnePrice'].toDouble(),
+              title: post['title'] ?? "",
+              createdAt: post['createdAt'],
+              offersIds: ids,
+              clientId: post['customer']['id']));
           print("****************************************");
           print(post['customer']['id']);
-
         }
 
         return posts;
-
-        } else {
+      } else {
         print('Failed to load product: ${response.statusCode}');
       }
       return posts;
@@ -177,25 +180,27 @@ class postService{
 
         final List<dynamic> getPosts = data['data']['getPosts'];
 
-        for(var post in getPosts){
+        for (var post in getPosts) {
           List<String>? ids = [];
-            if(post['offers'] != null){
-              for(var offer in post['offers']){
-                ids.add(offer['id']);
+          if (post['offers'] != null) {
+            for (var offer in post['offers']) {
+              ids.add(offer['id']);
             }
           }
-          posts.add(postModel(userName: post['customer']['username'] ?? "" ,
-              clientImage:post['customer']['clientProfile'],
-              description: post['description'],postImage:  post['gallery'][0]['fileURL']
-              ,quantity:post['suggestedQuantity'],duration:post['suggestedOneDuration']
-              , price: post['suggestedOnePrice'].toDouble(),
-              id:  post['id'],
-              title:  post['title'] ?? "" , createdAt: post['createdAt'],
-              offersIds: ids,clientId: post['customer']['id']
-
-          ));
+          posts.add(postModel(
+              userName: post['customer']['username'] ?? "",
+              clientImage: post['customer']['clientProfile'],
+              description: post['description'],
+              postImage: post['gallery'][0]['fileURL'],
+              quantity: post['suggestedQuantity'],
+              duration: post['suggestedOneDuration'],
+              price: post['suggestedOnePrice'].toDouble(),
+              id: post['id'],
+              title: post['title'] ?? "",
+              createdAt: post['createdAt'],
+              offersIds: ids,
+              clientId: post['customer']['id']));
         }
-
       } else {
         print('Failed to load product: ${response.statusCode}');
       }
@@ -206,13 +211,11 @@ class postService{
     }
   }
 
-
-
-  Future<String> addPost(postModel post, String specializationId, File? image) async {
+  Future<String> addPost(
+      postModel post, String specializationId, File? image) async {
     Token tokenTable = Token();
-    String id = await tokenTable.getUUID()??"";
+    String id = await tokenTable.getUUID() ?? "";
     String myToken = await tokenTable.getToken() ?? "";
-
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
@@ -243,9 +246,7 @@ class postService{
     }
         }
       """,
-        "variables": {
-          "file": null
-        }
+        "variables": {"file": null}
       };
 
       request.fields['operations'] = jsonEncode(operations);
@@ -256,7 +257,6 @@ class postService{
 
       print(image);
       if (image != null) {
-
         request.files.add(await http.MultipartFile.fromPath(
           '0',
           image.path,
@@ -270,24 +270,104 @@ class postService{
       print('Response Body: $responseBody');
 
       if (response.statusCode == 200) {
-
-
-
         final data = jsonDecode(responseBody);
         if (data['errors'] != null) {
           throw Exception('GraphQL Error: ${data['errors'][0]['message']}');
         }
         return "post Added Successfully";
       } else {
-        throw Exception('Failed to create post: ${response.statusCode} - $responseBody');
+        throw Exception(
+            'Failed to create post: ${response.statusCode} - $responseBody');
       }
     } catch (e) {
       return "Error creating Advertisement: $e";
     }
   }
 
+  Future<void> deletePost(String postId) async {
+    String query = '''
+mutation DeletePost {
+    deletePost(id: "${postId}")
+}
 
+  ''';
 
+    final request = {
+      'query': query,
+      'variables': {
+        'id': postId,
+      },
+    };
 
+    try {
+      final myToken = await token.getToken();
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
 
+      if (response.statusCode == 200) {
+        print("Post Deleted Successfully");
+      } else {
+        print('Failed to delete post: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error delete post: $e');
+    }
+  }
+
+  Future<void> updatePost(postModel post) async {
+    String query = '''
+mutation UpdatePost {
+    updatePost(
+        id: "${post.id}"
+        data: {
+
+            description: "${post.description}"
+            suggestedOneDuration: "${post.duration}"
+            suggestedOnePrice: "${post.price}"
+            suggestedQuantity: "${post.quantity}"
+            title: "${post.title}"
+        }
+    ) {
+        id
+    }
+}
+  ''';
+    final request = {
+      'query': query,
+      'variables': {
+        'id': post.id,
+        'description': post.description,
+        'suggestedOneDuration': post.duration,
+        'suggestedOnePrice': post.price,
+        'suggestedQuantity': post.quantity,
+        'title': post.title
+      },
+    };
+
+    try {
+      final myToken = await token.getToken();
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        print("Post Updated Successfully");
+      } else {
+        print('Failed to Updated post: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error Updated post: $e');
+    }
+  }
 }
