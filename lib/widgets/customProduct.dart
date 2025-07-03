@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
-import 'package:gp_frontend/ViewModels/customerViewModel.dart';
-import 'package:provider/provider.dart';
 import '../Models/ProductModel.dart';
+import '../Providers/ProductProvider.dart';
 import '../SqfliteCodes/wishList.dart';
+import '../views/finalProducts.dart';
 import '../views/productDetails.dart';
 import 'Dimensions.dart';
 
@@ -14,10 +13,22 @@ class customProduct extends StatefulWidget {
   final bool showCompare;
   final int? comparedNum;
   final String? Category;
+  final bool? isCrafterProfile;
   final Function(productModel)? onComparePressed;
 
-  const customProduct(this.imageURL, this.Name, this.Price, this.rate, this.id, this.showCompare,
-      {this.onComparePressed, this.comparedNum, this.Category, super.key});
+  const customProduct(
+      this.imageURL,
+      this.Name,
+      this.Price,
+      this.rate,
+      this.id,
+      this.showCompare, {
+        this.onComparePressed,
+        this.comparedNum,
+        this.Category,
+        this.isCrafterProfile,
+        super.key,
+      });
 
   @override
   State<customProduct> createState() => _customProductState();
@@ -26,6 +37,7 @@ class customProduct extends StatefulWidget {
 class _customProductState extends State<customProduct> {
   final wishList wishListObj = wishList();
   final Token myToken = Token();
+  final productProvider productdetails = productProvider();
 
   bool isTapped = true;
   bool isFavorite = false;
@@ -52,7 +64,6 @@ class _customProductState extends State<customProduct> {
       await wishListObj.deleteProduct(widget.id, email);
     } else {
       await wishListObj.addProduct(id: widget.id, email: email);
-      print(await wishListObj.getProductIdsByEmail(email));
     }
     setState(() {
       isFavorite = !isFavorite;
@@ -84,8 +95,45 @@ class _customProductState extends State<customProduct> {
     }
   }
 
+  Future<void> _navigateToEditProduct() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    try {
+      await productdetails.getProductDetails(widget.id);
+      productModel myProduct = productdetails.productDetails;
+
+      // Close the loading dialog
+      if (mounted) Navigator.pop(context);
+
+      // Navigate to FinalProduct screen
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FinalProduct(product: myProduct),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Close the loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error loading product")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isCrafter = widget.isCrafterProfile ?? false;
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, productDetails.id, arguments: widget.id);
@@ -104,7 +152,8 @@ class _customProductState extends State<customProduct> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(5 * SizeConfig.textRatio),
+                  borderRadius:
+                  BorderRadius.circular(5 * SizeConfig.textRatio),
                   child: Image.network(
                     widget.imageURL,
                     width: 160 * SizeConfig.horizontalBlock,
@@ -120,11 +169,17 @@ class _customProductState extends State<customProduct> {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       icon: Icon(
-                        Icons.favorite,
+                        isCrafter ? Icons.edit : Icons.favorite,
                         size: 25 * SizeConfig.textRatio,
-                        color: isFavorite ? Colors.red : SizeConfig.fontColor,
+                        color: isCrafter
+                            ? SizeConfig.fontColor
+                            : (isFavorite
+                            ? Colors.red
+                            : SizeConfig.fontColor),
                       ),
-                      onPressed: toggleFavourite,
+                      onPressed: isCrafter
+                          ? _navigateToEditProduct
+                          : toggleFavourite,
                     ),
                   ),
                 ),
@@ -138,15 +193,26 @@ class _customProductState extends State<customProduct> {
                         width: 75 * SizeConfig.horizontalBlock,
                         height: 32 * SizeConfig.verticalBlock,
                         decoration: BoxDecoration(
-                          color: isTapped ? const Color(0x50E9E9E9) : SizeConfig.iconColor,
+                          color: isTapped
+                              ? const Color(0x50E9E9E9)
+                              : SizeConfig.iconColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Center(child: Text('Compare')),
+                        child: Center(
+                          child: Text(
+                            isTapped ? 'Compare' : 'Added',
+                            style: TextStyle(
+                              color: isTapped ? Colors.black : Colors.white,
+                              fontSize: 12 * SizeConfig.textRatio,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
               ],
             ),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -175,7 +241,9 @@ class _customProductState extends State<customProduct> {
               ],
             ),
             Text(
-              widget.Category?.isNotEmpty == true ? widget.Category! : "No Category",
+              widget.Category?.isNotEmpty == true
+                  ? widget.Category!
+                  : "No Category",
               style: TextStyle(fontSize: 11 * SizeConfig.textRatio),
             ),
             Row(
@@ -188,17 +256,18 @@ class _customProductState extends State<customProduct> {
                     fontSize: 16 * SizeConfig.textRatio,
                   ),
                 ),
-                Container(
-                  width: 30 * SizeConfig.horizontalBlock,
-                  height: 24 * SizeConfig.verticalBlock,
-                  decoration: BoxDecoration(
-                    color: SizeConfig.iconColor,
-                    borderRadius: BorderRadius.circular(5),
+                if (!isCrafter)
+                  Container(
+                    width: 30 * SizeConfig.horizontalBlock,
+                    height: 24 * SizeConfig.verticalBlock,
+                    decoration: BoxDecoration(
+                      color: SizeConfig.iconColor,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.add, color: Colors.white, size: 14),
+                    ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.add, color: Colors.white, size: 14),
-                  ),
-                )
               ],
             ),
           ],

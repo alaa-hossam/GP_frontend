@@ -5,19 +5,18 @@ import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/widgets/BazarProduct.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 import 'package:provider/provider.dart';
+import '../CommomnFunctions/ProfileData.dart';
 import '../Models/CategoryModel.dart';
 import '../Models/ProductModel.dart';
 import '../Providers/BazarProvider.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
 import '../SqfliteCodes/Token.dart';
-import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/messages.dart';
 import 'MyHandcrafterProfile.dart';
-import 'ProfileView.dart';
 import 'cartView.dart';
 import 'checkOut.dart';
 
@@ -432,7 +431,15 @@ class _showBazarState extends State<showBazar> {
             if (role == 'Handicrafter') {
               Navigator.pushNamed(context, MyHandcrafterProfile.id);
             } else {
-              Navigator.pushNamed(context, Profile.id);
+              loadProfileByRole(
+                context: context,
+                onCustomerLoaded: (customer) {
+                  print("Customer loaded: ${customer.name}");
+                },
+                onCrafterLoaded: (crafter) {
+                  print("Crafter loaded: ${crafter.name}");
+                },
+              );
             }
           },
           icon: Icon(Icons.account_circle_outlined, size: 24),

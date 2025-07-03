@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
-import 'package:gp_frontend/views/HandcrafterRequest.dart';
-import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/compareView.dart';
 import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:provider/provider.dart';
+import '../CommomnFunctions/ProfileData.dart';
 import '../Models/CategoryModel.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
-import '../SqfliteCodes/Token.dart';
-import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
-import '../widgets/SideButton.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 import '../widgets/customizeTextFormField.dart';
-import 'MyHandcrafterProfile.dart';
-import 'ProfileView.dart';
-import 'eventsView.dart';
-import 'historyView.dart';
-import 'logInView.dart';
 
 class browseProducts extends StatefulWidget {
   static String id = "browseProductsScreen";
@@ -133,15 +124,16 @@ class _BrowseProductsState extends State<browseProducts> {
               ),
               IconButton(
                 onPressed: () async{
-                  final token = Token();
-                  final role = await token.getRole();
-                  print(role);
-                  // Navigate to the appropriate profile based on the role
-                  if (role == 'Handicrafter') {
-                    Navigator.pushNamed(context, MyHandcrafterProfile.id);
-                  } else if (role == 'Client') {
-                    Navigator.pushNamed(context, Profile.id);
-                  }                },
+                  loadProfileByRole(
+                    context: context,
+                    onCustomerLoaded: (customer) {
+                      print("Customer loaded: ${customer.name}");
+                    },
+                    onCrafterLoaded: (crafter) {
+                      print("Crafter loaded: ${crafter.name}");
+                    },
+                  );
+                },
                 icon: Icon(Icons.account_circle_outlined,
                     size: 24 * SizeConfig.textRatio),
               ),

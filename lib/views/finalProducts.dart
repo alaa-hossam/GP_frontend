@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/addFinalProduct.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
-
 import '../widgets/messages.dart';
 
 class FinalProduct extends StatefulWidget {

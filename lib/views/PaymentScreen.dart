@@ -7,6 +7,7 @@ import 'package:gp_frontend/Providers/orderProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
+import '../CommomnFunctions/ProfileData.dart';
 import '../External Services/PaymentAPI.dart';
 import '../ViewModels/AdvertisementsViewModel.dart';
 import '../widgets/Dimensions.dart';
@@ -233,7 +234,15 @@ print(transactionId);
           IconButton(
             icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
             onPressed: () {
-              Navigator.pushNamed(context, Profile.id);
+              loadProfileByRole(
+                context: context,
+                onCustomerLoaded: (customer) {
+                  print("Customer loaded: ${customer.name}");
+                },
+                onCrafterLoaded: (crafter) {
+                  print("Crafter loaded: ${crafter.name}");
+                },
+              );
             },
           ),
         ],

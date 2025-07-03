@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/views/showOrders.dart';
 
+import '../CommomnFunctions/ProfileData.dart';
 import '../SqfliteCodes/Token.dart';
 import '../views/AddAdvertisement.dart';
 import '../views/HandcrafterRequest.dart';
@@ -24,7 +25,6 @@ class Mydrawer extends StatefulWidget {
 }
 
 class _MydrawerState extends State<Mydrawer> {
-
   Widget _buildDrawerHeader() {
     return Stack(
       children: [
@@ -48,7 +48,8 @@ class _MydrawerState extends State<Mydrawer> {
                   backgroundImage: AssetImage('assets/images/p1.jpg'),
                 ),
               ),
-              Text("my name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+              Text("my name",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
               Text("myemail@gmail.com", style: TextStyle(fontSize: 14)),
             ],
           ),
@@ -59,77 +60,79 @@ class _MydrawerState extends State<Mydrawer> {
 
   @override
   Widget build(BuildContext context) {
-      return Drawer(
-        width: 223 * SizeConfig.horizontalBlock,
-        backgroundColor: Colors.white,
-        child: Stack(
-          children: [
-            ListView(
-              children: [
-                _buildDrawerHeader(),
-                Padding(
-                  padding: EdgeInsets.only(left: 10, top: 10),
-                  child: Column(
-                    children: [
-                      sideButton("My Account", Icons.account_circle_outlined,
-                          SizeConfig.iconColor, () async{
-                            final token = Token();
-                            final role = await token.getRole();
-                            print(role);
-                            // Navigate to the appropriate profile based on the role
-                            if (role == 'Handicrafter') {
-                              Navigator.pushNamed(context, MyHandcrafterProfile.id);
-                            } else if (role == 'Client') {
-                              Navigator.pushNamed(context, Profile.id);
-                            }
-                          }),
-                      sideButton("My orders", Icons.shopping_cart_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, showOrders.id);
-                          }),
-                      sideButton("History", Icons.history_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, HistoryProducts.id);
-                          }),
-                      sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
-                              () {
-                            Navigator.pushNamed(context, posts.id , arguments: 0);
-                          }),
-                      sideButton("Compare Products", Icons.compare_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, browseProducts.id , arguments: {"showCompare":true});
-                          }),
-                      sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, RecommendGift.id);
-                          }),
-                      sideButton("Event Reminder", Icons.event_available_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, EventsView.id);
-                          }),
-                      sideButton("Add Advertisement", Icons.camera_roll_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, Addadvertisement.id);
-                          }),
-                      sideButton("Join as Handcrafter", Icons.shopping_bag_outlined,
-                          SizeConfig.iconColor, () {
-                            Navigator.pushNamed(context, HandcrafterRequest.id);
-                          }),
-                    ],
-                  ),
+    return Drawer(
+      width: 223 * SizeConfig.horizontalBlock,
+      backgroundColor: Colors.white,
+      child: Stack(
+        children: [
+          ListView(
+            children: [
+              _buildDrawerHeader(),
+              Padding(
+                padding: EdgeInsets.only(left: 10, top: 10),
+                child: Column(
+                  children: [
+                    sideButton("My Account", Icons.account_circle_outlined,
+                        SizeConfig.iconColor, () async {
+                      loadProfileByRole(
+                        context: context,
+                        onCustomerLoaded: (customer) {
+                          print("Customer loaded: ${customer.name}");
+                        },
+                        onCrafterLoaded: (crafter) {
+                          print("Crafter loaded: ${crafter.name}");
+                        },
+                      );
+                    }),
+                    sideButton("My orders", Icons.shopping_cart_outlined,
+                        SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, showOrders.id);
+                    }),
+                    sideButton(
+                        "History", Icons.history_outlined, SizeConfig.iconColor,
+                        () {
+                      Navigator.pushNamed(context, HistoryProducts.id);
+                    }),
+                    sideButton("My posts", Icons.post_add, SizeConfig.iconColor,
+                        () {
+                      Navigator.pushNamed(context, posts.id, arguments: 0);
+                    }),
+                    sideButton("Compare Products", Icons.compare_outlined,
+                        SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, browseProducts.id,
+                          arguments: {"showCompare": true});
+                    }),
+                    sideButton("Recommend Gifts", Icons.card_giftcard_outlined,
+                        SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, RecommendGift.id);
+                    }),
+                    sideButton("Event Reminder", Icons.event_available_outlined,
+                        SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, EventsView.id);
+                    }),
+                    sideButton("Add Advertisement", Icons.camera_roll_outlined,
+                        SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, Addadvertisement.id);
+                    }),
+                    sideButton("Join as Handcrafter",
+                        Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
+                      Navigator.pushNamed(context, HandcrafterRequest.id);
+                    }),
+                  ],
                 ),
-              ],
-            ),
-            Positioned(
-              left: 10,
-              bottom: 10,
-              child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
-                Navigator.pushReplacementNamed(context, logIn.id);
-              }),
-            ),
-          ],
-        ),
-      );
+              ),
+            ],
+          ),
+          Positioned(
+            left: 10,
+            bottom: 10,
+            child: sideButton("Log Out", Icons.logout_outlined, Colors.red, () {
+              Navigator.pushReplacementNamed(context, logIn.id);
+            }),
+          ),
+        ],
+      ),
+    );
 
     ;
   }

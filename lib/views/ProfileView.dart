@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/voucherView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
@@ -8,7 +7,6 @@ import 'package:gp_frontend/widgets/customizeNavigatorProfile.dart';
 import 'package:gp_frontend/widgets/customizeProfileOptions.dart';
 import 'package:image_picker/image_picker.dart';
 import '../Models/CustomerModel.dart';
-import '../ViewModels/customerViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import 'chooseAddress.dart';
@@ -16,8 +14,9 @@ import 'logInView.dart';
 
 class Profile extends StatefulWidget {
   static String id = "ProfileScreen";
+  final CustomerModel customer;
 
-  const Profile({super.key});
+  const Profile(this.customer, {super.key});
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -25,32 +24,13 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   File? _image;
-  customerViewModel cvm = customerViewModel();
-  CustomerModel? _customer;
-  bool _isLoading = true;
+  late CustomerModel _customer;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadCustomerData();
-  }
-
-  Future<void> _loadCustomerData() async {
-    try {
-      final customer = await cvm.fetchUserProfile();
-      setState(() {
-        _customer = customer;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print("Error loading customer data: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading profile data')),
-      );
-    }
+    _customer = widget.customer;
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -61,7 +41,7 @@ class _ProfileState extends State<Profile> {
         setState(() {
           _image = File(pickedImage.path);
         });
-        // Here you would typically upload the image to your server
+        // TODO: Upload image to server
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,6 +53,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
@@ -80,10 +61,7 @@ class _ProfileState extends State<Profile> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFF223F4A),
-                Color(0xFF5095B0),
-              ],
+              colors: [Color(0xFF223F4A), Color(0xFF5095B0)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -97,16 +75,13 @@ class _ProfileState extends State<Profile> {
         automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 5 * SizeConfig.verticalBlock,
           children: [
             Row(
               children: [
                 IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.white,
-                    size: SizeConfig.textRatio * 15,
-                  ),
+                  icon: Icon(Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                      size: SizeConfig.textRatio * 15),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -132,24 +107,33 @@ class _ProfileState extends State<Profile> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.emoji_events_outlined,color: Color(0xFF0B44ED),size: 20 * SizeConfig.textRatio,),
-                      Text(_customer!.points.toString(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 19 * SizeConfig.textRatio,
-                      ),),
-                      Text('points',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 10 * SizeConfig.textRatio,
-                      ),)
+                      Icon(Icons.emoji_events_outlined,
+                          color: Color(0xFF0B44ED),
+                          size: 20 * SizeConfig.textRatio),
+                      const SizedBox(width: 6),
+                      Text(
+                        _customer.points.toString(),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 19 * SizeConfig.textRatio,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'points',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10 * SizeConfig.textRatio,
+                        ),
+                      )
                     ],
                   ),
                 ),
               ],
             ),
-            // Profile content below
+            const SizedBox(height: 10),
             Center(
               child: Stack(
                 children: [
@@ -159,21 +143,19 @@ class _ProfileState extends State<Profile> {
                     child: CircleAvatar(
                       radius: SizeConfig.horizontalBlock * 67,
                       backgroundColor: Colors.white,
-                      child: _customer?.profileImage != null
+                      child: _customer.profileImage != null
                           ? ClipOval(
                         child: Image.network(
-                          _customer!.profileImage!,
+                          _customer.profileImage!,
                           width: SizeConfig.horizontalBlock * 134,
                           height: SizeConfig.horizontalBlock * 134,
                           fit: BoxFit.cover,
                         ),
                       )
-                          : Center(
-                        child: Icon(
-                          Icons.person,
-                          size: SizeConfig.horizontalBlock * 60,
-                          color: SizeConfig.iconColor,
-                        ),
+                          : Icon(
+                        Icons.person,
+                        size: SizeConfig.horizontalBlock * 60,
+                        color: SizeConfig.iconColor,
                       ),
                     ),
                   ),
@@ -183,10 +165,7 @@ class _ProfileState extends State<Profile> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.0,
-                        ),
+                        border: Border.all(color: Colors.white, width: 1.0),
                       ),
                       child: CircleAvatar(
                         backgroundColor: SizeConfig.iconColor,
@@ -207,7 +186,7 @@ class _ProfileState extends State<Profile> {
             ),
             Center(
               child: Text(
-                _customer?.name ?? 'No Name',
+                _customer.name!,
                 style: TextStyle(
                   fontFamily: "Rubik",
                   fontSize: 24 * SizeConfig.textRatio,
@@ -218,7 +197,7 @@ class _ProfileState extends State<Profile> {
             ),
             Center(
               child: Text(
-                _customer?.email ?? 'NO Email',
+                _customer.email!,
                 style: TextStyle(
                   fontFamily: "Roboto",
                   fontSize: 16 * SizeConfig.textRatio,
@@ -228,7 +207,7 @@ class _ProfileState extends State<Profile> {
             ),
           ],
         ),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(20),
             bottomRight: Radius.circular(20),
@@ -238,49 +217,46 @@ class _ProfileState extends State<Profile> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Center(
-                child: Column(
-                  children: [
-                    SizedBox(height: SizeConfig.verticalBlock * 20),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CustomizeProfileOptions(
-                            buttonName: 'Voucher',
-                            buttonIcon: Icons.confirmation_num_outlined,
-                            iconColor: const Color(0xFFDF9B3B),
-                            onClickButton: () =>
-                                Navigator.pushNamed(context, voucherView.id),
-                          ),
-                          SizedBox(width: SizeConfig.horizontalBlock * 15),
-                          CustomizeProfileOptions(
-                            buttonName: 'Wishlist',
-                            buttonIcon: Icons.favorite,
-                            iconColor: const Color(0xFFCA0003),
-                            onClickButton: () =>
-                                Navigator.pushNamed(context, wishListView.id),
-                          ),
-                          SizedBox(width: SizeConfig.horizontalBlock * 15),
-                          CustomizeProfileOptions(
-                            buttonName: 'Gift Card',
-                            buttonIcon: Icons.wallet_giftcard_rounded,
-                            iconColor: const Color(0xFF24944D),
-                            onClickButton: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: SizeConfig.verticalBlock * 20),
-                    ..._buildProfileOptions(),
-                    SizedBox(height: SizeConfig.verticalBlock * 10),
-                  ],
-                ),
+        child: Column(
+          children: [
+            SizedBox(height: SizeConfig.verticalBlock * 20),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomizeProfileOptions(
+                    buttonName: 'Voucher',
+                    buttonIcon: Icons.confirmation_num_outlined,
+                    iconColor: const Color(0xFFDF9B3B),
+                    onClickButton: () =>
+                        Navigator.pushNamed(context, voucherView.id),
+                  ),
+                  SizedBox(width: SizeConfig.horizontalBlock * 15),
+                  CustomizeProfileOptions(
+                    buttonName: 'Wishlist',
+                    buttonIcon: Icons.favorite,
+                    iconColor: const Color(0xFFCA0003),
+                    onClickButton: () =>
+                        Navigator.pushNamed(context, wishListView.id),
+                  ),
+                  SizedBox(width: SizeConfig.horizontalBlock * 15),
+                  CustomizeProfileOptions(
+                    buttonName: 'Gift Card',
+                    buttonIcon: Icons.wallet_giftcard_rounded,
+                    iconColor: const Color(0xFF24944D),
+                    onClickButton: () {},
+                  ),
+                ],
               ),
             ),
-      bottomNavigationBar: BottomBar(currentIndex: 2
+            SizedBox(height: SizeConfig.verticalBlock * 20),
+            ..._buildProfileOptions(),
+            SizedBox(height: SizeConfig.verticalBlock * 10),
+          ],
+        ),
       ),
+      bottomNavigationBar: BottomBar(currentIndex: 2),
     );
   }
 
@@ -297,14 +273,16 @@ class _ProfileState extends State<Profile> {
         buttonName: 'History',
         buttonIcon: Icons.history_outlined,
         iconColor: SizeConfig.iconColor,
-        onClickButton: () => Navigator.pushNamed(context, HistoryProducts.id),
+        onClickButton: () =>
+            Navigator.pushNamed(context, HistoryProducts.id),
       ),
       SizedBox(height: SizeConfig.verticalBlock * 10),
       customizeNavigatorProfile(
-        buttonName: 'My Addresses ',
+        buttonName: 'My Addresses',
         buttonIcon: Icons.location_on_outlined,
         iconColor: SizeConfig.iconColor,
-        onClickButton: () => Navigator.pushNamed(context, chooseAddress.id),
+        onClickButton: () =>
+            Navigator.pushNamed(context, chooseAddress.id),
       ),
       SizedBox(height: SizeConfig.verticalBlock * 10),
       customizeNavigatorProfile(
@@ -319,7 +297,7 @@ class _ProfileState extends State<Profile> {
         buttonIcon: Icons.logout_outlined,
         iconColor: const Color(0xFFCA0003),
         onClickButton: () {
-          Navigator.pushReplacementNamed(context, logIn.id);
+          Navigator.popUntil(context, ModalRoute.withName(logIn.id));
         },
       ),
     ];

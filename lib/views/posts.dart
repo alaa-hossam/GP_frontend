@@ -6,10 +6,9 @@ import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/widgets/customPost.dart';
 import 'package:provider/provider.dart';
-
+import '../CommomnFunctions/ProfileData.dart';
 import '../Providers/postProvider.dart';
 import '../widgets/Dimensions.dart';
-import 'ProfileView.dart';
 
 class posts extends StatefulWidget {
   static String id = "posts";
@@ -24,6 +23,7 @@ class _postsState extends State<posts> {
   List<postModel> posts = [];
   Future<void>? _postsFuture;
   late int page;
+  late String role;
 
   @override
   void initState() {
@@ -91,8 +91,16 @@ class _postsState extends State<posts> {
             actions: [
               IconButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, Profile.id);
-                },
+                  loadProfileByRole(
+                    context: context,
+                    onCustomerLoaded: (customer) {
+                      print("Customer loaded: ${customer.name}");
+                    },
+                    onCrafterLoaded: (crafter) {
+                      print("Crafter loaded: ${crafter.name}");
+                    },
+                  );
+                  },
                 icon: Icon(
                   Icons.account_circle_outlined,
                   color: Colors.white,

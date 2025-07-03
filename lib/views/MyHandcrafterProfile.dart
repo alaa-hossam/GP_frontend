@@ -14,7 +14,9 @@ import 'addCrafterReel.dart';
 
 class MyHandcrafterProfile extends StatefulWidget {
   static String id = "MyHandcrafterProfileScreen";
-  const MyHandcrafterProfile({super.key});
+  final handcrafterModel handcrafter;
+
+  const MyHandcrafterProfile(this.handcrafter,{super.key});
 
   @override
   State<MyHandcrafterProfile> createState() => _MyHandcrafterProfileState();
@@ -23,7 +25,7 @@ class MyHandcrafterProfile extends StatefulWidget {
 class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
   File? _image;
   handcrafterViewModel hvm = handcrafterViewModel();
-  handcrafterModel? _handcrafter;
+  late handcrafterModel _handcrafter;
   bool _isLoading = true;
   late productProvider prodProvider;
 
@@ -51,28 +53,11 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
     return textPainter.width + 40 * SizeConfig.horizontalBlock;
   }
 
-  Future<void> _loadHandcrafterData() async {
-    try {
-      final handcrafter = await hvm.fetchHandcrafter();
-      setState(() {
-        _handcrafter = handcrafter;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print("Error loading customer data: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading profile data')),
-      );
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _loadHandcrafterData();
+    _handcrafter = widget.handcrafter;
     prodProvider = Provider.of<productProvider>(context, listen: false);
     prodProvider.handCrafterProducts.clear();
     prodProvider.fetchHandCrafter();
@@ -223,16 +208,16 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
               ),
               child: SizedBox(
                 height: 50 * SizeConfig.verticalBlock,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                     customizeButton(
                       buttonName: "Add Product",
-                      buttonColor: Color(0xFF5095B0),
-                      fontColor: Color(0xFFFFFFFF),
+                      buttonColor: Color(0xFFE9E9E9).withOpacity(0.5),
+                      fontColor: SizeConfig.iconColor,
                       buttonIcon: Icons.add,
-                      IconColor: Color(0xFFFFFFFF),
+                      IconColor: SizeConfig.iconColor,
                       textSize: 14 * SizeConfig.textRatio,
                       width: _calculateButtonWidth("Add Product", context),
                       height: 40 * SizeConfig.verticalBlock,
@@ -348,6 +333,7 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                         product.rate,
                         product.id,
                         false,
+                        isCrafterProfile: true,
                       );
                     },
                   ),

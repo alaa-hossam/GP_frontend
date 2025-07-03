@@ -727,6 +727,7 @@ class productService {
         averageRating
         id
         variations {
+          id
           variationType
           variationValue
           sizeUnit
@@ -819,6 +820,18 @@ class productService {
 
           // Access variations
           final List<dynamic>? variations = getProduct['variations'];
+          Map<String, List<dynamic>> variationMap = {};
+
+          for (var variation in variations!) {
+            final id = variation['id'];
+            final value = variation['variationValue'];
+
+            if (!variationMap.containsKey(id)) {
+              variationMap[id] = [];
+            }
+
+            variationMap[id]?.add(value);
+          }
           print("before variations: ${variations}");
 
           // Access finalProducts
@@ -848,6 +861,7 @@ class productService {
               reviews: reviews,
               category: categoryName,
               galleryImg: galleryImages,
+              variationsWithIds: variationMap,
               custom: custom);
 
           return myProduct;

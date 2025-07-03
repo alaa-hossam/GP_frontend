@@ -12,17 +12,17 @@ import 'package:gp_frontend/widgets/customizeButton.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:provider/provider.dart';
+import '../CommomnFunctions/ProfileData.dart';
+import '../Models/CustomerModel.dart';
 import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
-import '../SqfliteCodes/cart.dart';
+import '../ViewModels/customerViewModel.dart';
 import '../widgets/BottomBar.dart';
 import '../widgets/Dimensions.dart';
 import '../widgets/customizeTextFormField.dart';
 import '../widgets/customizeCategory.dart';
 import '../SqfliteCodes/Token.dart';
-import 'MyHandcrafterProfile.dart';
 import 'SearchView.dart';
 import 'messageView.dart';
 
@@ -39,7 +39,8 @@ class _HomeState extends State<Home> {
   late Future<void> _initialization;
   late Token token;
   late String role;
-
+  customerViewModel cvm = customerViewModel();
+  CustomerModel? _customer;
 
   @override
   void initState() {
@@ -59,9 +60,8 @@ class _HomeState extends State<Home> {
         Provider.of<AdvertisementProvider>(context, listen: false);
     final bazarProvider = Provider.of<BazarProvider>(context, listen: false);
 
-
     token = Token();
-    role = await token.getRole()?? "";
+    role = await token.getRole() ?? "";
 
     await Future.wait<void>([
       catProvider.fetchCategories(),
@@ -76,7 +76,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-
     return Scaffold(
       drawer: Mydrawer(),
       appBar: _buildAppBar(context),
@@ -90,7 +89,9 @@ class _HomeState extends State<Home> {
           return _buildHomeContent();
         },
       ),
-      bottomNavigationBar: BottomBar(currentIndex: 0,),
+      bottomNavigationBar: BottomBar(
+        currentIndex: 0,
+      ),
     );
   }
 
@@ -114,19 +115,21 @@ class _HomeState extends State<Home> {
           },
           icon: Icon(Icons.notifications_none, size: 24),
         ),
-
         IconButton(
           onPressed: () => Navigator.pushNamed(context, cartScreen.id),
           icon: Icon(Icons.shopping_cart_outlined, size: 24),
         ),
         IconButton(
           onPressed: () async {
-            // Navigate to the appropriate profile based on the role
-            if (role == 'Handicrafter') {
-              Navigator.pushNamed(context, MyHandcrafterProfile.id);
-            } else if (role == 'Client') {
-              Navigator.pushNamed(context, Profile.id);
-            }
+            loadProfileByRole(
+              context: context,
+              onCustomerLoaded: (customer) {
+                print("Customer loaded: ${customer.name}");
+              },
+              onCrafterLoaded: (crafter) {
+                print("Crafter loaded: ${crafter.name}");
+              },
+            );
           },
           icon: Icon(Icons.account_circle_outlined, size: 24),
         ),
@@ -164,7 +167,7 @@ class _HomeState extends State<Home> {
         SizedBox(height: 10),
         _buildCategories(categoryProvider),
         SizedBox(height: 10),
-        _buildSectionTitle("Best Seller" , onTap: () {
+        _buildSectionTitle("Best Seller", onTap: () {
           Navigator.pushNamed(context, browseProducts.id);
         }),
         _buildProductList(productProv.products),
@@ -347,7 +350,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildSectionTitle(String title , {VoidCallback? onTap}) {
+  Widget _buildSectionTitle(String title, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Row(
@@ -362,7 +365,6 @@ class _HomeState extends State<Home> {
             ),
         ],
       ),
-
     );
   }
 
@@ -371,7 +373,6 @@ class _HomeState extends State<Home> {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Text(title,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-
     );
   }
 

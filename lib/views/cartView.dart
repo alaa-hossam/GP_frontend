@@ -11,11 +11,11 @@ import 'package:gp_frontend/widgets/cartAppBar.dart';
 import 'package:gp_frontend/widgets/cartDiscount.dart';
 import 'package:gp_frontend/widgets/messages.dart';
 import 'package:provider/provider.dart';
+import '../CommomnFunctions/ProfileData.dart';
 import '../SqfliteCodes/cart.dart';
 import '../widgets/cartContainer.dart';
 import '../widgets/cartPriceSummary.dart';
 import '../widgets/customizeButton.dart';
-import 'ProfileView.dart';
 
 class cartScreen extends StatefulWidget {
   static String id = "cartScreen";
@@ -33,6 +33,7 @@ class _cartScreenState extends State<cartScreen> {
   voucherProvider? _voucherProvider;
   Token token = Token();
   String userId = "";
+  late String role;
 
   final List<String> _options = [
     'Choose',
@@ -143,7 +144,15 @@ class _cartScreenState extends State<cartScreen> {
                   ),
                   IconButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, Profile.id);
+                        loadProfileByRole(
+                          context: context,
+                          onCustomerLoaded: (customer) {
+                            print("Customer loaded: ${customer.name}");
+                          },
+                          onCrafterLoaded: (crafter) {
+                            print("Crafter loaded: ${crafter.name}");
+                          },
+                        );
                       },
                       icon: Icon(
                         Icons.account_circle_outlined,
