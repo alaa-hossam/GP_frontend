@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -506,4 +507,77 @@ class customerServices {
       return 'Error fetching user: $e';
     }
   }
+
+  Future<String> changeImageProfile(File file) async {
+    print("In CustomerModel ==========");
+
+    Token token = Token();
+    final userId = await token.getUUID();
+    if (userId == null) {
+      return "Error: User ID not found.";
+    }
+    final myToken = await token.getToken();
+    print("Token in chanfe profile image: $myToken");
+    // Create a multipart request
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+    // Add headers
+    request.headers['Content-Type'] = 'multipart/form-data';
+    request.headers['x-apollo-operation-name'] = 'ChangeProfileImage';
+    request.headers['Authorization'] = 'Bearer $myToken';
+
+    // GraphQL query with variables
+    final query = '''
+    mutation ChangeProfileImage (\$file: Upload!){
+    changeProfileImage(file: \$file, userId: "${userId}") {
+        imageUrl
+        userId
+    }
+}
+    ''';
+
+    // Add the query and variables to the request
+    request.fields['operations'] = jsonEncode({
+      'query': query,
+      'variables': {
+        'file': null,
+      },
+    });
+
+    // Add the file map
+    request.fields['map'] = jsonEncode({
+      '0': ['variables.file'],
+    });
+
+    // Add files to the request
+    request.files.add(await http.MultipartFile.fromPath(
+      '0',
+      file.path,
+    ));
+
+    try {
+      // Send the request
+      final response = await request.send();
+
+      // Read the response
+      final responseBody = await response.stream.bytesToString();
+      print("Response: $responseBody"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody);
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+        print(data['data']['changeProfileImage']['imageUrl']);
+        return "image changed successfully";
+      } else {
+        // Handle HTTP errors
+        return "HTTP Error: ${response.statusCode} - ${response.reasonPhrase}";
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return "An error occurred: $e";
+    }
+  }
+
 }

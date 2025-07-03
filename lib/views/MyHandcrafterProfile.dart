@@ -29,15 +29,90 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
   bool _isLoading = true;
   late productProvider prodProvider;
 
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text('Choose from gallery'),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text('Take a photo'),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: source);
-    if (pickedImage != null) {
-      setState(() {
-        _image = File(pickedImage.path);
-      });
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.pickImage(source: source);
+
+      if (pickedImage != null) {
+        setState(() {
+          _image = File(pickedImage.path);
+        });
+
+        // Show confirmation dialog
+        final shouldUpload = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Confirm Upload"),
+              content: const Text("Do you want to upload this photo?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    hvm.changeProfileImage(file: _image);
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text("Yes"),
+                ),
+              ],
+            );
+          },
+        );
+
+        // If user cancels, remove selected image
+        if (shouldUpload != true) {
+          setState(() {
+            _image = null;
+          });
+        } else {
+          // ✅ You can handle upload logic here
+          // For now do nothing
+          print("Image confirmed for upload.");
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: $e')),
+      );
     }
   }
+
 
   double _calculateButtonWidth(String text, BuildContext context) {
     final textPainter = TextPainter(
@@ -124,22 +199,30 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                     child: CircleAvatar(
                       radius: SizeConfig.horizontalBlock * 67,
                       backgroundColor: Colors.white,
-                      child: _handcrafter?.profileURL != null
+                      child: _image != null
                           ? ClipOval(
-                              child: Image.network(
-                                _handcrafter!.profileURL!,
-                                width: SizeConfig.horizontalBlock * 134,
-                                height: SizeConfig.horizontalBlock * 134,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Center(
-                              child: Icon(
-                                Icons.person,
-                                size: SizeConfig.horizontalBlock * 60,
-                                color: SizeConfig.iconColor,
-                              ),
-                            ),
+                        child: Image.file(
+                          _image!,
+                          width: SizeConfig.horizontalBlock * 134,
+                          height: SizeConfig.horizontalBlock * 134,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : (_handcrafter.profileURL != null
+                          ? ClipOval(
+                        child: Image.network(
+                          _handcrafter.profileURL!,
+                          width: SizeConfig.horizontalBlock * 134,
+                          height: SizeConfig.horizontalBlock * 134,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : Icon(
+                        Icons.person,
+                        size: SizeConfig.horizontalBlock * 60,
+                        color: SizeConfig.iconColor,
+                      )),
+
                     ),
                   ),
                   Positioned(
@@ -148,16 +231,13 @@ class _MyHandcrafterProfileState extends State<MyHandcrafterProfile> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.0,
-                        ),
+                        border: Border.all(color: Colors.white, width: 1.0),
                       ),
                       child: CircleAvatar(
                         backgroundColor: SizeConfig.iconColor,
                         radius: SizeConfig.horizontalBlock * 20,
                         child: IconButton(
-                          onPressed: () => _pickImage(ImageSource.gallery),
+                          onPressed: _showImagePickerOptions,
                           icon: Icon(
                             Icons.edit_outlined,
                             color: Colors.white,

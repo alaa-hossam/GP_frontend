@@ -20,6 +20,11 @@ class customerViewModel {
     return customerProcesses.getUserProfile();
   }
 
+  Future<String> changeProfileImage({required file})async{
+    print("in CVMMMMMMMMMMMM");
+    return customerProcesses.changeImageProfile(file);
+  }
+
   Future<String> verifyCustomer(String code , String email){
     return customerProcesses.verifyCustomer(code, email);
   }

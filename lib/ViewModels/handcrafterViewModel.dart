@@ -15,6 +15,10 @@ class handcrafterViewModel {
     print("in HVMMMMMMMMMMMM");
     return handcrafterSer.addHandcrafterReel(content,file);
   }
+  Future<String> changeProfileImage({required file})async{
+    print("in HVMMMMMMMMMMMM");
+    return handcrafterSer.changeImageProfile(file);
+  }
 
   Future<handcrafterModel?> fetchHandcrafter() async {
     return handcrafterSer.getHandcrafter();

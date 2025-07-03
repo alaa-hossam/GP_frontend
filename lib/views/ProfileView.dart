@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/voucherView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
@@ -24,6 +25,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   File? _image;
+  customerViewModel CVM = customerViewModel();
   late CustomerModel _customer;
   bool _isLoading = false;
 
@@ -33,15 +35,82 @@ class _ProfileState extends State<Profile> {
     _customer = widget.customer;
   }
 
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.photo),
+            title: const Text('Choose from gallery'),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text('Take a photo'),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       final picker = ImagePicker();
       final pickedImage = await picker.pickImage(source: source);
+
       if (pickedImage != null) {
         setState(() {
           _image = File(pickedImage.path);
         });
-        // TODO: Upload image to server
+
+        // Show confirmation dialog
+        final shouldUpload = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Confirm Upload"),
+              content: const Text("Do you want to upload this photo?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    CVM.changeProfileImage(file: _image);
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text("Yes"),
+                ),
+              ],
+            );
+          },
+        );
+
+        // If user cancels, remove selected image
+        if (shouldUpload != true) {
+          setState(() {
+            _image = null;
+          });
+        } else {
+          // ✅ You can handle upload logic here
+          // For now do nothing
+          print("Image confirmed for upload.");
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,7 +212,16 @@ class _ProfileState extends State<Profile> {
                     child: CircleAvatar(
                       radius: SizeConfig.horizontalBlock * 67,
                       backgroundColor: Colors.white,
-                      child: _customer.profileImage != null
+                      child: _image != null
+                          ? ClipOval(
+                        child: Image.file(
+                          _image!,
+                          width: SizeConfig.horizontalBlock * 134,
+                          height: SizeConfig.horizontalBlock * 134,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : (_customer.profileImage != null
                           ? ClipOval(
                         child: Image.network(
                           _customer.profileImage!,
@@ -156,7 +234,8 @@ class _ProfileState extends State<Profile> {
                         Icons.person,
                         size: SizeConfig.horizontalBlock * 60,
                         color: SizeConfig.iconColor,
-                      ),
+                      )),
+
                     ),
                   ),
                   Positioned(
@@ -171,7 +250,7 @@ class _ProfileState extends State<Profile> {
                         backgroundColor: SizeConfig.iconColor,
                         radius: SizeConfig.horizontalBlock * 20,
                         child: IconButton(
-                          onPressed: () => _pickImage(ImageSource.gallery),
+                          onPressed: _showImagePickerOptions,
                           icon: Icon(
                             Icons.edit_outlined,
                             color: Colors.white,

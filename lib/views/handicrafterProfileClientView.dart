@@ -39,19 +39,23 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
   }
 
   Future<void> _loadHandcrafterData() async {
+    // Show loading spinner
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
     try {
       final handcrafter = await hvm.fetchHandcrafterById(widget.handCrafterId);
       setState(() {
         _handcrafter = handcrafter;
-        _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print("Error loading customer data: $e");
+      Navigator.pop(context); // Close loading if error
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading profile data')),
+        const SnackBar(content: Text("Error loading profile")),
       );
     }
   }

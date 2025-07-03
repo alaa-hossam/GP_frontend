@@ -197,6 +197,78 @@ class handcrafterService {
     }
   }
 
+  Future<String> changeImageProfile(File file) async {
+    print("In handcrafterModel ==========");
+
+    Token token = Token();
+    final userId = await token.getUUID();
+    if (userId == null) {
+      return "Error: User ID not found.";
+    }
+    final myToken = await token.getToken();
+    print("Token in chanfe profile image: $myToken");
+    // Create a multipart request
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+    // Add headers
+    request.headers['Content-Type'] = 'multipart/form-data';
+    request.headers['x-apollo-operation-name'] = 'ChangeProfileImage';
+    request.headers['Authorization'] = 'Bearer $myToken';
+
+    // GraphQL query with variables
+    final query = '''
+    mutation ChangeProfileImage (\$file: Upload!){
+    changeProfileImage(file: \$file, userId: "${userId}") {
+        imageUrl
+        userId
+    }
+}
+    ''';
+
+    // Add the query and variables to the request
+    request.fields['operations'] = jsonEncode({
+      'query': query,
+      'variables': {
+        'file': null,
+      },
+    });
+
+    // Add the file map
+    request.fields['map'] = jsonEncode({
+      '0': ['variables.file'],
+    });
+
+    // Add files to the request
+    request.files.add(await http.MultipartFile.fromPath(
+      '0',
+      file.path,
+    ));
+
+    try {
+      // Send the request
+      final response = await request.send();
+
+      // Read the response
+      final responseBody = await response.stream.bytesToString();
+      print("Response: $responseBody"); // Debugging the response
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(responseBody);
+        if (data['errors'] != null) {
+          return data['errors'][0]['message'];
+        }
+        print(data['data']['changeProfileImage']['imageUrl']);
+        return "image changed successfully";
+      } else {
+        // Handle HTTP errors
+        return "HTTP Error: ${response.statusCode} - ${response.reasonPhrase}";
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return "An error occurred: $e";
+    }
+  }
+
   Future<handcrafterModel?> getHandcrafter() async {
     print("Fetching handcrafter reels...");
     Token token = Token();
@@ -209,7 +281,6 @@ class handcrafterService {
       user(id: "${userId}") {
         handicrafterProfile {
           name
-          imageUrl
           description
           averageRating
           posts {
@@ -217,6 +288,9 @@ class handcrafterService {
             content
             postFileUrl
           }
+        }
+         clientProfile {
+            imageUrl
         }
       }
     }
@@ -237,14 +311,14 @@ class handcrafterService {
         },
         body: jsonEncode(request),
       );
-
+print(response);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        final profile = data['data']['user']['handicrafterProfile'];
+        final profile = data['data']['user'];
 
         List<handcrafterPostModel> postList = [];
-        for (var post in profile['posts']) {
+        for (var post in profile['handicrafterProfile']['posts']) {
           postList.add(
             handcrafterPostModel(
               post['content'],
@@ -255,12 +329,15 @@ class handcrafterService {
         }
 
         handcrafter = handcrafterModel(
-          name: profile['name'],
-          profileURL: profile['imageUrl'],
-          description: profile['description'],
-          rate: profile['averageRating']?.toDouble() ?? 0.0,
+          name: profile['handicrafterProfile']['name'],
+          profileURL: profile['clientProfile']['imageUrl'],
+          description: profile['handicrafterProfile']['description'],
+          rate: profile['handicrafterProfile']['averageRating']?.toDouble() ?? 0.0,
           posts: postList,
         );
+        print("00000000000000000000000000000000000000000000000000000000000000000000000000000");
+        print(profile['imageUrl']);
+        print("00000000000000000000000000000000000000000000000000000000000000000000000000000");
 
         return handcrafter;
       } else {
@@ -276,24 +353,28 @@ class handcrafterService {
   Future<handcrafterModel?> getHandcrafterById(String id) async {
     print("Fetching handcrafter reels...");
     Token token = Token();
+    final userId = await token.getUUID();
     handcrafterModel? handcrafter;
 
     String query = '''
-    query User {
-      user(id: "$id") {
-        handicrafterProfile {
-          name
-          imageUrl
-          description
-          averageRating
-          posts {
-            id
+    query GetHandicrafterProfile {
+    getHandicrafterProfile(handicrafterProfileId: "${id}", viewerId: "${userId}") {
+        averageRating
+        name
+        description
+        posts {
             content
+            id
             postFileUrl
-          }
         }
-      }
+         user {
+            clientProfile {
+                imageUrl
+            }
+        }
     }
+}
+
   ''';
 
     final request = {
@@ -315,7 +396,7 @@ class handcrafterService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        final profile = data['data']['user']['handicrafterProfile'];
+        final profile = data['data']['getHandicrafterProfile'];
 
         List<handcrafterPostModel> postList = [];
         for (var post in profile['posts']) {
@@ -330,7 +411,7 @@ class handcrafterService {
 
         handcrafter = handcrafterModel(
           name: profile['name'],
-          profileURL: profile['imageUrl'],
+          profileURL: profile['user']['clientProfile']['imageUrl'],
           description: profile['description'],
           rate: profile['averageRating']?.toDouble() ?? 0.0,
           posts: postList,
@@ -386,4 +467,6 @@ class handcrafterService {
 
     return false;
   }
+
+
 }
