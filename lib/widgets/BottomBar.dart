@@ -38,7 +38,7 @@ class _BottomBarState extends State<BottomBar> {
           _buildItem(icon: Icons.home_outlined, index: 0),
           _buildItem(icon: Icons.android, index: 1),
           _buildItem(icon: Icons.post_add, index: 2),
-          _buildItem(icon: Icons.shopping_cart_outlined, index: 3),
+          _buildItem(icon: Icons.chat, index: 3),
         ],
       ),
     );
@@ -90,7 +90,7 @@ class _BottomBarState extends State<BottomBar> {
       case 2:
         return "Posts";
       case 3:
-        return "Cart";
+        return "My Chats";
       default:
         return '';
     }
