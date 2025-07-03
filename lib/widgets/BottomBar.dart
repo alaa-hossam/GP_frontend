@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/views/ChatView.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/posts.dart';
@@ -21,7 +22,7 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> {
-  List<String> pages = [Home.id ,AIChat.id , posts.id , cartScreen.id];
+  List<String> pages = [Home.id ,AIChat.id , posts.id , ChatView.id];
 
   @override
   Widget build(BuildContext context) {

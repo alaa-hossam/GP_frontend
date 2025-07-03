@@ -26,14 +26,14 @@ class _logInState extends State<logIn> {
   customerViewModel cvm = customerViewModel();
   bool _isLoading = false;
   Token token = Token();
-  Cart cart = Cart();
-  wishList wishlist = wishList();
+  // Cart cart = Cart();
+  // wishList wishlist = wishList();
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-      cart.deleteDatabaseFile();
-      wishlist.deleteDatabaseFile();
+      // cart.deleteDatabaseFile();
+      // wishlist.deleteDatabaseFile();
 
     });
   }
