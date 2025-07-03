@@ -72,4 +72,12 @@ class wishList {
     );
     return result.isNotEmpty;
   }
+
+
+  Future<void> deleteDatabaseFile() async {
+    String path = join(await getDatabasesPath(), 'wishlist.db');
+    await deleteDatabase(path);
+  }
+
+
 }

@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/SqfliteCodes/cart.dart';
+import 'package:gp_frontend/SqfliteCodes/wishList.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/forgetPasswordView.dart';
@@ -24,10 +26,15 @@ class _logInState extends State<logIn> {
   customerViewModel cvm = customerViewModel();
   bool _isLoading = false;
   Token token = Token();
+  Cart cart = Cart();
+  wishList wishlist = wishList();
 
   togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
+      cart.deleteDatabaseFile();
+      wishlist.deleteDatabaseFile();
+
     });
   }
 
