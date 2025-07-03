@@ -8,6 +8,7 @@ import 'package:gp_frontend/widgets/AppBar.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 
 import '../Models/messageModel.dart';
+import 'ChatDetails.dart';
 
 class ChatView extends StatefulWidget {
   static String id = "Chat View";
@@ -110,8 +111,16 @@ class _ChatViewState extends State<ChatView> {
                             title: Text(name ?? ""),
                             subtitle: Text(lastMessage),
                             onTap: () {
-                              // Navigate to detailed chat screen
+                              Navigator.pushNamed(
+                                context,
+                                ChatDetails.id,
+                                arguments: {
+                                  'id':id,
+                                  'otherId': otherUserId
+                                }
+                              );
                             },
+
                           );
                         },
                       );
