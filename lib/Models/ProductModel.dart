@@ -165,11 +165,13 @@ class productService {
   }
 
   Future<String> addFinalProduct({
-    required String categoryId,
-    required String name,
-    required String description,
-    required List<String> indicatorIds,
-    required List<Map<String, dynamic>> variations,
+    required String productId,
+    int? duration,
+    int? stockquntity,
+    required bool isCustom,
+    required double price,
+    required List<String> varitionIds,
+    required List<File> galleryImages,
     required File imageFile,
   }) async {
     final myToken = await token.getToken();
@@ -177,51 +179,64 @@ class productService {
 
     var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
     request.headers['Content-Type'] = 'multipart/form-data';
-    request.headers['x-apollo-operation-name'] = 'CreateProduct';
+    request.headers['x-apollo-operation-name'] = 'CreateFinalProduct2';
     request.headers['Authorization'] = 'Bearer $myToken';
-    // Add headers
 
-    // GraphQL mutation
+    // GraphQL mutation with variables
     final query = '''
-    mutation CreateProduct(\$indicatorIds: [String!]!, \$variations: [CreateProductVariationDto!], \$file: Upload!) {
-      createProduct(
-        createProductDto: {
-          categoryId: "$categoryId",
-          description: "$description",
-          handicrafterId: "$userId",
-          name: "$name",
-          indicatorIds: \$indicatorIds,
-          variations: \$variations
-        },
-        file: \$file
+    mutation CreateFinalProduct(
+      \$createFinalProductDto: CreateFinalProductDto!, 
+      \$mainImageFile: Upload!, 
+      \$galleryFiles: [Upload!]
+    ) {
+      createFinalProduct(
+        createFinalProductDto: \$createFinalProductDto, 
+        mainImageFile: \$mainImageFile, 
+        galleryFiles: \$galleryFiles
       ) {
         id
       }
     }
   ''';
 
-    // Build the GraphQL variables
+    // Prepare variables
     final variables = {
-      "indicatorIds": indicatorIds,
-      "variations": variations,
-      "file": null
+      "createFinalProductDto": {
+        "duration": duration,
+        "handicrafterPrice": price,
+        "isCustomMade": isCustom,
+        "productId": productId,
+        "productVariationIds": varitionIds,
+        "stockQuantity": stockquntity,
+      },
+      "mainImageFile": null,
+      "galleryFiles": List.filled(galleryImages.length, null),
     };
 
-    // Set up multipart fields
+    // Prepare map for file uploads
+    final Map<String, List<String>> fileMap = {
+      "0": ["variables.mainImageFile"],
+    };
+
+    for (int i = 0; i < galleryImages.length; i++) {
+      fileMap["${i + 1}"] = ["variables.galleryFiles.$i"];
+    }
+
+    // Set fields
     request.fields['operations'] = jsonEncode({
       "query": query,
       "variables": variables,
     });
 
-    request.fields['map'] = jsonEncode({
-      "0": ["variables.file"]
-    });
+    request.fields['map'] = jsonEncode(fileMap);
 
-    // Attach image
-    request.files.add(await http.MultipartFile.fromPath(
-      '0',
-      imageFile.path,
-    ));
+    // Attach main image
+    request.files.add(await http.MultipartFile.fromPath('0', imageFile.path));
+
+    // Attach gallery images
+    for (int i = 0; i < galleryImages.length; i++) {
+      request.files.add(await http.MultipartFile.fromPath('${i + 1}', galleryImages[i].path));
+    }
 
     try {
       final streamedResponse = await request.send();
@@ -234,7 +249,7 @@ class productService {
         if (data['errors'] != null) {
           return "Error: ${data['errors'][0]['message']}";
         }
-        final created = data['data']['createProduct'];
+        final created = data['data']['createFinalProduct'];
         return "Product added: ID = ${created['id']}";
       } else {
         final error = jsonDecode(response.body);
@@ -245,6 +260,7 @@ class productService {
       return "Exception: $e";
     }
   }
+
 
   Future<List<productModel>> getAllProducts(String categoryId) async {
     print("Fetching products from API...");

@@ -1203,13 +1203,6 @@ class _AddProductState extends State<AddProduct> {
                             return;
                           }
 
-                          // Optional debug logs
-                          print('\n\n===== PRODUCT INPUT DATA =====');
-                          print('- Product Name: ${productName.text}');
-                          print('- Description: ${description.text}');
-                          print('- Selected Tags: ${selectedTags.map((e) => e.name).toList()}');
-                          print('- Selected Variations: $selectedVariations');
-
                           // Now call _saveData
                           final result = await _saveData();
 

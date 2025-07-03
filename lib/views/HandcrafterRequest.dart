@@ -91,34 +91,32 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
                     }
 
                     final specializations = snapshot.data!;
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: specializations.length,
-                      itemBuilder: (context, index) {
-                        final specialization = specializations[index];
-                        final isSelected = tempSelectedSpecializations.contains(specialization.name);
-                        bool check ;
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return ListView.builder(
+                          itemCount: specializations.length,
+                          itemBuilder: (context, index) {
+                            final specialization = specializations[index];
+                            final isSelected = tempSelectedSpecializationsID.contains(specialization.id);
 
-                        return CheckboxListTile(
-                          title: Text(specialization.name),
-                          value: isSelected, // Check if selected
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                // Checkbox is checked
-                                if (!tempSelectedSpecializations.contains(specialization.name)) {
-                                  tempSelectedSpecializations.add(specialization.name); // Add specialization
-                                  tempSelectedSpecializationsID.add(specialization.id); // Add ID
-                                }
-                              } else {
-                                // Checkbox is unchecked
-                                tempSelectedSpecializations.remove(specialization.name); // Remove specialization
-                                tempSelectedSpecializationsID.remove(specialization.id); // Remove ID
-                              }
-                            });
+                            return CheckboxListTile(
+                              title: Text(specialization.name),
+                              value: isSelected,
+                              onChanged: (bool? value) {
+                                setModalState(() {
+                                  if (value == true) {
+                                    tempSelectedSpecializations.add(specialization.name);
+                                    tempSelectedSpecializationsID.add(specialization.id);
+                                  } else {
+                                    tempSelectedSpecializations.remove(specialization.name);
+                                    tempSelectedSpecializationsID.remove(specialization.id);
+                                  }
+                                });
+                              },
+                              activeColor: SizeConfig.iconColor,
+                              checkColor: Colors.white,
+                            );
                           },
-                          activeColor: Colors.green, // Change this to your desired color
-                          checkColor: SizeConfig.iconColor, // Change this to your desired checkmark color
                         );
                       },
                     );
@@ -127,18 +125,17 @@ class _HandcrafterRequestState extends State<HandcrafterRequest> {
               ),
               customizeButton(
                 buttonName: 'Select',
-                buttonColor: Color(0xFF5095B0),
+                buttonColor: const Color(0xFF5095B0),
                 fontColor: const Color(0xFFF5F5F5),
                 onClickButton: () {
-                  if (mounted) {
-                    setState(() {
-                      selectedSpecializations = List.from(tempSelectedSpecializations);
-                      selectedSpecializationsID = List.from(tempSelectedSpecializationsID);
-                    });
-                  }
+                  setState(() {
+                    selectedSpecializations = List.from(tempSelectedSpecializations);
+                    selectedSpecializationsID = List.from(tempSelectedSpecializationsID);
+                  });
                   Navigator.pop(context);
                 },
               ),
+
             ],
           ),
         );
