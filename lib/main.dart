@@ -12,6 +12,7 @@ import 'package:gp_frontend/ViewModels/messageViewModel.dart';
 import 'package:gp_frontend/views/AddAdvertisement.dart';
 import 'package:gp_frontend/views/AdvertisementsPackages.dart';
 import 'package:gp_frontend/views/BazarProductsReview.dart';
+import 'package:gp_frontend/views/ChatDetails.dart';
 import 'package:gp_frontend/views/ChatView.dart';
 import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
@@ -150,6 +151,7 @@ class MyApp extends StatelessWidget {
         addOffer.id : (BuildContext context) => addOffer(),
         AddProduct.id : (BuildContext context) => AddProduct(),
         ChatView.id : (BuildContext context) => ChatView(),
+        ChatDetails.id : (BuildContext context) => ChatDetails(),
       },
     );
   }
