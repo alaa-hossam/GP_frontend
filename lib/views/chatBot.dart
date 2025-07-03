@@ -18,7 +18,7 @@ class _AIChatState extends State<AIChat> {
   List<generateImageModel> chatItems = [];
   bool write = false;
   bool edit = false;
-  bool isLoading = false; // Show loading indicator when generating image
+  bool isLoading = false;
   int selectedIndex = -1;
   final FocusNode _focusNode = FocusNode();
   final generateImageViewModel imageViewModel = generateImageViewModel();
