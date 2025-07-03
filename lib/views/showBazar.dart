@@ -34,10 +34,8 @@ class _showBazarState extends State<showBazar> {
   int selectedIndex = 0;
   int selectedChildIndex = 0;
   late productProvider prodProvider;
-  late CategoryProvider catProvider;
   late BazarProvider bazarProvider;
-  String? selectedCategoryId;
-  List<CategoryModel> categoryChildren = [];
+
   bool isLoading = false;
   late Token token;
   late String role;
@@ -62,38 +60,20 @@ class _showBazarState extends State<showBazar> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_hasInitialized) {
-      final args = ModalRoute.of(context)?.settings.arguments;
+      final args = ModalRoute
+          .of(context)
+          ?.settings
+          .arguments;
       if (args != null && args is String) {
         bazarId = args;
         bazarProvider = Provider.of<BazarProvider>(context, listen: false);
         bazarProvider.bazarProducts.clear();
         bazarProvider.getBazarProducts(bazarId!);
       }
-      catProvider = Provider.of<CategoryProvider>(context, listen: false);
-      catProvider.fetchCategories();
-      _fetchInitialData();
-      _hasInitialized = true;
+
     }
-  }
 
-  Future<void> _fetchInitialData() async {
-    token = Token();
-    role = await token.getRole()?? "";
-  }
 
-  Future<void> _handleCategorySelection(CategoryModel category) async {
-    setState(() {
-      selectedIndex = catProvider.categories.indexOf(category);
-      selectedCategoryId = category.id;
-      isLoading = true;
-      selectedChildIndex = 0;
-    });
-    await catProvider.fetchCategoryChildren(category.id);
-    await prodProvider.fetchProducts(selectedCategoryId!);
-    setState(() {
-      categoryChildren = catProvider.categoryCildren;
-      isLoading = false;
-    });
   }
 
   @override
@@ -161,78 +141,7 @@ class _showBazarState extends State<showBazar> {
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                   ],
                 ),
-                Consumer<CategoryProvider>(
-                  builder: (context, catProvider, child) {
-                    if (catProvider.categories.isEmpty) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: 43 * SizeConfig.verticalBlock,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: catProvider.categories.length,
-                          itemBuilder: (context, index) {
-                            bool isSelected = index == selectedIndex;
-                            var category = catProvider.categories[index];
-                            return GestureDetector(
-                              onTap: () {
-                                _handleCategorySelection(category);
-                              },
-                              child: Row(
-                                children: [
-                                  Customizecategory(
-                                    "${category.name}",
-                                    isSelected,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                if (categoryChildren.isNotEmpty)
-                  Consumer<CategoryProvider>(
-                    builder: (context, catProvider, child) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          height: 43 * SizeConfig.verticalBlock,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: catProvider.categoryCildren.length,
-                            itemBuilder: (context, index) {
-                              bool isSelected = selectedChildIndex == index;
-                              var category = catProvider.categoryCildren[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedChildIndex = index;
-                                    _handleCategorySelection(category);
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Customizecategory(
-                                      "${category.name}",
-                                      isSelected,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                if (isLoading)
-                  Center(child: CircularProgressIndicator())
-                else
+
                   Consumer<BazarProvider>(
                     builder: (context, bazarProvider, child) {
                       if (bazarProvider.loading) {
@@ -308,42 +217,57 @@ class _showBazarState extends State<showBazar> {
                               width: 100,
                               margin: EdgeInsets.symmetric(horizontal: 5),
                               decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(product.imageURL),
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                      Colors.black.withOpacity(0.4),
-                                      BlendMode.darken),
-                                ),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(color: Colors.white),
                               ),
                               child: Stack(
                                 children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      product.imageURL,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.black.withOpacity(0.2),
+                                          child: Center(
+                                            child: Icon(Icons.broken_image, color: Colors.white, size: 30),
+                                          ),
+                                        );
+                                      },
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(child: CircularProgressIndicator());
+                                      },
+                                    ),
+                                  ),
+                                  // Bottom left: product name
                                   Positioned(
                                     bottom: 5,
                                     left: 5,
                                     child: Text(
                                       product.name,
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
+                                  // Top right: remove button
                                   Positioned(
                                     top: 5,
                                     right: 5,
                                     child: IconButton(
-                                      icon: Icon(Icons.remove_circle,
-                                          color: Colors.red, size: 20),
+                                      icon: Icon(Icons.remove_circle, color: Colors.red, size: 20),
                                       onPressed: () {
                                         setState(() {
                                           if (quantity > 1) {
-                                            selectedProducts[product] =
-                                                quantity - 1;
+                                            selectedProducts[product] = quantity - 1;
                                           } else {
                                             selectedProducts.remove(product);
                                           }
@@ -351,20 +275,19 @@ class _showBazarState extends State<showBazar> {
                                       },
                                     ),
                                   ),
+                                  // Bottom right: quantity badge
                                   Positioned(
                                     bottom: 5,
                                     right: 5,
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
+                                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: Colors.black54,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
                                         'x$quantity',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
                                       ),
                                     ),
                                   ),

@@ -37,6 +37,14 @@ class BazarProduct extends StatelessWidget {
                     width: double.infinity,
                     height: 150 * SizeConfig.verticalBlock,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.black.withOpacity(0.2),
+                        child: Center(
+                          child: Icon(Icons.broken_image, color: Colors.white, size: 150 * SizeConfig.verticalBlock),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Padding(

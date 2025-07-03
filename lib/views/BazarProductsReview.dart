@@ -87,6 +87,12 @@ class _BazarReviewState extends State<BazarReview> {
                                 width: 100 * SizeConfig.horizontalBlock,
                                 height: 100 * SizeConfig.verticalBlock,
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    "assets/images/logo.png",
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(width: 12),

@@ -173,6 +173,12 @@ class _JoinBazarState extends State<JoinBazar> {
                                         width: 170 * SizeConfig.horizontalBlock,
                                         height: 165 * SizeConfig.verticalBlock,
                                         fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Image.asset(
+                                            "assets/images/logo.png",
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),

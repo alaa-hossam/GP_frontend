@@ -1,6 +1,7 @@
 
 class ValidateImage{
   String? getValidImageUrl(String? imageUrl) {
+    print("herrrrrrrrrrre");
     if (imageUrl == null || imageUrl.isEmpty) return null;
 
     try {

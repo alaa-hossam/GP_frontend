@@ -105,16 +105,25 @@ class _variationScreenState extends State<variationScreen> {
                         },
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8.0 * SizeConfig.verticalBlock),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image(
-                                image: ValidateImage().getValidImageUrl(galleryProvider.galleryImages[index]['imageUrl']) != null
-                                    ? NetworkImage(ValidateImage().getValidImageUrl(galleryProvider.galleryImages[index]['imageUrl'])!)
-                                    : AssetImage("assets/images/logo.png") as ImageProvider,
+                              borderRadius: BorderRadius.circular(10 * SizeConfig.verticalBlock),
+                              child: Image.network(
+                                  galleryProvider.galleryImages[index]['imageUrl'],
                                 fit: BoxFit.cover,
+
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    "assets/images/logo.png",
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               ),
-                            ),
+
+
+                              )
+
+
 
                           );
                         },
@@ -327,7 +336,6 @@ class _variationScreenState extends State<variationScreen> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        // Show the gallery pop-up when the image is clicked
                                         _showGalleryPopup(
                                           context,
                                           detailsProvider
@@ -335,16 +343,26 @@ class _variationScreenState extends State<variationScreen> {
                                           ['galleryImages'],
                                         );
                                       },
-                                      child: ClipRRect(
+                                      child:
+
+                                      ClipRRect(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(15)),
                                         child: Image.network(
+
                                           detailsProvider
                                               .finalProductsProvider[index]
                                           ['imageUrl'],
                                           width:
                                           80 * SizeConfig.horizontalBlock,
                                           fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset(
+                                              "assets/images/logo.png",
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+
                                         ),
                                       ),
                                     ),
