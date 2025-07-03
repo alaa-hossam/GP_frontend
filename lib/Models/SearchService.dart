@@ -8,24 +8,23 @@ import 'package:http_parser/http_parser.dart';
 class SearchServiceAI {
 
 
-  Future<List<String>> SearchImage(int topK) async {
+
+
+  Future<List<String>> searchImage(int topK, {required ImageSource source}) async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: source);
     List<String> products = [];
 
     if (pickedFile == null) {
       print("No image selected");
-      return[];
+      return [];
     }
 
     final uri = Uri.parse("https://squid-app-8tjc4.ondigitalocean.app/api/v1/image/search");
 
     final request = http.MultipartRequest('POST', uri);
-
     final imageFile = File(pickedFile.path);
     final fileName = pickedFile.path.split('/').last;
-    print(imageFile.path);
-    print(fileName);
 
     request.files.add(
       await http.MultipartFile.fromPath(
@@ -33,22 +32,16 @@ class SearchServiceAI {
         imageFile.path,
         contentType: MediaType('image', _getImageMimeType(fileName)),
       ),
-
-
     );
 
     request.fields['top_k'] = topK.toString();
 
     try {
-
       final response = await request.send();
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final responseBody = await response.stream.bytesToString();
-        print(responseBody);
         final data = json.decode(responseBody);
-
-        // print(data['images']);
-        for(var product in data['images']){
+        for (var product in data['images']) {
           products.add(product['id']);
         }
         print("Success! Response: $responseBody");

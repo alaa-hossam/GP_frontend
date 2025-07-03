@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/OrdersAppBar.dart';
+
 class showOrders extends StatefulWidget {
   static String id = "ShowOrders";
   const showOrders({super.key});
@@ -12,6 +14,8 @@ class showOrders extends StatefulWidget {
 class _showOrdersState extends State<showOrders> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: OrdersAppBar(index: 0,),
+    );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/Models/SearchModel.dart';
 import 'package:gp_frontend/Providers/ProductProvider.dart';
 import 'package:gp_frontend/Providers/SearchProvider.dart';
 import 'package:gp_frontend/ViewModels/SearchViewModel.dart';
 import 'package:gp_frontend/ViewModels/productViewModel.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../Models/SearchService.dart';
 import '../widgets/Dimensions.dart';
@@ -46,6 +46,84 @@ class _searchState extends State<searchView> {
     _debounceTimer?.cancel();
     super.dispose();
   }
+
+
+  Future<void> _handleImageSearch(SearchServiceAI service, ImageSource source) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      List<String> ids = await service.searchImage(6, source: source);
+
+      if (!mounted) return;
+
+      final mySearchProvider = Provider.of<SearchProvider>(context, listen: false);
+      await mySearchProvider.getSearchProductsImage(ids);
+
+      // Dismiss loading indicator
+      if (mounted) Navigator.pop(context);
+
+      if (mySearchProvider.searchProducts.isNotEmpty) {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => ProductBottomSheet(products: mySearchProvider.searchProducts),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No products found.")),
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Dismiss loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error searching image.")),
+      );
+    }
+  }
+
+
+  void _showImageSourceDialog(BuildContext context, SearchServiceAI service) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text("Take Photo"),
+              onTap: () async {
+                Navigator.pop(context);
+                await _handleImageSearch(service, ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text("Choose from Gallery"),
+              onTap: () async {
+                Navigator.pop(context);
+                await _handleImageSearch(service, ImageSource.gallery);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   void _onSearchTextChanged(String value) {
     if (_debounceTimer?.isActive ?? false) {
@@ -144,27 +222,9 @@ class _searchState extends State<searchView> {
                         size: 24 * SizeConfig.textRatio,
                       ),
                       onPressed: () async {
-                        ids = await searchEndPoint.SearchImage(6);
-                        if (context.mounted) {
-                          final mySearchProvider = Provider.of<SearchProvider>(context, listen: false);
-                          await mySearchProvider.getSearchProductsImage(ids);
-
-                          if (mySearchProvider.searchProducts.isNotEmpty) {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                              ),
-                              builder: (context) => ProductBottomSheet(products: mySearchProvider.searchProducts),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("No products found.")),
-                            );
-                          }
-                        }
+                        _showImageSourceDialog(context, searchEndPoint);
                       },
+
                     ),
                     onChanged: (value) => _onSearchTextChanged(value.toString()),
                   ),
@@ -248,3 +308,7 @@ class ProductBottomSheet extends StatelessWidget {
     );
   }
 }
+
+
+
+
