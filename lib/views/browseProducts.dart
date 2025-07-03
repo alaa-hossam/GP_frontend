@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/ProductModel.dart';
 import 'package:gp_frontend/views/compareView.dart';
+import 'package:gp_frontend/widgets/HomeBar.dart';
 import 'package:gp_frontend/widgets/MyDrawer.dart';
 import 'package:provider/provider.dart';
 import '../CommomnFunctions/ProfileData.dart';
@@ -43,7 +44,17 @@ class _BrowseProductsState extends State<browseProducts> {
     prodProvider.products.clear();
     prodProvider.fetchProducts('0');
     catProvider.fetchCategories();
+
+    Future.microtask(() {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null && mounted) {
+        setState(() {
+          showCompare = args['showCompare'] ?? false;
+        });
+      }
+    });
   }
+
   void _handleCompare(productModel product) {
     bool exist = false;
     int index = 0;
@@ -101,66 +112,12 @@ class _BrowseProductsState extends State<browseProducts> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    showCompare = args?['showCompare']??false;
+    print(showCompare);
     SizeConfig().init(context);
     return Scaffold(
       drawer:Mydrawer(),
-      appBar: AppBar(
-        centerTitle: true,
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.notifications_none,
-                    size: 24 * SizeConfig.textRatio),
-              ),
-              Icon(
-                Icons.shopping_cart_outlined,
-                size: 24 * SizeConfig.textRatio,
-              ),
-              IconButton(
-                onPressed: () async{
-                  loadProfileByRole(
-                    context: context,
-                    onCustomerLoaded: (customer) {
-                      print("Customer loaded: ${customer.name}");
-                    },
-                    onCrafterLoaded: (crafter) {
-                      print("Crafter loaded: ${crafter.name}");
-                    },
-                  );
-                },
-                icon: Icon(Icons.account_circle_outlined,
-                    size: 24 * SizeConfig.textRatio),
-              ),
-            ],
-          )
-        ],
-        title: Row(
-          children: [
-            Image(
-              image: AssetImage("assets/images/Frame 36920.png"),
-              width: SizeConfig.textRatio * 40,
-              height: SizeConfig.textRatio * 40,
-              fit: BoxFit.cover,
-            ),
-            Text(
-              "SAN3A",
-              style: TextStyle(
-                color: Color(0xFF073477),
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                fontFamily: 'Poppins',
-                fontSize: SizeConfig.textRatio * 24,
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: HomeBar(),
       body:
       Stack(
         children: [
@@ -182,23 +139,14 @@ class _BrowseProductsState extends State<browseProducts> {
                         ),
                         onPressed: () {},
                       ),
-                      width: 253 * SizeConfig.horizontalBlock,
+                      width: 300 * SizeConfig.horizontalBlock,
                       height: 45 * SizeConfig.verticalBlock,
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
+
                     Container(
-                      width: 48 * SizeConfig.horizontalBlock,
-                      height: 45 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                        color: Color(0x80E9E9E9),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Icon(Icons.tune, size: 24 * SizeConfig.textRatio),
-                    ),
-                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                    Container(
-                      width: 48 * SizeConfig.horizontalBlock,
-                      height: 45 * SizeConfig.verticalBlock,
+                      width: 60 * SizeConfig.horizontalBlock,
+                      height: 55 * SizeConfig.verticalBlock,
                       decoration: BoxDecoration(
                         color: showCompare
                             ? SizeConfig.iconColor
@@ -207,10 +155,11 @@ class _BrowseProductsState extends State<browseProducts> {
                       ),
                       child: IconButton(
                         icon: Icon(Icons.compare_outlined,
-                            size: 24 * SizeConfig.textRatio),
+                            size: 24 * SizeConfig.textRatio , color: showCompare? Colors.white : Colors.black,),
                         onPressed: () {
                           setState(() {
                             showCompare = !showCompare;
+                            print(showCompare);
                           });
                         },
                       ),

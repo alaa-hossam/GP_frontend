@@ -7,11 +7,11 @@ import 'package:gp_frontend/ViewModels/postViewModel.dart';
 class postProvider with ChangeNotifier {
   postViewModel postVM = postViewModel();
   List<postModel> posts = [];
-  final TextEditingController description = TextEditingController();
-  final TextEditingController title = TextEditingController();
-  final TextEditingController price = TextEditingController();
-  final TextEditingController duration = TextEditingController();
-  final TextEditingController quantity = TextEditingController();
+   TextEditingController description = TextEditingController();
+   TextEditingController title = TextEditingController();
+   TextEditingController price = TextEditingController();
+   TextEditingController duration = TextEditingController();
+   TextEditingController quantity = TextEditingController();
   bool loading = false;
 
 

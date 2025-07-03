@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/CommomnFunctions/validImage.dart';
 import 'package:gp_frontend/Models/postModel.dart';
+import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/offers.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:provider/provider.dart';
@@ -105,7 +106,7 @@ class _CustomPostState extends State<customPost> {
                     PopupMenuButton<int>(
                       onSelected: (value) async {
                         if (value == 1) {
-                          print("Update Post");
+                          Navigator.pushNamed(context, addPost.id , arguments: {'type':'update' , 'post': post });
                         } else if (value == 2) {
                           final confirm = await showDialog<bool>(
                             context: context,

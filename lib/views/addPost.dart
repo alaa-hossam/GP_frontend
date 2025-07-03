@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/Models/postModel.dart';
 import 'package:gp_frontend/Providers/postProvider.dart';
@@ -9,7 +8,6 @@ import 'package:gp_frontend/widgets/messages.dart';
 import 'package:gp_frontend/widgets/specializtion.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
 import '../Providers/CategoryProvider.dart';
 import '../widgets/AppBar.dart';
 import '../widgets/customizeTextFormField.dart';
@@ -26,10 +24,15 @@ class addPost extends StatefulWidget {
 class _addPostState extends State<addPost> {
   File? postImage;
   bool _isLoading = false;
+  String? imagePath;
+  bool isUpdate = false;
+  bool disableImageAndSpecialization = false;
 
   postProvider myPostProvider = postProvider();
 
   Future<void> _pickImage(ImageSource source) async {
+    if (disableImageAndSpecialization) return;
+
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: source);
     if (pickedImage != null && mounted) {
@@ -37,12 +40,6 @@ class _addPostState extends State<addPost> {
         postImage = File(pickedImage.path);
       });
     }
-  }
-
-  Future<bool> submitOrder(
-      postModel post, String specialization, File? image) async {
-    await myPostProvider.addPost(post, specialization, image);
-    return true;
   }
 
   void clearFields(postProvider addPostProvider) {
@@ -54,16 +51,64 @@ class _addPostState extends State<addPost> {
     Provider.of<CategoryProvider>(context, listen: false).clearSelected();
     setState(() {
       postImage = null;
+      imagePath = "";
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // Wait until the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+      if (args != null && args['type'] == "update") {
+        final post = args['post'] as postModel;
+        final addPostProvider = Provider.of<postProvider>(context, listen: false);
+        final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+
+        setState(() {
+          isUpdate = true;
+          disableImageAndSpecialization = true;
+          imagePath = post.postImage;
+        });
+
+        addPostProvider.title.text = post.title ?? '';
+        addPostProvider.description.text = post.description ?? '';
+        addPostProvider.price.text = post.price?.toString() ?? '';
+        addPostProvider.duration.text = post.duration?.toString() ?? '';
+        addPostProvider.quantity.text = post.quantity?.toString() ?? '';
+
+        // 💡 Set selected specialization using both ID and name
+        if (post.specialName != null && post.specialId != null) {
+          catProvider.selectSpecialization(post.specialName!, post.specialId!);
+        }
+      }
+    });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+
     final addPostProvider = Provider.of<postProvider>(context);
+    final catProvider = Provider.of<CategoryProvider>(context, listen: false);
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+
+    Future<bool> submitOrder(postModel post, String specialization, File? image) async {
+      if (isUpdate) {
+        await myPostProvider.updatePost(post);
+      } else {
+        await myPostProvider.addPost(post, specialization, image);
+      }
+      return true;
+    }
 
     return Scaffold(
       appBar: customAppbar(
-        "add Post",
+        isUpdate ? "Update Post" : "Add Post",
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
@@ -77,8 +122,7 @@ class _addPostState extends State<addPost> {
                 height: 640 * SizeConfig.verticalBlock,
                 child: ListView(
                   children: [
-                    Container(
-                      alignment: Alignment.center,
+                    Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 16 * SizeConfig.horizontalBlock,
                         vertical: 5 * SizeConfig.verticalBlock,
@@ -93,8 +137,7 @@ class _addPostState extends State<addPost> {
                         labelText: "Description",
                       ),
                     ),
-                    Container(
-                      alignment: Alignment.center,
+                    Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 16 * SizeConfig.horizontalBlock,
                         vertical: 5 * SizeConfig.verticalBlock,
@@ -109,22 +152,17 @@ class _addPostState extends State<addPost> {
                         labelText: "Title",
                       ),
                     ),
-                    incrementDecrementButtons(
-                        "price",
-                        "0.00",
-                        addPostProvider.price,
+                    incrementDecrementButtons("price", "0.00", addPostProvider.price,
                         "ًWrite an estimated price that suits you for the whole."),
-                    incrementDecrementButtons(
-                        "Duration",
-                        "0.00",
-                        addPostProvider.duration,
+                    incrementDecrementButtons("Duration", "0.00", addPostProvider.duration,
                         "Write an estimated time you can wait for the order to be completed."),
-                    incrementDecrementButtons("Quantity", "0.00",
-                        addPostProvider.quantity, "Write the number you want."),
+                    incrementDecrementButtons("Quantity", "0.00", addPostProvider.quantity,
+                        "Write the number you want."),
                     Padding(
                       padding: EdgeInsets.only(
-                          left: 20 * SizeConfig.horizontalBlock,
-                          bottom: 10 * SizeConfig.verticalBlock),
+                        left: 20 * SizeConfig.horizontalBlock,
+                        bottom: 10 * SizeConfig.verticalBlock,
+                      ),
                       child: Text(
                         "Specializations",
                         style: TextStyle(fontSize: 20 * SizeConfig.textRatio),
@@ -135,11 +173,13 @@ class _addPostState extends State<addPost> {
                         horizontal: 16 * SizeConfig.horizontalBlock,
                         vertical: 10 * SizeConfig.verticalBlock,
                       ),
-                      child: specializtions(),
+                      child: AbsorbPointer(
+                        absorbing: disableImageAndSpecialization,
+                        child: specializtions(),
+                      ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(
-                          left: 16 * SizeConfig.horizontalBlock),
+                      padding: EdgeInsets.only(left: 16 * SizeConfig.horizontalBlock),
                       child: Text(
                         "Upload post Image (Max 5MB, JPG, PNG) ",
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -147,28 +187,26 @@ class _addPostState extends State<addPost> {
                     ),
                     Center(
                       child: GestureDetector(
-                        onTap: () {
-                          _pickImage(ImageSource.gallery);
-                        },
+                        onTap: () => _pickImage(ImageSource.gallery),
                         child: Container(
-                          margin: EdgeInsets.only(
-                              top: 10 * SizeConfig.verticalBlock),
+                          margin: EdgeInsets.only(top: 10 * SizeConfig.verticalBlock),
                           height: 100 * SizeConfig.horizontalBlock,
                           width: 100 * SizeConfig.horizontalBlock,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(
-                                width: 1, color: SizeConfig.iconColor),
+                            border: Border.all(width: 1, color: SizeConfig.iconColor),
                             color: const Color(0x80E9E9E9),
                           ),
-                          child: postImage == null
+                          child: imagePath != null
+                              ? Image.network(imagePath!)
+                              : postImage == null
                               ? Icon(Icons.file_upload_outlined,
-                                  color: SizeConfig.iconColor,
-                                  size: 30 * SizeConfig.textRatio)
+                              color: SizeConfig.iconColor,
+                              size: 30 * SizeConfig.textRatio)
                               : Image.file(
-                                  File(postImage!.path),
-                                  fit: BoxFit.cover,
-                                ),
+                            File(postImage!.path),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -181,76 +219,63 @@ class _addPostState extends State<addPost> {
                   vertical: 10 * SizeConfig.verticalBlock,
                 ),
                 child: customizeButton(
-                    buttonName: "Add Post",
-                    buttonColor: SizeConfig.iconColor,
-                    fontColor: Colors.white,
-                    onClickButton: () async {
-                      final catProvider =
-                          Provider.of<CategoryProvider>(context, listen: false);
+                  buttonName: isUpdate ? "Update Post" : "Add Post",
+                  buttonColor: SizeConfig.iconColor,
+                  fontColor: Colors.white,
+                  onClickButton: () async {
+                    if (addPostProvider.title.text.trim().isEmpty ||
+                        addPostProvider.description.text.trim().isEmpty ||
+                        addPostProvider.price.text.trim().isEmpty ||
+                        addPostProvider.duration.text.trim().isEmpty ||
+                        addPostProvider.quantity.text.trim().isEmpty ||
+                        catProvider.selectedSpecializationId == null ||
+                        catProvider.selectedSpecializationId!.isEmpty) {
+                      showCustomPopup(
+                          context,
+                          "Missing!",
+                          "Please fill in all fields and select specialization",
+                          []);
+                      return;
+                    }
 
-                      if (addPostProvider.title.text.trim().isEmpty ||
-                          addPostProvider.description.text.trim().isEmpty ||
-                          addPostProvider.price.text.trim().isEmpty ||
-                          addPostProvider.duration.text.trim().isEmpty ||
-                          addPostProvider.quantity.text.trim().isEmpty ||
-                          catProvider.selectedSpecializationId == null ||
-                          catProvider.selectedSpecializationId!.isEmpty) {
-                        showCustomPopup(
-                            context,
-                            "Missing!",
-                            "Please fill in all fields and select specialization",
-                          []
-                            );
+                    setState(() => _isLoading = true);
 
-                        return;
+                    final selectedSpecialization = catProvider.selectedSpecializationId!;
+
+                    try {
+                      final post = postModel(
+                        id: isUpdate ? args!['post'].id : null,
+                        title: addPostProvider.title.text,
+                        description: addPostProvider.description.text,
+                        price: double.parse(addPostProvider.price.text),
+                        duration: int.parse(addPostProvider.duration.text),
+                        quantity: int.parse(addPostProvider.quantity.text),
+                      );
+
+                      final success = await submitOrder(post, selectedSpecialization, postImage);
+
+                      if (success && mounted) {
+                        clearFields(addPostProvider);
+                        Navigator.pop(context, true);
+                      } else {
+                        showCustomPopup(context, "Post", "Failed to add post", []);
                       }
-
-                      setState(() {
-                        _isLoading = true;
-                      });
-
-                      final selectedSpecializations =
-                          catProvider.selectedSpecializationId!;
-
-                      try {
-                        bool success = await submitOrder(
-                          postModel(
-                            description: addPostProvider.description.text,
-                            title: addPostProvider.title.text,
-                            price: double.parse(addPostProvider.price.text),
-                            duration: int.parse(addPostProvider.duration.text),
-                            quantity: int.parse(addPostProvider.quantity.text),
-                          ),
-                          selectedSpecializations,
-                          postImage,
-                        );
-
-                        if (success && mounted) {
-                          clearFields(addPostProvider);
-                          Navigator.pop(context, true);
-                        } else {
-                          showCustomPopup(
-                              context, "Post", "Failed to add post", []);
-                        }
-                      } catch (e) {
-                        showCustomPopup(context, "Post", "${e.toString()}", []);
-                      } finally {
-                        if (mounted) {
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        }
+                    } catch (e) {
+                      showCustomPopup(context, "Post", e.toString(), []);
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isLoading = false);
                       }
-                    }),
+                    }
+                  },
+                ),
               ),
             ],
           ),
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             ),
         ],
       ),

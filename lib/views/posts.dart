@@ -162,7 +162,7 @@ class _postsState extends State<posts> {
                             ),
                             child: IconButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, addPost.id);
+                                Navigator.pushNamed(context, addPost.id ,arguments: {'type': 'add'});
                               },
                               icon: Icon(Icons.add),
                               iconSize: 30 * SizeConfig.textRatio,
@@ -205,7 +205,7 @@ class _postsState extends State<posts> {
                             ),
                             child: IconButton(
                               onPressed: () async {
-                                final result = await Navigator.pushNamed(context, addPost.id);
+                                final result = await Navigator.pushNamed(context, addPost.id , arguments: {'type':'add'});
                                 if (result == true) {
                                   setState(() {
                                     _postsFuture = getPosts(page);

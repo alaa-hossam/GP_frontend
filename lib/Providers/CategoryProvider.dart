@@ -22,6 +22,7 @@ class CategoryProvider with ChangeNotifier {
   String? _selectedCategory;
   String? _selectedCategoryId;
 
+
   String? get selectedSpecialization => _selectedSpecialization;
   String? get selectedSpecializationId => _selectedSpecializationId;
 
@@ -88,5 +89,11 @@ class CategoryProvider with ChangeNotifier {
     _selectedCategoryId = null;
     notifyListeners();
   }
+
+  void setSelectedSpecialization(String id) {
+    _selectedSpecializationId = id;
+    notifyListeners();
+  }
+
 
 }

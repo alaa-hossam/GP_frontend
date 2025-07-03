@@ -1,23 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/widgets/BazarProduct.dart';
+import 'package:gp_frontend/widgets/HomeBar.dart';
+import 'package:gp_frontend/widgets/SearchRow.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 import 'package:provider/provider.dart';
-import '../CommomnFunctions/ProfileData.dart';
-import '../Models/CategoryModel.dart';
 import '../Models/ProductModel.dart';
 import '../Providers/BazarProvider.dart';
-import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
 import '../SqfliteCodes/Token.dart';
 import '../widgets/Dimensions.dart';
-import '../widgets/customizeCategory.dart';
-import '../widgets/customizeTextFormField.dart';
 import '../widgets/messages.dart';
-import 'MyHandcrafterProfile.dart';
-import 'cartView.dart';
 import 'checkOut.dart';
 
 class showBazar extends StatefulWidget {
@@ -30,7 +24,6 @@ class showBazar extends StatefulWidget {
 }
 
 class _showBazarState extends State<showBazar> {
-  TextEditingController search = TextEditingController();
   int selectedIndex = 0;
   int selectedChildIndex = 0;
   late productProvider prodProvider;
@@ -79,7 +72,7 @@ class _showBazarState extends State<showBazar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: HomeBar(),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -110,38 +103,7 @@ class _showBazarState extends State<showBazar> {
                   ),
                 ),
                 SizedBox(height: 10 * SizeConfig.verticalBlock),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    MyTextFormField(
-                      controller: search,
-                      hintName: "Search",
-                      icon: Icons.search,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          Icons.camera_alt_outlined,
-                          color: SizeConfig.iconColor,
-                          size: 24 * SizeConfig.textRatio,
-                        ),
-                        onPressed: () {},
-                      ),
-                      width: 263 * SizeConfig.horizontalBlock,
-                      height: 35 * SizeConfig.verticalBlock,
-                    ),
-                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                    Container(
-                      width: 58 * SizeConfig.horizontalBlock,
-                      height: 55 * SizeConfig.verticalBlock,
-                      decoration: BoxDecoration(
-                        color: Color(0x80E9E9E9),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Icon(Icons.tune, size: 24 * SizeConfig.textRatio),
-                    ),
-                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                  ],
-                ),
-
+                  SearchRow(context),
                   Consumer<BazarProvider>(
                     builder: (context, bazarProvider, child) {
                       if (bazarProvider.loading) {
@@ -333,57 +295,4 @@ class _showBazarState extends State<showBazar> {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      leading: IconButton(
-        onPressed: () => Navigator.pushReplacementNamed(context, Home.id),
-        icon: Icon(Icons.arrow_back),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.notifications_none, size: 24),
-        ),
-        IconButton(
-          onPressed: () => Navigator.pushNamed(context, cartScreen.id),
-          icon: Icon(Icons.shopping_cart_outlined, size: 24),
-        ),
-        IconButton(
-          onPressed: () async {
-            if (role == 'Handicrafter') {
-              Navigator.pushNamed(context, MyHandcrafterProfile.id);
-            } else {
-              loadProfileByRole(
-                context: context,
-                onCustomerLoaded: (customer) {
-                  print("Customer loaded: ${customer.name}");
-                },
-                onCrafterLoaded: (crafter) {
-                  print("Crafter loaded: ${crafter.name}");
-                },
-              );
-            }
-          },
-          icon: Icon(Icons.account_circle_outlined, size: 24),
-        ),
-      ],
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset("assets/images/Frame 36920.png", width: 40, height: 40),
-          Text(
-            "SAN3A",
-            style: TextStyle(
-              color: Color(0xFF073477),
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic,
-              fontFamily: 'Poppins',
-              fontSize: 24,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

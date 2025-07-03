@@ -6,7 +6,9 @@ import 'package:gp_frontend/views/browseProducts.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/joinBazar.dart';
 import 'package:gp_frontend/views/showBazar.dart';
+import 'package:gp_frontend/widgets/HomeBar.dart';
 import 'package:gp_frontend/widgets/MyDrawer.dart';
+import 'package:gp_frontend/widgets/SearchRow.dart';
 import 'package:gp_frontend/widgets/customProduct.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -78,7 +80,7 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       drawer: Mydrawer(),
-      appBar: _buildAppBar(context),
+      appBar:HomeBar(),
       body: FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
@@ -95,63 +97,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      actions: [
-        IconButton(
-          onPressed: () async {
-            // await Cart().deleteDatabaseFile();
-            // String id = await getId();
-            // Widget screen = ChatScreen(
-            //   currentUserId: id,
-            //   otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
-            // );
-            //
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => screen),
-            // );
-          },
-          icon: Icon(Icons.notifications_none, size: 24),
-        ),
-        IconButton(
-          onPressed: () => Navigator.pushNamed(context, cartScreen.id),
-          icon: Icon(Icons.shopping_cart_outlined, size: 24),
-        ),
-        IconButton(
-          onPressed: () async {
-            loadProfileByRole(
-              context: context,
-              onCustomerLoaded: (customer) {
-                print("Customer loaded: ${customer.name}");
-              },
-              onCrafterLoaded: (crafter) {
-                print("Crafter loaded: ${crafter.name}");
-              },
-            );
-          },
-          icon: Icon(Icons.account_circle_outlined, size: 24),
-        ),
-      ],
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset("assets/images/Frame 36920.png", width: 40, height: 40),
-          Text(
-            "SAN3A",
-            style: TextStyle(
-              color: Color(0xFF073477),
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic,
-              fontFamily: 'Poppins',
-              fontSize: 24,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildHomeContent() {
     final adsProvider = Provider.of<AdvertisementProvider>(context);
@@ -161,7 +106,7 @@ class _HomeState extends State<Home> {
 
     return ListView(
       children: [
-        _buildSearchBar(SearchServiceAI()),
+        SearchRow(context),
         SizedBox(height: 10),
         _buildAdsSection(adsProvider, bazarProvider),
         SizedBox(height: 10),

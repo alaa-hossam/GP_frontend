@@ -11,7 +11,9 @@ class postModel {
       title,
       createdAt,
       id,
-      clientId;
+      clientId,
+  specialName,
+  specialId;
   int? quantity, duration;
   double? price;
   List<String>? offersIds;
@@ -28,7 +30,9 @@ class postModel {
       this.price,
       this.title,
       this.createdAt,
-      this.offersIds});
+      this.offersIds,
+      this.specialName,
+      this.specialId});
 }
 
 class postService {
@@ -59,6 +63,11 @@ class postService {
        offers {
             id
         }
+         specialization {
+            name
+            id
+        }
+        
         
         suggestedOneDuration
         suggestedOnePrice
@@ -109,7 +118,12 @@ class postService {
               title: post['title'] ?? "",
               createdAt: post['createdAt'],
               offersIds: ids,
-              clientId: post['customer']['id']));
+              clientId: post['customer']['id'],
+            specialName: post['specialization']['name'],
+            specialId: post['specialization']['id'],
+
+
+          ));
           print("****************************************");
           print(post['customer']['id']);
         }
@@ -150,6 +164,10 @@ class postService {
         }
         gallery {
             fileURL
+        }
+        specialization {
+            name
+            id
         }
     }
 }
@@ -199,7 +217,12 @@ class postService {
               title: post['title'] ?? "",
               createdAt: post['createdAt'],
               offersIds: ids,
-              clientId: post['customer']['id']));
+              clientId: post['customer']['id'],
+            specialName: post['specialization']['name'],
+            specialId: post['specialization']['id'],
+          ),
+
+          );
         }
       } else {
         print('Failed to load product: ${response.statusCode}');
@@ -328,9 +351,9 @@ mutation UpdatePost {
         data: {
 
             description: "${post.description}"
-            suggestedOneDuration: "${post.duration}"
-            suggestedOnePrice: "${post.price}"
-            suggestedQuantity: "${post.quantity}"
+            suggestedOneDuration: ${post.duration}
+            suggestedOnePrice: ${post.price}
+            suggestedQuantity: ${post.quantity}
             title: "${post.title}"
         }
     ) {
@@ -349,6 +372,7 @@ mutation UpdatePost {
         'title': post.title
       },
     };
+    print(request);
 
     try {
       final myToken = await token.getToken();
