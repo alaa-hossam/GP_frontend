@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gp_frontend/External%20Services/PaymentAPI.dart';
 import 'package:gp_frontend/Models/offerModel.dart';
+import 'package:gp_frontend/Providers/offerProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/views/addOffer.dart';
 import 'package:gp_frontend/widgets/customizeButton.dart';
+import 'package:provider/provider.dart';
 
 import '../Models/AddressModel.dart';
 import '../views/PaymentScreen.dart';
@@ -12,57 +14,41 @@ import '../views/chooseAddress.dart';
 import 'Dimensions.dart';
 
 class customOffer extends StatelessWidget {
-  offerModel offer;
-  String clientId;
-  bool match = false;
-  AddressModel? addressData;
+  final offerModel offer;
+  final String clientId;
+  final AddressModel? addressData;
 
-  customOffer({super.key, required this.offer, required this.clientId});
+  const customOffer({
+    super.key,
+    required this.offer,
+    required this.clientId,
+    this.addressData,
+  });
+
   String? _getValidImageUrl(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) return null;
-
     try {
       final uri = Uri.parse(imageUrl);
       if (uri.hasAbsolutePath && !imageUrl.contains('http', 10)) {
         return imageUrl;
-      } else {
-        print("Invalid image URL detected: $imageUrl");
-        return null;
       }
-    } catch (e) {
-      print("Failed to parse image URL: $imageUrl");
-      return null;
-    }
-  }
-
-  Future<bool> checkId() async {
-    Token token = Token();
-    final idSQL = await token.getUUID();
-    print(idSQL);
-    if (idSQL == clientId) {
-      match = true;
-    } else {
-      match = false;
-    }
-    return true;
+    } catch (_) {}
+    return null;
   }
 
   String _getTimeAgo(DateTime createdAt) {
-    DateTime now = DateTime.now().toUtc();
-    Duration difference = now.difference(createdAt);
+    final now = DateTime.now().toUtc();
+    final diff = now.difference(createdAt);
+    if (diff.inHours > 8640) return "${(diff.inHours / 8760).toInt()} yrs";
+    if (diff.inHours > 720) return "${(diff.inHours / 720).toInt()} mos";
+    if (diff.inHours > 24) return "${(diff.inHours / 24).toInt()} days";
+    return "${diff.inHours} hrs";
+  }
 
-    if (difference.inHours > 8640) {
-      int years = (difference.inHours / 8760).toInt();
-      return "$years yrs";
-    } else if (difference.inHours > 720) {
-      int months = (difference.inHours / 720).toInt();
-      return "$months mos";
-    } else if (difference.inHours > 24) {
-      int days = (difference.inHours / 24).toInt();
-      return "$days days";
-    } else {
-      return "${difference.inHours} hrs";
-    }
+  Future<bool> _isHandcrafterOwner() async {
+    final token = Token();
+    final id = await token.getUUID();
+    return id == offer.handcrafterId;
   }
 
   @override
@@ -70,160 +56,142 @@ class customOffer extends StatelessWidget {
     DateTime createdAt;
     try {
       createdAt = DateTime.parse(offer.createdAt ?? "");
-    } catch (e) {
+    } catch (_) {
       createdAt = DateTime.now();
     }
-    final String? validProfileImageUrl = _getValidImageUrl(offer.profileImage);
-    final String timeAgo = _getTimeAgo(createdAt);
 
-    return Column(
-      children: [
-        Row(
+    final validProfileImageUrl = _getValidImageUrl(offer.profileImage);
+    final timeAgo = _getTimeAgo(createdAt);
+
+    return FutureBuilder<bool>(
+      future: _isHandcrafterOwner(),
+      builder: (context, snapshot) {
+        final isOwner = snapshot.data ?? false;
+
+        return Column(
           children: [
-            if (validProfileImageUrl != null)
-              Padding(
-                padding: EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(validProfileImageUrl),
-                  backgroundColor: Colors.transparent,
-                  radius: 20 * SizeConfig.horizontalBlock,
-                ),
-              )
-            else
-              Padding(
-                padding: EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey[300],
-                  radius: 20 * SizeConfig.horizontalBlock,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.grey[600],
-                    size: 20 * SizeConfig.textRatio,
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(5.0 * SizeConfig.horizontalBlock),
+                  child: CircleAvatar(
+                    backgroundImage: validProfileImageUrl != null
+                        ? NetworkImage(validProfileImageUrl)
+                        : null,
+                    backgroundColor: Colors.grey[300],
+                    radius: 20 * SizeConfig.horizontalBlock,
+                    child: validProfileImageUrl == null
+                        ? Icon(Icons.person, color: Colors.grey[600], size: 20 * SizeConfig.textRatio)
+                        : null,
                   ),
                 ),
-              ),
-            SizedBox(width: 10 * SizeConfig.horizontalBlock),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${offer.name}",
-                  style: GoogleFonts.roboto(
-                      fontSize: 10 * SizeConfig.textRatio,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  timeAgo,
-                  style: GoogleFonts.roboto(
-                      fontSize: 8 * SizeConfig.textRatio,
-                      color: const Color(0x503C3C3C)),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 10 * SizeConfig.verticalBlock,
-        ),
-        Container(
-          color: Color(0x50E9E9E9),
-          child: Padding(
-            padding: EdgeInsets.all(10.0 * SizeConfig.horizontalBlock),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "${offer.description}",
-                  style: GoogleFonts.roboto(
-                      fontSize: 14 * SizeConfig.textRatio,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 20 * SizeConfig.verticalBlock,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Price: ",
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio,
-                                  color: Color(0x50000000),
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "${offer.price} LE",
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Duration: ",
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio,
-                                  color: Color(0x50000000),
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "${offer.duration} days",
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12 * SizeConfig.textRatio,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    FutureBuilder<bool>(
-                        future: checkId(),
-                        builder: (context, child) {
-                          if (match) {
-                            return customizeButton(
-                                buttonName: "Confirm",
-                                buttonColor: SizeConfig.iconColor,
-                                fontColor: Colors.white,
-                                height: 30 * SizeConfig.verticalBlock,
-                                width: 90 * SizeConfig.horizontalBlock,
-                                onClickButton: () async {
-                                  AddressModel selectedAddress =
-                                      await Navigator.pushNamed(
-                                    context,
-                                    chooseAddress.id,
-                                  ) as AddressModel;
-print(selectedAddress.id);
-                                  Navigator.pushNamed(context, Paymentscreen.id,
-                                      arguments: {
-                                    'type':'offer',
-                                        'price': offer.price,
-                                        'offerId': offer.id,
-                                        'addressId': selectedAddress.id
-                                      });
-                                });
-                          }
-                          return Container();
-                        })
+                    Text("${offer.name}", style: GoogleFonts.roboto(
+                        fontSize: 10 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                    Text(timeAgo, style: GoogleFonts.roboto(
+                        fontSize: 8 * SizeConfig.textRatio, color: const Color(0x503C3C3C))),
                   ],
                 ),
+                Spacer(),
+                if (isOwner)
+                  PopupMenuButton<int>(
+                    onSelected: (value) async {
+                      if (value == 1) {
+                        Navigator.pushNamed(context, addOffer.id, arguments: {
+                          'type': 'update',
+                          'offer': offer,
+                        });
+                      } else if (value == 2) {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Delete offer"),
+                            content: const Text("Are you sure you want to delete this offer?"),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete")),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true) {
+                          final myOfferProvider = Provider.of<offerProvider>(context, listen: false);
+                          await myOfferProvider.deleteOffer(offer.id!);
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(value: 1, child: Text("Update offer")),
+                      PopupMenuItem(value: 2, child: Text("Delete offer")),
+                    ],
+                    icon: const Icon(Icons.more_vert),
+                  ),
               ],
             ),
-          ),
-        ),
-        SizedBox(
-          height: 20 * SizeConfig.verticalBlock,
-        ),
-        Divider(
-          height: 2 * SizeConfig.verticalBlock,
-        )
-      ],
+            SizedBox(height: 10 * SizeConfig.verticalBlock),
+            Container(
+              color: const Color(0x50E9E9E9),
+              padding: EdgeInsets.all(10.0 * SizeConfig.horizontalBlock),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("${offer.description}", style: GoogleFonts.roboto(
+                      fontSize: 14 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20 * SizeConfig.verticalBlock),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          Row(children: [
+                            Text("Price: ", style: GoogleFonts.roboto(
+                                fontSize: 12 * SizeConfig.textRatio,
+                                color: const Color(0x50000000),
+                                fontWeight: FontWeight.bold)),
+                            Text("${offer.price} LE", style: GoogleFonts.roboto(
+                                fontSize: 12 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                          ]),
+                          Row(children: [
+                            Text("Duration: ", style: GoogleFonts.roboto(
+                                fontSize: 12 * SizeConfig.textRatio,
+                                color: const Color(0x50000000),
+                                fontWeight: FontWeight.bold)),
+                            Text("${offer.duration} days", style: GoogleFonts.roboto(
+                                fontSize: 12 * SizeConfig.textRatio, fontWeight: FontWeight.bold)),
+                          ]),
+                        ],
+                      ),
+                      if (clientId == offer.handcrafterId)
+                        customizeButton(
+                          buttonName: "Confirm",
+                          buttonColor: SizeConfig.iconColor,
+                          fontColor: Colors.white,
+                          height: 30 * SizeConfig.verticalBlock,
+                          width: 90 * SizeConfig.horizontalBlock,
+                          onClickButton: () async {
+                            final selectedAddress = await Navigator.pushNamed(
+                                context, chooseAddress.id) as AddressModel;
+
+                            Navigator.pushNamed(context, Paymentscreen.id, arguments: {
+                              'type': 'offer',
+                              'price': offer.price,
+                              'offerId': offer.id,
+                              'addressId': selectedAddress.id
+                            });
+                          },
+                        ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 20 * SizeConfig.verticalBlock),
+            Divider(height: 2 * SizeConfig.verticalBlock),
+          ],
+        );
+      },
     );
   }
 }

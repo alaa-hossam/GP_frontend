@@ -8,4 +8,13 @@ class offerViewModel{
   Future<bool> addOffer(offerModel offer , String postId)async{
     return await APIService.addOffer(offer, postId);
   }
+
+  Future<bool> updateOffer(offerModel offer)async{
+    bool update = await APIService.updateOffer(offer);
+    return update;
+  }
+  Future<bool> deleteOffer(String offerId)async{
+    bool delete = await APIService.deleteOffer(offerId);
+    return delete;
+  }
 }

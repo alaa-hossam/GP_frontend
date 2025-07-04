@@ -17,8 +17,6 @@ import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
 import 'package:gp_frontend/views/HandcrafterRequest.dart';
 import 'package:gp_frontend/views/Home.dart';
 import 'package:gp_frontend/views/PaymentScreen.dart';
-import 'package:gp_frontend/views/MyHandcrafterProfile.dart';
-import 'package:gp_frontend/views/ProfileView.dart';
 import 'package:gp_frontend/views/RecommendGiftView.dart';
 import 'package:gp_frontend/views/SearchView.dart';
 import 'package:gp_frontend/views/UpdatePost.dart';

@@ -112,7 +112,12 @@ class _offersState extends State<offers> {
                         ),
                         child: IconButton(
                           onPressed: () async {
-                            Navigator.pushNamed(context, addOffer.id,arguments: widget.postId);},
+                            Navigator.pushNamed(
+                                context, addOffer.id, arguments: {
+                              'type': 'create',
+                              'postId': widget.postId,
+                            });
+                          },
 
                           icon: Icon(Icons.add),
                           iconSize: 30 * SizeConfig.textRatio,

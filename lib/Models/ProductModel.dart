@@ -573,6 +573,7 @@ class productService {
     wishList myWish = wishList();
 
     List<String> ids = await myWish.getProductIdsByEmail(email);
+    print(ids);
 
     const String query = '''
     query GetProductsByIds(\$productIds: [String!]!) {

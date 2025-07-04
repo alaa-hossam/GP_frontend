@@ -191,14 +191,18 @@ class postService {
         },
         body: jsonEncode(request),
       );
+      print("//////////////////////////////////////////");
+
       print(response.body);
       print(response.statusCode);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         final List<dynamic> getPosts = data['data']['getPosts'];
+        print(getPosts.length);
 
         for (var post in getPosts) {
+          print(post['id']);
           List<String>? ids = [];
           if (post['offers'] != null) {
             for (var offer in post['offers']) {
@@ -209,8 +213,11 @@ class postService {
               userName: post['customer']['username'] ?? "",
               clientImage: post['customer']['clientProfile'],
               description: post['description'],
-              postImage: post['gallery'][0]['fileURL'],
-              quantity: post['suggestedQuantity'],
+              postImage:post['gallery'] != null && post['gallery'].isNotEmpty
+          ? post['gallery'][0]['fileURL']
+            : null,
+
+            quantity: post['suggestedQuantity'],
               duration: post['suggestedOneDuration'],
               price: post['suggestedOnePrice'].toDouble(),
               id: post['id'],
@@ -224,6 +231,7 @@ class postService {
 
           );
         }
+        print(posts);
       } else {
         print('Failed to load product: ${response.statusCode}');
       }

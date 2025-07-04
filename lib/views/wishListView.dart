@@ -27,7 +27,9 @@ class _wishListViewState extends State<wishListView> {
   late productProvider wishProvider = productProvider();
 
 
-   wishProducts() async{
+
+
+  wishProducts() async{
     await wishProvider.getWishProducts();
     print("before provider");
     print(wishProvider.wishListProducts);

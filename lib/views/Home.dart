@@ -50,6 +50,8 @@ class _HomeState extends State<Home> {
     _initialization = _fetchInitialData();
   }
 
+
+
   Future<String> getId() async {
     Token token = Token();
     return await token.getUUID() ?? "";

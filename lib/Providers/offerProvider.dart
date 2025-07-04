@@ -8,16 +8,25 @@ class offerProvider extends ChangeNotifier{
 
   getOffers(String postId)async{
     offers = await offerVM.fetchOffers(postId);
-    print("////////////////////");
-    print("called");
     notifyListeners();
   }
 
   Future<bool> addOffer(offerModel offer , String postId)async{
     bool response =  await offerVM.addOffer(offer, postId);
-    print("..................");
     notifyListeners();
     return response;
+  }
+
+  Future<bool> updateOffer(offerModel offer)async{
+    bool update = await offerVM.updateOffer(offer);
+    notifyListeners();
+    return update;
+  }
+
+  Future<bool> deleteOffer(String offerId)async{
+    bool delete = await offerVM.deleteOffer(offerId);
+    notifyListeners();
+    return delete;
   }
 
 

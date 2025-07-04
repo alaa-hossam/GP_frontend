@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
 class offerModel{
-  String? profileImage , name , createdAt, description , id;
+  String? profileImage , name , createdAt, description , id , handcrafterId;
   int? duration;
   double? price;
 
@@ -16,7 +16,8 @@ class offerModel{
       this.description,
       this.duration,
       this.price,
-      this.id});
+      this.id,
+      this.handcrafterId});
 }
 
 class offerService{
@@ -37,6 +38,7 @@ class offerService{
                 imageUrl
                 name
             }
+            id
         }
         suggestedOneDuration
         suggestedOnePrice
@@ -74,7 +76,7 @@ class offerService{
           price: offer['suggestedOnePrice'].toDouble(),description: offer['description'],
             name: offer['handicrafter']['handicrafterProfile']['name'],
               profileImage: offer['handicrafter']['handicrafterProfile']['imageUrl'],
-            id: offer['id']
+            id: offer['id'], handcrafterId: offer['handicrafter']['id']
           ));
         }
 
@@ -128,6 +130,95 @@ class offerService{
       }
       return false;
     }catch(e){
+      return false;
+    }
+  }
+
+  Future<bool> updateOffer(offerModel offer)async{
+    Token token = Token();
+    String query = '''
+    mutation UpdateOffer {
+    updateOffer(
+        data: { description: "${offer.description}", suggestedOneDuration: ${offer.duration}, suggestedOnePrice: ${offer.price} }
+        offerId: "${offer.id}"
+        userId: "${offer.handcrafterId}"
+    ) {
+        id
+    }
+}
+
+''';
+    final request = {
+      'query': query,
+      'variables': {
+        'description':offer.description,
+        'suggestedOnePrice':offer.price,
+        'suggestedOneDuration':offer.duration,
+        'offerId' :offer.id,
+        'userId':offer.handcrafterId
+      },
+    };
+
+    print("reeeeeeeeeeeeeeeeq");
+    print(request);
+    try{
+      final myToken = await token.getToken();
+      final response = await http.post(
+          Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request)
+      );
+      print(response.body);
+      if(response.statusCode == 200){
+       print("offer Updated Successfully");
+       return true;
+      }
+      print("offer failed to update");
+      return false;
+    }catch(e){
+      print("offer failed to Update");
+      return false;
+    }
+  }
+  Future<bool> deleteOffer(String offerId)async{
+    Token token = Token();
+    String query = '''
+   mutation DeleteOffer {
+    deleteOffer(offerId: "${offerId}")
+}
+
+
+''';
+    final request = {
+      'query': query,
+      'variables': {
+        'offerId':offerId,
+
+      },
+    };
+
+    try{
+      final myToken = await token.getToken();
+      final response = await http.post(
+          Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request)
+      );
+      print(response.body);
+      if(response.statusCode == 200){
+       print("offer deleted Successfully");
+       return true;
+      }
+      print("offer failed to deleted");
+      return false;
+    }catch(e){
+      print("offer failed to deleted");
       return false;
     }
   }

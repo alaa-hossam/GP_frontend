@@ -39,7 +39,7 @@ class wishList {
   Future<List<String>> getProductIdsByEmail(String email) async {
     final myWishlist = await db;
     final result = await myWishlist.query('WISHLIST', where: 'email = ?', whereArgs: [email]);
-    return result.map((row) => row['ID']?.toString() ?? "").toList();
+    return result.map((row) => row['id']?.toString() ?? "").toList();
   }
 
   Future<void> deleteProduct(String id, String email) async {
