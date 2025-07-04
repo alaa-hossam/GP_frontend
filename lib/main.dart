@@ -2,6 +2,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:gp_frontend/views/analysisView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/sharewishlist.dart';
 import 'package:provider/provider.dart';
@@ -166,6 +167,7 @@ class MyApp extends StatelessWidget {
             ChatDetails.id: (_) => ChatDetails(),
             UpdatePost.id: (_) => UpdatePost(),
             giftCard.id: (_) => giftCard(),
+            AnalysisView.id : (_) => AnalysisView(),
             '/sharedWishlist': (context) {
               final binId = ModalRoute.of(context)!.settings.arguments as String;
               return SharedWishlistView(binId: binId);

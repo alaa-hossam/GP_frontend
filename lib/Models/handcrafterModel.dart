@@ -9,6 +9,29 @@ class handcrafterPostModel {
   handcrafterPostModel(this.content, this.fileURl, this.id);
 }
 
+class handcrafterAnalysisModel {
+  List<Map<String, dynamic>>? customMade;
+  List<Map<String, dynamic>>? postCustomized;
+  List<Map<String, dynamic>>? readyMade;
+  List<Map<String, dynamic>>? visits;
+  double? totalCustom;
+  double? totalPost;
+  double? totalReady;
+  int? totalVisit;
+
+  handcrafterAnalysisModel({
+    this.customMade,
+    this.postCustomized,
+    this.readyMade,
+    this.visits,
+    this.totalCustom,
+    this.totalPost,
+    this.totalReady,
+    this.totalVisit,
+  });
+}
+
+
 class handcrafterModel {
   String? name, description, profileURL;
   File? profileImage, nationalIdImage;
@@ -345,6 +368,84 @@ print(response);
       }
     } catch (e) {
       print('Error fetching handcrafter reels: $e');
+    }
+
+    return null;
+  }
+
+
+  Future<handcrafterAnalysisModel?> getHandcrafterAnalysis(String interval) async {
+    print("Fetching handcrafter analysis...");
+    Token token = Token();
+    final userId = await token.getUUID();
+
+    String query = '''
+    query GetHandicrafterAnalysis {
+      getHandicrafterAnalysis(handicrafterId: "$userId", interval: $interval) {
+        totalRevenue {
+          customMade {
+            data { period revenue }
+            total
+          }
+          postCustomized {
+            data { period revenue }
+            total
+          }
+          readyMade {
+            data { period revenue }
+            total
+          }
+        }
+        profileVisits {
+          visitedData { count period }
+          totalVisits
+        }
+      }
+    }
+  ''';
+
+    final request = {'query': query};
+
+    try {
+      final myToken = await token.getToken();
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $myToken',
+        },
+        body: jsonEncode(request),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final analysis = data['data']['getHandicrafterAnalysis'];
+
+        final customMadeData = List<Map<String, dynamic>>.from(
+            analysis['totalRevenue']['customMade']['data']);
+        final postCustomizedData = List<Map<String, dynamic>>.from(
+            analysis['totalRevenue']['postCustomized']['data']);
+        final readyMadeData = List<Map<String, dynamic>>.from(
+            analysis['totalRevenue']['readyMade']['data']);
+        final visitsData = List<Map<String, dynamic>>.from(
+            analysis['profileVisits']['visitedData']);
+
+        return handcrafterAnalysisModel(
+          customMade: customMadeData,
+          postCustomized: postCustomizedData,
+          readyMade: readyMadeData,
+          totalCustom: (analysis['totalRevenue']['customMade']['total'] ?? 0).toDouble(),
+          totalPost: (analysis['totalRevenue']['postCustomized']['total'] ?? 0).toDouble(),
+          totalReady: (analysis['totalRevenue']['readyMade']['total'] ?? 0).toDouble(),
+          visits: visitsData,
+          totalVisit: analysis['profileVisits']['totalVisits'],
+        );
+      } else {
+        print("HTTP Error: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print('Error fetching handcrafter analysis: $e');
     }
 
     return null;
