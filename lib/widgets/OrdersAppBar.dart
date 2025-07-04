@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'Dimensions.dart';
 
 class OrdersAppBar extends StatelessWidget implements PreferredSizeWidget {
-  int index;
-  OrdersAppBar({super.key  ,required this.index});
+  final int index;
+  final void Function(int) onTabSelected;
+
+  OrdersAppBar({super.key, required this.index, required this.onTabSelected});
 
   @override
   Size get preferredSize => Size.fromHeight(122 * SizeConfig.verticalBlock);
@@ -49,47 +53,51 @@ class OrdersAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
 
-
+        // Tabs
         Positioned(
-          bottom: -15 * SizeConfig.verticalBlock, // Half out
+          bottom: -15 * SizeConfig.verticalBlock,
           left: 30 * SizeConfig.horizontalBlock,
-          child: appBarContainer("Active", index , 0)
-        ), Positioned(
-          bottom: -15 * SizeConfig.verticalBlock, // Half out
+          child: appBarContainer("Active", index, 0, onTabSelected),
+        ),
+        Positioned(
+          bottom: -15 * SizeConfig.verticalBlock,
           left: 150 * SizeConfig.horizontalBlock,
-          child: appBarContainer("Complete", index , 1)
-        ), Positioned(
-          bottom: -15 * SizeConfig.verticalBlock, // Half out
+          child: appBarContainer("Complete", index, 1, onTabSelected),
+        ),
+        Positioned(
+          bottom: -15 * SizeConfig.verticalBlock,
           left: 270 * SizeConfig.horizontalBlock,
-          child: appBarContainer("Cancelled", index , 2)
+          child: appBarContainer("Cancelled", index, 2, onTabSelected),
         ),
       ],
     );
   }
 }
 
-
-Widget appBarContainer(String title , int index , int current){
-  return Container(
-    height: 40 * SizeConfig.verticalBlock,
-    width: 100 * SizeConfig.horizontalBlock,
-    decoration: BoxDecoration(
-      color: index == current ? SizeConfig.secondColor : Colors.white,
-      borderRadius: BorderRadius.circular(12 * SizeConfig.verticalBlock),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black26,
-          blurRadius: 4,
-          offset: Offset(0, 2),
-        )
-      ],
-    ),
-    alignment: Alignment.center,
-    child: Text(
-      title,
-      style: TextStyle(
-        color: index == current ? Colors.white :SizeConfig.iconColor,
-        fontSize: 14 * SizeConfig.textRatio,
+Widget appBarContainer(String title, int selectedIndex, int currentIndex, void Function(int) onTap) {
+  return GestureDetector(
+    onTap: () => onTap(currentIndex),
+    child: Container(
+      height: 40 * SizeConfig.verticalBlock,
+      width: 100 * SizeConfig.horizontalBlock,
+      decoration: BoxDecoration(
+        color: selectedIndex == currentIndex ? SizeConfig.secondColor : Colors.white,
+        borderRadius: BorderRadius.circular(12 * SizeConfig.verticalBlock),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          )
+        ],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        title,
+        style: TextStyle(
+          color: selectedIndex == currentIndex ? Colors.white : SizeConfig.iconColor,
+          fontSize: 14 * SizeConfig.textRatio,
+        ),
       ),
     ),
   );

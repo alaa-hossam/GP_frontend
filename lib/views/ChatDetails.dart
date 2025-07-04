@@ -157,7 +157,6 @@ class _ChatDetailsViewState extends State<ChatDetails> {
   }
 
   void sendMessage() {
-    print("ssssssssssssend");
     if (_controller.text.trim().isEmpty) return;
     final message = MessageModel(
       id: '',

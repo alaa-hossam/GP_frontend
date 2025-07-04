@@ -15,4 +15,8 @@ class orderViewModel{
     return await ApiService.createCustomOrder(order ,giftCode ?? "", fromBazar );
 
   }
+
+  Future<List<Map<String , dynamic>>> getOrders() async{
+    return await ApiService.getOrders();
+  }
 }
