@@ -422,23 +422,18 @@ print(response);
         final Map<String, dynamic> data = jsonDecode(response.body);
         final analysis = data['data']['getHandicrafterAnalysis'];
 
-        final customMadeData = List<Map<String, dynamic>>.from(
-            analysis['totalRevenue']['customMade']['data']);
-        final postCustomizedData = List<Map<String, dynamic>>.from(
-            analysis['totalRevenue']['postCustomized']['data']);
-        final readyMadeData = List<Map<String, dynamic>>.from(
-            analysis['totalRevenue']['readyMade']['data']);
-        final visitsData = List<Map<String, dynamic>>.from(
-            analysis['profileVisits']['visitedData']);
-
         return handcrafterAnalysisModel(
-          customMade: customMadeData,
-          postCustomized: postCustomizedData,
-          readyMade: readyMadeData,
+          customMade: List<Map<String, dynamic>>.from(
+              analysis['totalRevenue']['customMade']['data']),
+          postCustomized: List<Map<String, dynamic>>.from(
+              analysis['totalRevenue']['postCustomized']['data']),
+          readyMade: List<Map<String, dynamic>>.from(
+              analysis['totalRevenue']['readyMade']['data']),
+          visits: List<Map<String, dynamic>>.from(
+              analysis['profileVisits']['visitedData']),
           totalCustom: (analysis['totalRevenue']['customMade']['total'] ?? 0).toDouble(),
           totalPost: (analysis['totalRevenue']['postCustomized']['total'] ?? 0).toDouble(),
           totalReady: (analysis['totalRevenue']['readyMade']['total'] ?? 0).toDouble(),
-          visits: visitsData,
           totalVisit: analysis['profileVisits']['totalVisits'],
         );
       } else {
