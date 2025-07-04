@@ -26,6 +26,7 @@ class handcrafterViewModel {
   }
 
   Future<handcrafterModel?> fetchHandcrafterById(String Id) async {
+    print("fetchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
     return handcrafterSer.getHandcrafterById(Id);
   }
   Future<bool> deleteHandcrafterReel(String Id) async {

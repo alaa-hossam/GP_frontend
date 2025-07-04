@@ -452,7 +452,7 @@ print(response);
   }
 
   Future<handcrafterModel?> getHandcrafterById(String id) async {
-    print("Fetching handcrafter reels...");
+    print("Fetching handcrafter reels by id...");
     Token token = Token();
     final userId = await token.getUUID();
     handcrafterModel? handcrafter;
@@ -461,20 +461,18 @@ print(response);
     query GetHandicrafterProfile {
     getHandicrafterProfile(handicrafterProfileId: "${id}", viewerId: "${userId}") {
         averageRating
-        name
         description
+        id
+        imageUrl
+        name
         posts {
             content
             id
             postFileUrl
         }
-         user {
-            clientProfile {
-                imageUrl
-            }
-        }
     }
 }
+
 
   ''';
 
@@ -512,7 +510,7 @@ print(response);
 
         handcrafter = handcrafterModel(
           name: profile['name'],
-          profileURL: profile['user']['clientProfile']['imageUrl'],
+          profileURL: profile['imageUrl'],
           description: profile['description'],
           rate: profile['averageRating']?.toDouble() ?? 0.0,
           posts: postList,

@@ -9,6 +9,7 @@ import 'package:gp_frontend/ViewModels/customerViewModel.dart';
 import 'package:gp_frontend/views/handicrafterProfileClientView.dart';
 import 'package:gp_frontend/views/productReviews.dart';
 import 'package:gp_frontend/views/variationsDetails.dart';
+import '../CommomnFunctions/ProfileData.dart';
 import '../widgets/Dimensions.dart';
 
 class productDetails extends StatefulWidget {
@@ -35,7 +36,7 @@ class _productDetailsState extends State<productDetails> {
   }
 
   Future<void> _initUserInfo() async {
-    email = await token.getEmail()?? "";
+    email = await token.getEmail() ?? "";
     userId = await token.getUUID() ?? "";
     setState(() {}); // To refresh UI once values are loaded
   }
@@ -49,8 +50,6 @@ class _productDetailsState extends State<productDetails> {
     }
     setState(() {});
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +72,8 @@ class _productDetailsState extends State<productDetails> {
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding:
+                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Stack(
                         children: [
                           Container(
@@ -99,7 +99,8 @@ class _productDetailsState extends State<productDetails> {
                             top: 15,
                             right: 25,
                             child: FutureBuilder<bool>(
-                              future: wishListObj.doesIdExist(myProduct.id, email),
+                              future:
+                                  wishListObj.doesIdExist(myProduct.id, email),
                               builder: (context, snapshot) {
                                 bool exists = snapshot.data ?? false;
                                 return CircleAvatar(
@@ -108,9 +109,12 @@ class _productDetailsState extends State<productDetails> {
                                     icon: Icon(
                                       Icons.favorite,
                                       size: 25 * SizeConfig.textRatio,
-                                      color: exists ? Colors.red : SizeConfig.fontColor,
+                                      color: exists
+                                          ? Colors.red
+                                          : SizeConfig.fontColor,
                                     ),
-                                    onPressed: () => toggleFavourite(myProduct.id),
+                                    onPressed: () =>
+                                        toggleFavourite(myProduct.id),
                                   ),
                                 );
                               },
@@ -138,11 +142,13 @@ class _productDetailsState extends State<productDetails> {
                     ),
                     SizedBox(height: 10 * SizeConfig.verticalBlock),
                     Padding(
-                      padding: EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
+                      padding:
+                          EdgeInsets.only(left: 5.0 * SizeConfig.textRatio),
                       child: Container(
                         width: 361 * SizeConfig.horizontalBlock,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 * SizeConfig.textRatio),
+                          borderRadius:
+                              BorderRadius.circular(10 * SizeConfig.textRatio),
                           color: const Color(0X50E9E9E9),
                           border: Border.all(color: SizeConfig.iconColor),
                         ),
@@ -152,22 +158,43 @@ class _productDetailsState extends State<productDetails> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => HandcrafterProfileClientView(
-                                              handCrafterId: myProduct.handcrafterId!),
-                                        ),
-                                      );
+                                    onTap: () async {
+                                      Token token = Token();
+                                      final userId = await token.getUUID();
+                                      if (userId == myProduct.handcrafterId!) {
+                                        loadProfileByRole(
+                                          context: context,
+                                          onCustomerLoaded: (customer) {
+                                            print(
+                                                "Customer loaded: ${customer.name}");
+                                          },
+                                          onCrafterLoaded: (crafter) {
+                                            print(
+                                                "Crafter loaded: ${crafter.name}");
+                                          },
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                HandcrafterProfileClientView(
+                                                    handCrafterId: myProduct
+                                                        .handcrafterId!),
+                                          ),
+                                        );
+                                      }
                                     },
                                     child: Row(
                                       children: [
                                         const Icon(Icons.person_outline),
-                                        SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                                        SizedBox(
+                                            width:
+                                                5 * SizeConfig.horizontalBlock),
                                         Text(
                                           '${myProduct.handcrafterName}',
                                           style: GoogleFonts.roboto(
@@ -180,8 +207,11 @@ class _productDetailsState extends State<productDetails> {
                                   ),
                                   Row(
                                     children: [
-                                      const Icon(Icons.star, color: Color(0xFFD4931C)),
-                                      SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                                      const Icon(Icons.star,
+                                          color: Color(0xFFD4931C)),
+                                      SizedBox(
+                                          width:
+                                              5 * SizeConfig.horizontalBlock),
                                       Text("${myProduct.rate}"),
                                     ],
                                   ),
@@ -220,7 +250,8 @@ class _productDetailsState extends State<productDetails> {
                                         ),
                                       );
                                     },
-                                    icon: const Icon(Icons.chat, color: SizeConfig.iconColor),
+                                    icon: const Icon(Icons.chat,
+                                        color: SizeConfig.iconColor),
                                   ),
                                   SizedBox(width: 5 * SizeConfig.verticalBlock),
                                   Text(
@@ -241,7 +272,6 @@ class _productDetailsState extends State<productDetails> {
 
                     // ✅ Variations + Add to Cart Button
                     variationScreen(myProduct),
-
                   ],
                 ),
               ],

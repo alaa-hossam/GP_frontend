@@ -114,6 +114,8 @@ class productProvider extends ChangeNotifier {
   Future<productModel> getProductDetails(String productId)async{
     print("in get product details provider");
     productDetails =await productVM.productDetails(productId);
+    print("crafterIddddddddddddddddddddddddddddddddd");
+    print(productDetails.handcrafterId);
     return productDetails;
   }
 

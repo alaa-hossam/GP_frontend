@@ -61,11 +61,19 @@ class _AnalysisViewState extends State<AnalysisView> {
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: 16 * SizeConfig.verticalBlock,
-            horizontal: 16 * SizeConfig.horizontalBlock
-          ),
+              vertical: 16 * SizeConfig.verticalBlock,
+              horizontal: 16 * SizeConfig.horizontalBlock),
           child: Column(
-
+            children: [
+              Text(
+                "Dashboard",
+                style: TextStyle(
+                  fontSize: 20 * SizeConfig.textRatio,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Roboto",
+                ),
+              ),
+            ],
           ),
         ),
       ),
