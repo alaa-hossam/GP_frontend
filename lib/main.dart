@@ -28,6 +28,7 @@ import 'package:gp_frontend/views/addOffer.dart';
 import 'package:gp_frontend/views/addPost.dart';
 import 'package:gp_frontend/views/addProduct.dart';
 import 'package:gp_frontend/views/browseProducts.dart';
+import 'package:gp_frontend/views/buyGiftCard.dart';
 import 'package:gp_frontend/views/cartView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/checkOut.dart';
@@ -151,6 +152,7 @@ class MyApp extends StatelessWidget {
         ChatView.id : (BuildContext context) => ChatView(),
         ChatDetails.id : (BuildContext context) => ChatDetails(),
         UpdatePost.id : (BuildContext context) => UpdatePost(),
+        giftCard.id : (BuildContext context) => giftCard(),
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gp_frontend/ViewModels/customerViewModel.dart';
+import 'package:gp_frontend/views/buyGiftCard.dart';
 import 'package:gp_frontend/views/historyView.dart';
 import 'package:gp_frontend/views/voucherView.dart';
 import 'package:gp_frontend/views/wishListView.dart';
@@ -324,7 +325,9 @@ class _ProfileState extends State<Profile> {
                     buttonName: 'Gift Card',
                     buttonIcon: Icons.wallet_giftcard_rounded,
                     iconColor: const Color(0xFF24944D),
-                    onClickButton: () {},
+                    onClickButton: () {
+                      Navigator.pushNamed(context, giftCard.id);
+                    },
                   ),
                 ],
               ),

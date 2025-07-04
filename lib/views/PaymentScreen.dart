@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/Models/orderModel.dart';
 import 'package:gp_frontend/Providers/orderProvider.dart';
 import 'package:gp_frontend/SqfliteCodes/Token.dart';
+import 'package:gp_frontend/ViewModels/giftCardViewModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import '../CommomnFunctions/ProfileData.dart';
@@ -24,7 +25,7 @@ class _PaymentscreenState extends State<Paymentscreen> {
   late WebViewController _controller;
   bool isLoading = true;
   late double price;
-  late String offerId, addressId, type, giftCode, AdvertisementURL, Package;
+  late String offerId, addressId, type, giftCode, AdvertisementURL, Package,email , message;
   File? AdvertisementImage;
   List<Map<String, dynamic>> products = [];
   bool _hasInitialized = false;
@@ -54,6 +55,9 @@ class _PaymentscreenState extends State<Paymentscreen> {
         AdvertisementImage = args['advertisementImage'];
         AdvertisementURL = args['AdvertisementURL'] ?? "";
         Package = args['package'];
+      } else if (type == "GiftCard" ) {
+        email = args['mail'];
+        message = args['message'] ;
       }
 
       _hasInitialized = true;
@@ -79,6 +83,15 @@ class _PaymentscreenState extends State<Paymentscreen> {
 print(transactionId);
     await AdsVM.addAdvertisement(
         AdvertisementImage, AdvertisementURL, Package, transactionId);
+  }
+
+  Future<void> _giftCard(String transactionId) async {
+    giftCardViewModel cardVM = giftCardViewModel();
+
+    print(transactionId);
+    await cardVM.buyGiftCard(email, price, message, transactionId);
+
+
   }
 
   Future<void> _readyOrder(String transactionId) async {
@@ -122,6 +135,8 @@ print(transactionId);
       _customOrder(transactionId);
     } else if (type == "advertisement" ){
       _advertisement(transactionId);
+    }else if (type == "GiftCard" ){
+      _giftCard(transactionId);
     }
 
     Navigator.pushReplacementNamed(context, '/PaymentResult', arguments: {
