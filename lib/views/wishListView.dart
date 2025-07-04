@@ -119,11 +119,13 @@ class _wishListViewState extends State<wishListView> {
   Future<void> uploadAndShareWishlist(String email) async {
     try {
       final ids = await wishList().getProductIdsByEmail(email);
+      final products = wishProvider.wishListProducts
+          .where((prod) => ids.contains(prod['id']))
+          .toList();
 
-      final products = wishProvider.wishListProducts.where((prod) => ids.contains(prod['id'])).toList();
-
+      // Step 1: Upload the wishlist JSON to JSONBin
       final url = Uri.parse('https://api.jsonbin.io/v3/b');
-      final apiKey = '\$2a\$10\$mA/MU1ktlqt4VqFHJNlwtOcnOoOq21QmXQJFRnMr0jTjbTEwzgp.S'; // replace with your actual key
+      final apiKey = r'$2a$10$mA/MU1ktlqt4VqFHJNlwtOcnOoOq21QmXQJFRnMr0jTjbTEwzgp.S';
 
       final response = await http.post(
         url,
@@ -141,15 +143,34 @@ class _wishListViewState extends State<wishListView> {
         final data = jsonDecode(response.body);
         final binId = data['metadata']['id'];
 
-        final dynamicLink = await createDynamicLink(binId);
-        await Share.share('Check out my wishlist: $dynamicLink');
+        // Step 2: Create a Firebase Dynamic Link to the wishlist
+        final DynamicLinkParameters parameters = DynamicLinkParameters(
+          uriPrefix: 'https://san3a.page.link',
+          link: Uri.parse('https://placeholder.san3a.com/wishlist/$binId'),
+          androidParameters: AndroidParameters(
+            packageName: 'com.gpfrontend.app', // e.g., com.gpfrontend.app
+            minimumVersion: 0,
+          ),
+
+        );
+
+        final ShortDynamicLink shortLink =
+        await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+        final Uri shortUrl = shortLink.shortUrl;
+
+        // Step 3: Share the link
+        await Share.share('Check out my wishlist! $shortUrl');
       } else {
         print('Upload failed: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to upload wishlist")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to upload wishlist")),
+        );
       }
     } catch (e) {
       print("Upload error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
 

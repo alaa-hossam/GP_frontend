@@ -76,16 +76,18 @@ void main() async {
   await Cart().db;
 
   // Handle dynamic links
-  FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData? dynamicLink) {
-    final Uri? deepLink = dynamicLink?.link;
+  FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+    final Uri deepLink = dynamicLinkData.link;
 
-    if (deepLink != null && deepLink.pathSegments.contains('wishlist')) {
+    if (deepLink.pathSegments.contains('wishlist')) {
       final binId = deepLink.pathSegments.last;
-      navigatorKey.currentState?.pushNamed('/sharedWishlist', arguments: binId);
+      navigatorKey.currentState?.pushNamed(
+        '/sharedWishlist',
+        arguments: binId,
+      );
     }
-  }).onError((error) {
-    print('Dynamic Link Failed: $error');
   });
+
 
   runApp(MyApp());
 }
