@@ -106,7 +106,7 @@ class MyApp extends StatelessWidget {
           builder: DevicePreview.appBuilder,
           title: 'Flutter Demo',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
             useMaterial3: true,
           ),
           initialRoute: logIn.id,

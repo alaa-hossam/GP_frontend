@@ -55,43 +55,46 @@ class OrderContainer extends StatelessWidget {
                   ),
                   child: Image.asset("assets/images/logo.png"),
                 ),
-                SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                SizedBox(width: 3 * SizeConfig.horizontalBlock,),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 5 * SizeConfig.verticalBlock),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Order #",
-                            style: GoogleFonts.roboto(
-                              fontSize: 16 * SizeConfig.textRatio,
-                              fontWeight: FontWeight.bold,
+                      Container(
+                        width: 205 * SizeConfig.horizontalBlock,
+                        child: Row(
+                          children: [
+                            Text(
+                              "Order #",
+                              style: GoogleFonts.roboto(
+                                fontSize: 16 * SizeConfig.textRatio,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            shortId,
-                            style: GoogleFonts.roboto(
-                              fontSize: 16 * SizeConfig.textRatio,
+                            Text(
+                              shortId,
+                              style: GoogleFonts.roboto(
+                                fontSize: 16 * SizeConfig.textRatio,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 20 * SizeConfig.horizontalBlock,),
-                          Text(
-                            "${order['quantity']} items",
-                            style: GoogleFonts.roboto(
-                              fontSize: 16 * SizeConfig.textRatio,
+                            SizedBox(width: 20 * SizeConfig.horizontalBlock,),
+                            Text(
+                              "${order['quantity']} items",
+                              style: GoogleFonts.roboto(
+                                fontSize: 16 * SizeConfig.textRatio,
+                              ),
                             ),
-                          ),
 
-                        ],
+                          ],
 
+                        ),
                       ),
                       Row(
                         children: [
                           Container(
-                            width: 160 * SizeConfig.horizontalBlock,
+                            width: 170 * SizeConfig.horizontalBlock,
                             child: Text(
                               "Totlal Price   ${order['orderPrice']} LE",
                               style: GoogleFonts.roboto(

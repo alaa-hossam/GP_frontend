@@ -342,6 +342,7 @@ class orderService {
           } else if (order['orderType'] == "PostCustomized") {
             int quantity = order['postCustomizedDetails']['quantity'];
 
+
             productModel product = productModel(
               "",
               order['postCustomizedDetails']['approvedOffer']['post'] != null &&
@@ -363,6 +364,7 @@ class orderService {
               handcrafterImage: order['postCustomizedDetails']['approvedOffer']
                       ['handicrafter']['handicrafterProfile']['imageUrl'] ??
                   "",
+              Quantity: order['postCustomizedDetails']['quantity']
             );
 
             orders.add({
@@ -376,14 +378,14 @@ class orderService {
             });
           } else if (order['orderType'] == "CustomMade") {
             int quantity = 1;
-            List<Map<String, dynamic>> variations = [];
-            for (var variation in order['customMadeDetails']['finalProduct']
-                ['finalProductVariation']) {
-              variations.add({
-                'variationType': variation['variationType'],
-                'variationValue': variation['variationValue']
-              });
-            }
+            // List<Map<String, dynamic>> variations = [];
+            // for (var variation in order['customMadeDetails']['finalProduct']
+            //     ['finalProductVariation']) {
+            //   variations.add({
+            //     'variationType': variation['variationType'],
+            //     'variationValue': variation['variationValue']
+            //   });
+            // }
 
             productModel product = productModel(
                 order['customMadeDetails']['finalProduct']['product']['id'],
@@ -397,7 +399,9 @@ class orderService {
                 handcrafterImage: order['customMadeDetails']['finalProduct']
                         ['product']['handicrafter']['handicrafterProfile']
                     ['imageUrl'],
-                variations: variations);
+                // variations: variations
+              Quantity: 1
+            );
             orders.add({
               'id': order['id'],
               'orderPrice': price,

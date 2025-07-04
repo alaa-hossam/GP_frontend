@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/widgets/AppBar.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
+import 'package:gp_frontend/widgets/ProductOrderDetails.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   static String id = "OrderDetailsScreen";
@@ -28,37 +29,12 @@ class OrderDetailsScreen extends StatelessWidget {
       ),),
       body: Padding(
         padding: EdgeInsets.all(12.0 * SizeConfig.horizontalBlock),
-        child: Expanded(
-          child: ListView.builder(
-            itemCount: productsRaw.length,
-            itemBuilder: (context, index) {
-              final product = productsRaw[index];
-              return Card(
-                elevation: 3,
-                margin: EdgeInsets.symmetric(vertical: 10 * SizeConfig.verticalBlock),
-                child: ListTile(
-                  leading: Image.network(
-                    product.imageURL ?? '',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.image_not_supported),
-                  ),
-                  title: Text(
-                    product.name ?? 'Unknown Product',
-                    style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Price: ${product.price} LE"),
-                      Text("Quantity: ${product.Quantity}"),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+        child: ListView.builder(
+          itemCount: productsRaw.length,
+          itemBuilder: (context, index) {
+            final product = productsRaw[index];
+            return ProductOrderDetails(product: product);
+          },
         ),
       ),
     );
