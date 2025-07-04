@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:gp_frontend/views/analysisView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
-import 'package:gp_frontend/views/sharewishlist.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -68,27 +67,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Initialize local SQLite databases
-  await wishList().db;
-  await Cart().db;
-
-  // Handle dynamic links
-  FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-    final Uri deepLink = dynamicLinkData.link;
-
-    if (deepLink.pathSegments.contains('wishlist')) {
-      final binId = deepLink.pathSegments.last;
-      navigatorKey.currentState?.pushNamed(
-        '/sharedWishlist',
-        arguments: binId,
-      );
-    }
-  });
-
+  await Firebase.initializeApp();
 
   runApp(MyApp());
 }
@@ -168,10 +147,7 @@ class MyApp extends StatelessWidget {
             UpdatePost.id: (_) => UpdatePost(),
             giftCard.id: (_) => giftCard(),
             AnalysisView.id : (_) => AnalysisView(),
-            '/sharedWishlist': (context) {
-              final binId = ModalRoute.of(context)!.settings.arguments as String;
-              return SharedWishlistView(binId: binId);
-            },
+
           },
         ),
       ),

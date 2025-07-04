@@ -98,20 +98,20 @@ class _wishListViewState extends State<wishListView> {
 
   Future<String> createDynamicLink(String binId) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://san3a.page.link',
-      link: Uri.parse('https://san3a.com/wishlist/$binId'), // <== must be a real domain or handled in app
+      uriPrefix: 'https://san3a.page.link ',
+      link: Uri.parse('https://san3a.page.link/wishlist/ $binId'), // ✅ Same domain
       androidParameters: AndroidParameters(
-        packageName: 'com.yourcompany.yourapp',
+        packageName: 'com.gpfrontend.app',
         minimumVersion: 0,
       ),
       iosParameters: IOSParameters(
-        bundleId: 'com.yourcompany.yourapp',
-        appStoreId: '123456789', // optional
+        bundleId: 'com.gpfrontend.app',
+        minimumVersion: '1.0.0',
       ),
     );
-
-    final ShortDynamicLink shortLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-    return shortLink.shortUrl.toString();
+    final ShortDynamicLink shortLink =
+    await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+    return shortLink.shortUrl.toString(); // Example: https://san3a.page.link/6Hbz
   }
 
 
@@ -138,20 +138,23 @@ class _wishListViewState extends State<wishListView> {
           'wishlist': products,
         }),
       );
-
+print(response.statusCode);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final binId = data['metadata']['id'];
-
+print(Uri.parse('https://san3a.page.link/wishlist/$binId'));
         // Step 2: Create a Firebase Dynamic Link to the wishlist
         final DynamicLinkParameters parameters = DynamicLinkParameters(
           uriPrefix: 'https://san3a.page.link',
-          link: Uri.parse('https://placeholder.san3a.com/wishlist/$binId'),
+          link: Uri.parse('https://san3a.page.link/wishlist/$binId'), // ✅ Now both match and are valid
           androidParameters: AndroidParameters(
-            packageName: 'com.gpfrontend.app', // e.g., com.gpfrontend.app
+            packageName: 'com.gpfrontend.app', // ✅ your actual app ID
             minimumVersion: 0,
           ),
-
+          iosParameters: IOSParameters(
+            bundleId: 'com.gpfrontend.app',
+            minimumVersion: '1.0.0',
+          ),
         );
 
         final ShortDynamicLink shortLink =

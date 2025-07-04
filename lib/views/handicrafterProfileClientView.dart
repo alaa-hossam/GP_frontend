@@ -200,6 +200,7 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                     onClickButton: () async {
                       Token token = Token();
                       final userId = await token.getUUID();
+                      print(userId);
                       Navigator.pushNamed(
                         context,
                         ChatDetails.id,

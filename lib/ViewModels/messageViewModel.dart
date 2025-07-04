@@ -14,12 +14,22 @@ class ChatViewModel extends ChangeNotifier {
   /// Sends a message to the Firestore chat document
   Future<void> sendMessage(MessageModel message) async {
     final chatId = getChatId(message.senderId, message.receiverId);
-    await _firestore
-        .collection("chats")
-        .doc(chatId)
-        .collection("messages")
-        .add(message.toJson());
+
+    // 1. Ensure chat document exists
+    final chatDoc = _firestore.collection("chats").doc(chatId);
+    final chatDocSnapshot = await chatDoc.get();
+
+    if (!chatDocSnapshot.exists) {
+      await chatDoc.set({
+        'participants': [message.senderId, message.receiverId],
+        'lastUpdated': FieldValue.serverTimestamp(), // optional
+      });
+    }
+
+    // 2. Add the message to the subcollection
+    await chatDoc.collection("messages").add(message.toJson());
   }
+
 
   /// Retrieves messages between two users, ordered by timestamp
   Stream<List<MessageModel>> getMessages(String currentUserId, String otherUserId) {
