@@ -1,63 +1,69 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
-import 'package:gp_frontend/Providers/AddressProvider.dart';
-import 'package:gp_frontend/Providers/BackagesProvider.dart';
-import 'package:gp_frontend/Providers/SearchProvider.dart';
-import 'package:gp_frontend/Providers/eventProvider.dart';
-import 'package:gp_frontend/Providers/offerProvider.dart';
-import 'package:gp_frontend/Providers/postProvider.dart';
-import 'package:gp_frontend/Providers/voucherProvider.dart';
-import 'package:gp_frontend/ViewModels/messageViewModel.dart';
-import 'package:gp_frontend/views/AddAdvertisement.dart';
-import 'package:gp_frontend/views/AdvertisementsPackages.dart';
-import 'package:gp_frontend/views/BazarProductsReview.dart';
-import 'package:gp_frontend/views/ChatDetails.dart';
-import 'package:gp_frontend/views/ChatView.dart';
-import 'package:gp_frontend/views/GiftRecommendationProducts.dart';
-import 'package:gp_frontend/views/HandcrafterRequest.dart';
-import 'package:gp_frontend/views/Home.dart';
-import 'package:gp_frontend/views/PaymentScreen.dart';
-import 'package:gp_frontend/views/RecommendGiftView.dart';
-import 'package:gp_frontend/views/SearchView.dart';
-import 'package:gp_frontend/views/UpdatePost.dart';
-import 'package:gp_frontend/views/addAddress.dart';
-import 'package:gp_frontend/views/addCrafterReel.dart';
-import 'package:gp_frontend/views/addOffer.dart';
-import 'package:gp_frontend/views/addPost.dart';
-import 'package:gp_frontend/views/addProduct.dart';
-import 'package:gp_frontend/views/browseProducts.dart';
-import 'package:gp_frontend/views/buyGiftCard.dart';
-import 'package:gp_frontend/views/cartView.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:gp_frontend/views/chatBot.dart';
-import 'package:gp_frontend/views/checkOut.dart';
-import 'package:gp_frontend/views/chooseAddress.dart';
-import 'package:gp_frontend/views/compareView.dart';
-import 'package:gp_frontend/views/confirmOrder.dart';
-import 'package:gp_frontend/views/eventsView.dart';
-import 'package:gp_frontend/views/forgetPasswordView.dart';
-import 'package:gp_frontend/views/historyView.dart';
-import 'package:gp_frontend/views/joinBazar.dart';
-import 'package:gp_frontend/views/logInView.dart';
-import 'package:gp_frontend/views/posts.dart';
-import 'package:gp_frontend/views/productDetails.dart';
-import 'package:gp_frontend/views/showBazar.dart';
-import 'package:gp_frontend/views/showOrders.dart';
-import 'package:gp_frontend/views/voucherView.dart';
-import 'package:gp_frontend/views/wishListView.dart';
+import 'package:gp_frontend/views/sharewishlist.dart';
 import 'package:provider/provider.dart';
-import 'Providers/AdvertisementProvider.dart';
-import 'Providers/BazarProvider.dart';
-import 'Providers/CategoryProvider.dart';
-import 'Providers/ProductProvider.dart';
-import 'Providers/cartProvider.dart';
-import 'Providers/detailsProvider.dart';
-import 'SqfliteCodes/cart.dart';
-import 'SqfliteCodes/wishList.dart';
+
 import 'firebase_options.dart';
 import 'views/signUpView.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'views/logInView.dart';
+import 'views/forgetPasswordView.dart';
+import 'views/Home.dart';
+import 'views/browseProducts.dart';
+import 'views/searchView.dart';
+import 'views/wishListView.dart';
+import 'views/compareView.dart';
+import 'views/productDetails.dart';
+import 'views/HandcrafterRequest.dart';
+import 'views/cartView.dart';
+import 'views/RecommendGiftView.dart';
+import 'views/GiftRecommendationProducts.dart';
+import 'views/joinBazar.dart';
 import 'views/BazarVariations.dart';
+import 'views/BazarProductsReview.dart';
+import 'views/showBazar.dart';
+import 'views/AddAdvertisement.dart';
+import 'views/AdvertisementsPackages.dart';
+import 'views/PaymentScreen.dart';
+import 'views/checkOut.dart';
+import 'views/chooseAddress.dart';
+import 'views/addAddress.dart';
+import 'views/confirmOrder.dart';
+import 'views/historyView.dart';
+import 'views/eventsView.dart';
+import 'views/posts.dart';
+import 'views/addPost.dart';
+import 'views/voucherView.dart';
+import 'views/showOrders.dart';
+import 'views/addCrafterReel.dart';
+import 'views/addOffer.dart';
+import 'views/addProduct.dart';
+import 'views/ChatView.dart';
+import 'views/ChatDetails.dart';
+import 'views/UpdatePost.dart';
+import 'views/buyGiftCard.dart';
 
+import 'Providers/AdvertisementProvider.dart';
+import 'Providers/CategoryProvider.dart';
+import 'Providers/ProductProvider.dart';
+import 'Providers/detailsProvider.dart';
+import 'Providers/cartProvider.dart';
+import 'Providers/BackagesProvider.dart';
+import 'Providers/BazarProvider.dart';
+import 'Providers/AddressProvider.dart';
+import 'Providers/eventProvider.dart';
+import 'Providers/postProvider.dart';
+import 'Providers/offerProvider.dart';
+import 'Providers/voucherProvider.dart';
+import 'Providers/SearchProvider.dart';
+import 'ViewModels/messageViewModel.dart';
+
+import 'SqfliteCodes/cart.dart';
+import 'SqfliteCodes/wishList.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,15 +71,31 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize databases
-  wishList wish = wishList();
-  Cart myCart = Cart();
+  // Initialize local SQLite databases
+  await wishList().db;
+  await Cart().db;
 
-  await wish.db; // Initialize Wishlist database
-  await myCart.db; // Initialize Cart database
+  // Handle dynamic links
+  FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData? dynamicLink) {
+    final Uri? deepLink = dynamicLink?.link;
 
-  runApp(
-    MultiProvider(
+    if (deepLink != null && deepLink.pathSegments.contains('wishlist')) {
+      final binId = deepLink.pathSegments.last;
+      navigatorKey.currentState?.pushNamed('/sharedWishlist', arguments: binId);
+    }
+  }).onError((error) {
+    print('Dynamic Link Failed: $error');
+  });
+
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AdvertisementProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
@@ -92,66 +114,63 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SearchProvider()),
       ],
       child: DevicePreview(
-        builder: (context) => MyApp(),
+        builder: (context) => MaterialApp(
+          navigatorKey: navigatorKey,
+          debugShowCheckedModeBanner: false,
+          useInheritedMediaQuery: true,
+          builder: DevicePreview.appBuilder,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          initialRoute: logIn.id,
+          routes: {
+            SignUp.id: (_) => SignUp(),
+            logIn.id: (_) => logIn(),
+            forgetPassword.id: (_) => forgetPassword(),
+            Home.id: (_) => Home(),
+            AIChat.id: (_) => AIChat(),
+            browseProducts.id: (_) => browseProducts(),
+            searchView.id: (_) => searchView(),
+            wishListView.id: (_) => wishListView(),
+            compareScreen.id: (_) => compareScreen(),
+            productDetails.id: (_) => productDetails(),
+            HandcrafterRequest.id: (_) => HandcrafterRequest(),
+            cartScreen.id: (_) => cartScreen(),
+            RecommendGift.id: (_) => RecommendGift(),
+            GiftRecommendationProducts.id: (_) => GiftRecommendationProducts(),
+            JoinBazar.id: (_) => JoinBazar(),
+            BazarVariations.id: (_) => BazarVariations(),
+            BazarReview.id: (_) => BazarReview(),
+            showBazar.id: (_) => showBazar(),
+            Addadvertisement.id: (_) => Addadvertisement(),
+            Advertisementspackages.id: (_) => Advertisementspackages(),
+            Paymentscreen.id: (_) => Paymentscreen(),
+            checkOut.id: (_) => checkOut(),
+            chooseAddress.id: (_) => chooseAddress(),
+            addAddress.id: (_) => addAddress(),
+            confirmOrder.id: (_) => confirmOrder(),
+            HistoryProducts.id: (_) => HistoryProducts(),
+            EventsView.id: (_) => EventsView(),
+            posts.id: (_) => posts(),
+            addPost.id: (_) => addPost(),
+            voucherView.id: (_) => voucherView(),
+            showOrders.id: (_) => showOrders(),
+            AddCrafterReel.id: (_) => AddCrafterReel(),
+            addOffer.id: (_) => addOffer(),
+            AddProduct.id: (_) => AddProduct(),
+            ChatView.id: (_) => ChatView(),
+            ChatDetails.id: (_) => ChatDetails(),
+            UpdatePost.id: (_) => UpdatePost(),
+            giftCard.id: (_) => giftCard(),
+            '/sharedWishlist': (context) {
+              final binId = ModalRoute.of(context)!.settings.arguments as String;
+              return SharedWishlistView(binId: binId);
+            },
+          },
+        ),
       ),
-    ),
-  );
-}
-
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      builder: DevicePreview.appBuilder,
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      initialRoute: logIn.id,
-      routes: {
-        SignUp.id: (BuildContext context) => SignUp(),
-        logIn.id: (BuildContext context) => logIn(),
-        forgetPassword.id: (BuildContext context) => forgetPassword(),
-        Home.id:(BuildContext context) => Home(),
-        AIChat.id:(BuildContext context) => AIChat(),
-        browseProducts.id:(BuildContext context) => browseProducts(),
-        searchView.id:(BuildContext context) => searchView(),
-        wishListView.id:(BuildContext context) => wishListView(),
-        compareScreen.id:(BuildContext context) => compareScreen(),
-        productDetails.id:(BuildContext context) => productDetails(),
-        HandcrafterRequest.id:(BuildContext context) => HandcrafterRequest(),
-        cartScreen.id:(BuildContext context) => cartScreen(),
-        RecommendGift.id : (BuildContext context) => RecommendGift(),
-        GiftRecommendationProducts.id : (BuildContext context) => GiftRecommendationProducts(),
-        JoinBazar.id : (BuildContext context) => JoinBazar(),
-        BazarVariations.id : (BuildContext context) => BazarVariations(),
-        BazarReview.id : (BuildContext context) => BazarReview(),
-        showBazar.id : (BuildContext context) => showBazar(),
-        Addadvertisement.id : (BuildContext context) => Addadvertisement(),
-        Advertisementspackages.id : (BuildContext context) => Advertisementspackages(),
-        Paymentscreen.id : (BuildContext context) => Paymentscreen(),
-        checkOut.id : (BuildContext context) => checkOut(),
-        chooseAddress.id : (BuildContext context) => chooseAddress(),
-        addAddress.id : (BuildContext context) => addAddress(),
-        confirmOrder.id : (BuildContext context) => confirmOrder(),
-        HistoryProducts.id : (BuildContext context) => HistoryProducts(),
-        EventsView.id : (BuildContext context) => EventsView(),
-        posts.id : (BuildContext context) => posts(),
-        addPost.id : (BuildContext context) => addPost(),
-        voucherView.id : (BuildContext context) => voucherView(),
-        showOrders.id : (BuildContext context) => showOrders(),
-        AddCrafterReel.id : (BuildContext context) => AddCrafterReel(),
-        addOffer.id : (BuildContext context) => addOffer(),
-        AddProduct.id : (BuildContext context) => AddProduct(),
-        ChatView.id : (BuildContext context) => ChatView(),
-        ChatDetails.id : (BuildContext context) => ChatDetails(),
-        UpdatePost.id : (BuildContext context) => UpdatePost(),
-        giftCard.id : (BuildContext context) => giftCard(),
-      },
     );
   }
 }
