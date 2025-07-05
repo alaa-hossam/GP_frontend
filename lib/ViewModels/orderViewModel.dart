@@ -19,4 +19,8 @@ class orderViewModel{
   Future<List<Map<String , dynamic>>> getOrders() async{
     return await ApiService.getOrders();
   }
+  Future<List<Map<String , dynamic>>> getCrafterOrders() async{
+    print("getCrafterOrders in VMMMM");
+    return await ApiService.getCrafterOrders();
+  }
 }

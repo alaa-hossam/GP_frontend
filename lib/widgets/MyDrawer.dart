@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gp_frontend/Models/CustomerModel.dart';
 import 'package:gp_frontend/views/showOrders.dart';
-
 import '../CommomnFunctions/ProfileData.dart';
 import '../SqfliteCodes/Token.dart';
+import '../ViewModels/customerViewModel.dart';
 import '../views/AddAdvertisement.dart';
 import '../views/HandcrafterRequest.dart';
-import '../views/MyHandcrafterProfile.dart';
-import '../views/ProfileView.dart';
 import '../views/RecommendGiftView.dart';
 import '../views/browseProducts.dart';
 import '../views/eventsView.dart';
@@ -25,7 +24,42 @@ class Mydrawer extends StatefulWidget {
 }
 
 class _MydrawerState extends State<Mydrawer> {
+  final cvm = customerViewModel();
+  CustomerModel _customer = CustomerModel();
+  bool _isLoading = true;
+  final token = Token();
+  late String _role;
+  @override
+  void initState() {
+    super.initState();
+    _loadData(); // Load everything at once
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final customer = await cvm.fetchUserProfile();
+      final role = await token.getRole() ?? "";
+      setState(() {
+        _customer = customer!;
+        _role = role!;
+        _isLoading = false;
+      });
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error loading profile")),
+      );
+    }
+  }
+
   Widget _buildDrawerHeader() {
+
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Stack(
       children: [
         Container(
@@ -43,14 +77,34 @@ class _MydrawerState extends State<Mydrawer> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Color(0xFF5095B0), width: 3),
                 ),
-                child: const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/images/p1.jpg'),
+                child: CircleAvatar(
+                  backgroundColor: SizeConfig.iconColor,
+                  radius: SizeConfig.horizontalBlock * 50,
+                  child: CircleAvatar(
+                    radius: SizeConfig.horizontalBlock * 47,
+                    backgroundColor: Colors.white,
+                    child: _customer?.profileImage != null
+                        ? ClipOval(
+                      child: Image.network(
+                        _customer!.profileImage!,
+                        width: SizeConfig.horizontalBlock * 134,
+                        height: SizeConfig.horizontalBlock * 134,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Center(
+                      child: Icon(
+                        Icons.person,
+                        size: SizeConfig.horizontalBlock * 60,
+                        color: SizeConfig.iconColor,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Text("my name",
+              Text(_customer.name!,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              Text("myemail@gmail.com", style: TextStyle(fontSize: 14)),
+              Text(_customer.email!, style: TextStyle(fontSize: 12)),
             ],
           ),
         ),
@@ -60,6 +114,13 @@ class _MydrawerState extends State<Mydrawer> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (_isLoading) {
+      return Drawer(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Drawer(
       width: 223 * SizeConfig.horizontalBlock,
       backgroundColor: Colors.white,
@@ -114,10 +175,11 @@ class _MydrawerState extends State<Mydrawer> {
                         SizeConfig.iconColor, () {
                       Navigator.pushNamed(context, Addadvertisement.id);
                     }),
-                    sideButton("Join as Handcrafter",
-                        Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
-                      Navigator.pushNamed(context, HandcrafterRequest.id);
-                    }),
+                    if (_role == 'Client')
+                      sideButton("Join as Handcrafter",
+                          Icons.shopping_bag_outlined, SizeConfig.iconColor, () {
+                        Navigator.pushNamed(context, HandcrafterRequest.id);
+                      }),
                   ],
                 ),
               ),
@@ -133,7 +195,5 @@ class _MydrawerState extends State<Mydrawer> {
         ],
       ),
     );
-
-    ;
   }
 }

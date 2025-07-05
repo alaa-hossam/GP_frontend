@@ -170,6 +170,7 @@ class _ProfileState extends State<Profile> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
+                  padding: EdgeInsets.only(right: 5 * SizeConfig.horizontalBlock),
                   width: SizeConfig.horizontalBlock * 85,
                   height: SizeConfig.verticalBlock * 40,
                   decoration: BoxDecoration(
@@ -181,8 +182,8 @@ class _ProfileState extends State<Profile> {
                     children: [
                       Icon(Icons.emoji_events_outlined,
                           color: Color(0xFF0B44ED),
-                          size: 20 * SizeConfig.textRatio),
-                      const SizedBox(width: 6),
+                          size: 15 * SizeConfig.textRatio),
+                      SizedBox(width: 6 * SizeConfig.horizontalBlock),
                       Text(
                         _customer.points.toString(),
                         style: TextStyle(
@@ -190,7 +191,7 @@ class _ProfileState extends State<Profile> {
                           fontSize: 19 * SizeConfig.textRatio,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4 * SizeConfig.horizontalBlock),
                       Text(
                         'points',
                         style: TextStyle(

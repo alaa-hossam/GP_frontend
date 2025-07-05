@@ -8,7 +8,8 @@ import '../views/OrderDetails.dart';
 
 class OrderContainer extends StatelessWidget {
   final Map<String, dynamic> order;
-  OrderContainer({super.key, required this.order});
+  final bool? isCrafter;
+  OrderContainer({super.key, required this.order,this.isCrafter});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class OrderContainer extends StatelessWidget {
         Navigator.pushNamed(
           context,
           OrderDetailsScreen.id,
-          arguments: {'order': order}
+          arguments: {'order': order,'isCrafter': isCrafter}
 
         );
       },

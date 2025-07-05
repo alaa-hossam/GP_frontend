@@ -38,6 +38,7 @@ class handcrafterModel {
   List<String>? specializationsId;
   List<handcrafterPostModel>? posts;
   double? rate;
+  int? sellOrders;
 
   handcrafterModel({
     this.name,
@@ -48,6 +49,7 @@ class handcrafterModel {
     this.nationalIdImage,
     this.posts,
     this.rate,
+    this.sellOrders,
   });
 }
 
@@ -235,15 +237,15 @@ class handcrafterService {
 
     // Add headers
     request.headers['Content-Type'] = 'multipart/form-data';
-    request.headers['x-apollo-operation-name'] = 'ChangeProfileImage';
+    request.headers['x-apollo-operation-name'] = 'ChangeHandicrafterProfileImage';
     request.headers['Authorization'] = 'Bearer $myToken';
 
     // GraphQL query with variables
     final query = '''
-    mutation ChangeProfileImage (\$file: Upload!){
-    changeProfileImage(file: \$file, userId: "${userId}") {
+    mutation ChangeHandicrafterProfileImage (\$file: Upload!) {
+    changeHandicrafterProfileImage(file: \$file, userId: "${userId}") {
+        id
         imageUrl
-        userId
     }
 }
     ''';
@@ -280,7 +282,7 @@ class handcrafterService {
         if (data['errors'] != null) {
           return data['errors'][0]['message'];
         }
-        print(data['data']['changeProfileImage']['imageUrl']);
+        print(data['data']['changeHandicrafterProfileImage']['imageUrl']);
         return "image changed successfully";
       } else {
         // Handle HTTP errors
@@ -303,6 +305,7 @@ class handcrafterService {
     query User {
       user(id: "${userId}") {
         handicrafterProfile {
+          imageUrl
           name
           description
           averageRating
@@ -311,9 +314,6 @@ class handcrafterService {
             content
             postFileUrl
           }
-        }
-         clientProfile {
-            imageUrl
         }
       }
     }
@@ -353,7 +353,7 @@ print(response);
 
         handcrafter = handcrafterModel(
           name: profile['handicrafterProfile']['name'],
-          profileURL: profile['clientProfile']['imageUrl'],
+          profileURL: profile['handicrafterProfile']['imageUrl'],
           description: profile['handicrafterProfile']['description'],
           rate: profile['handicrafterProfile']['averageRating']?.toDouble() ?? 0.0,
           posts: postList,
@@ -465,6 +465,7 @@ print(response);
             id
             postFileUrl
         }
+        sellOrders
     }
 }
 
@@ -509,6 +510,7 @@ print(response);
           description: profile['description'],
           rate: profile['averageRating']?.toDouble() ?? 0.0,
           posts: postList,
+          sellOrders: profile['sellOrders'],
         );
 
         return handcrafter;

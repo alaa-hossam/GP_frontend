@@ -6,13 +6,13 @@ import 'package:gp_frontend/widgets/ProductOrderDetails.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   static String id = "OrderDetailsScreen";
-
   const OrderDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final order = args['order'];
+    final isCrafter = args['isCrafter'];
     List<dynamic> productsRaw;
     if (order['products'] is List) {
       productsRaw = order['products'];
@@ -33,7 +33,7 @@ class OrderDetailsScreen extends StatelessWidget {
           itemCount: productsRaw.length,
           itemBuilder: (context, index) {
             final product = productsRaw[index];
-            return ProductOrderDetails(product: product);
+            return ProductOrderDetails(product: product,isCrafter: isCrafter,);
           },
         ),
       ),

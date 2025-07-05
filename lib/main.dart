@@ -6,6 +6,7 @@ import 'package:gp_frontend/Providers/orderProvider.dart';
 import 'package:gp_frontend/views/OrderDetails.dart';
 import 'package:gp_frontend/views/analysisView.dart';
 import 'package:gp_frontend/views/chatBot.dart';
+import 'package:gp_frontend/views/showCrafterOrders.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
@@ -151,7 +152,7 @@ class MyApp extends StatelessWidget {
             giftCard.id: (_) => giftCard(),
             AnalysisView.id : (_) => AnalysisView(),
             OrderDetailsScreen.id : (_) => OrderDetailsScreen(),
-
+            ShowCrafterOrders.id : (_) => ShowCrafterOrders(),
           },
         ),
       ),

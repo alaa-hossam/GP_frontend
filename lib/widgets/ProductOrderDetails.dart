@@ -6,8 +6,9 @@ import 'package:gp_frontend/widgets/Dimensions.dart';
 
 class ProductOrderDetails extends StatelessWidget {
   final productModel product;
+  final bool? isCrafter;
 
-  ProductOrderDetails({super.key, required this.product});
+  ProductOrderDetails({super.key, required this.product, this.isCrafter});
 
   Color _parseColor(String colorValue) {
     try {
@@ -23,48 +24,52 @@ class ProductOrderDetails extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 55 * SizeConfig.verticalBlock,
-          width: 55 * SizeConfig.horizontalBlock,
-          decoration: BoxDecoration(shape: BoxShape.circle),
-          child: Padding(
-            padding: EdgeInsets.all(5.0 * SizeConfig.verticalBlock),
-            child: CircleAvatar(
-              radius: 50 * SizeConfig.verticalBlock,
-              backgroundColor: Colors.transparent,
-              child: product.handcrafterImage == null
-                  ? Image.asset("assets/images/logo.png")
-                  : ClipOval(
-                child: Image.network(
-                  product.handcrafterImage!,
-                  fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.person),
-                ),
+        if (isCrafter! == false) ...[
+          Container(
+            height: 55 * SizeConfig.verticalBlock,
+            width: 55 * SizeConfig.horizontalBlock,
+            decoration: BoxDecoration(shape: BoxShape.circle),
+            child: Padding(
+              padding: EdgeInsets.all(5.0 * SizeConfig.verticalBlock),
+              child: CircleAvatar(
+                radius: 50 * SizeConfig.verticalBlock,
+                backgroundColor: Colors.transparent,
+                child: product.handcrafterImage == null
+                    ? Image.asset("assets/images/logo.png")
+                    : ClipOval(
+                        child: Image.network(
+                          product.handcrafterImage!,
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Icon(Icons.person),
+                        ),
+                      ),
               ),
             ),
           ),
-        ),
-        SizedBox(width: 10 * SizeConfig.horizontalBlock),
+          SizedBox(width: 10 * SizeConfig.horizontalBlock),
+        ],
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              product.handcrafterName ?? "",
-              style: GoogleFonts.roboto(
-                fontSize: 16 * SizeConfig.textRatio,
-                fontWeight: FontWeight.bold,
+            if(isCrafter == false)
+              Text(
+                product.handcrafterName ?? "",
+                style: GoogleFonts.roboto(
+                  fontSize: 16 * SizeConfig.textRatio,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
             Container(
-              width: 300 * SizeConfig.horizontalBlock,
+              width: isCrafter! ? 360 * SizeConfig.horizontalBlock : 300 * SizeConfig.horizontalBlock,
               height: 150 * SizeConfig.verticalBlock,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: SizeConfig.iconColor, width: 1),
-                borderRadius: BorderRadius.circular(5 * SizeConfig.verticalBlock),
+                borderRadius:
+                    BorderRadius.circular(5 * SizeConfig.verticalBlock),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -81,7 +86,8 @@ class ProductOrderDetails extends StatelessWidget {
                     width: 140 * SizeConfig.horizontalBlock,
                     decoration: BoxDecoration(
                       border: Border.all(color: SizeConfig.iconColor, width: 1),
-                      borderRadius: BorderRadius.circular(5 * SizeConfig.verticalBlock),
+                      borderRadius:
+                          BorderRadius.circular(5 * SizeConfig.verticalBlock),
                     ),
                     child: product.imageURL == ""
                         ? Image.asset("assets/images/logo.png")
@@ -108,7 +114,8 @@ class ProductOrderDetails extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final variation = product.variations![index];
                                 return Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 2 * SizeConfig.verticalBlock),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 2 * SizeConfig.verticalBlock),
                                   child: Row(
                                     children: [
                                       Text(
@@ -118,21 +125,27 @@ class ProductOrderDetails extends StatelessWidget {
                                           color: Color(0x50000000),
                                         ),
                                       ),
-                                      variation['variationType'] == "Color" ?
-                                        Container(
-                                          width: 25 * SizeConfig.horizontalBlock,
-                                          height: 25 * SizeConfig.verticalBlock,
-                                          decoration: BoxDecoration(
-                                            color: _parseColor(variation['variationValue']),
-                                            shape: BoxShape.circle,
-                                            border: Border.all(color: Colors.black26),
-                                          ),
-                                        ): Text(
-                                        variation['variationValue'],
-                                        style: GoogleFonts.roboto(
-                                          fontSize: 16 * SizeConfig.textRatio,
-                                        ),
-                                      ),
+                                      variation['variationType'] == "Color"
+                                          ? Container(
+                                              width: 25 *
+                                                  SizeConfig.horizontalBlock,
+                                              height:
+                                                  25 * SizeConfig.verticalBlock,
+                                              decoration: BoxDecoration(
+                                                color: _parseColor(variation[
+                                                    'variationValue']),
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Colors.black26),
+                                              ),
+                                            )
+                                          : Text(
+                                              variation['variationValue'],
+                                              style: GoogleFonts.roboto(
+                                                fontSize:
+                                                    16 * SizeConfig.textRatio,
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 );
@@ -148,7 +161,6 @@ class ProductOrderDetails extends StatelessWidget {
                                 color: Color(0x50000000),
                               ),
                             ),
-
                             Text(
                               "${product.Quantity}",
                               style: GoogleFonts.roboto(
@@ -166,7 +178,6 @@ class ProductOrderDetails extends StatelessWidget {
                                 color: Color(0x50000000),
                               ),
                             ),
-
                             Text(
                               "${product.price}",
                               style: GoogleFonts.roboto(
@@ -175,7 +186,6 @@ class ProductOrderDetails extends StatelessWidget {
                             ),
                           ],
                         ),
-
                       ],
                     ),
                   )

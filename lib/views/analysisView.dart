@@ -295,20 +295,14 @@ class _AnalysisViewState extends State<AnalysisView> {
                               ],
                             ),
                             Divider(height: 30, thickness: 1),
-                            Text("Daily Statistics",
+                            Text("Statistics",
                                 style: GoogleFonts.rubik(
                                   fontSize: 18 * SizeConfig.textRatio,
                                   fontWeight: FontWeight.bold,
                                 )),
                             Container(
                               height: 300 * SizeConfig.verticalBlock,
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Color(0xFFE9E9E9),
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                              padding: EdgeInsets.all(15 * SizeConfig.verticalBlock),
                               child: BarChart(
                                 BarChartData(
                                   barGroups: _buildBarGroups(),

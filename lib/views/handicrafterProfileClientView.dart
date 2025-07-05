@@ -263,7 +263,7 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                     customizeButton(
-                      buttonName: "Orders",
+                      buttonName: "${_handcrafter?.sellOrders!} Orders",
                       buttonColor: Color(0xFFE9E9E9).withOpacity(0.5),
                       fontColor: SizeConfig.iconColor,
                       textSize: 14 * SizeConfig.textRatio,

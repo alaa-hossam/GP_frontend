@@ -22,4 +22,8 @@ class orderProvider extends ChangeNotifier{
   Future<List<Map<String , dynamic>>> getOrders() async{
     return await orderVM.getOrders();
   }
+  Future<List<Map<String , dynamic>>> getCrafterOrders() async{
+    print("getCrafterOrders in provider");
+    return await orderVM.getCrafterOrders();
+  }
 }
