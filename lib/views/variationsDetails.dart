@@ -80,6 +80,15 @@ class _variationScreenState extends State<variationScreen> {
     return await prodProvider.checkCustom();
   }
 
+
+  Color _parseColor(String colorValue) {
+    try {
+      return Color(int.parse('0xFF$colorValue'));
+    } catch (_) {
+      return Colors.grey;
+    }
+  }
+
   void _showGalleryPopup(BuildContext context, List<dynamic> galleryImages) {
     final galleryProvider = Provider.of<galleryImageProvider>(context, listen: false);
     galleryProvider.setGalleryImages(galleryImages);
@@ -218,51 +227,47 @@ class _variationScreenState extends State<variationScreen> {
 
                                 return GestureDetector(
                                   onTap: () {
-
-                                    if (detailsProvider
-                                        .selectedVariations[key] ==
-                                        value) {
+                                    if (detailsProvider.selectedVariations[key] == value) {
                                       setState(() {
-                                        count =0;
-
+                                        count = 0;
                                       });
                                       detailsProvider.deselectVariation(key, widget.myProduct.finalProducts!);
                                     } else {
                                       setState(() {
-                                        count =0;
-
+                                        count = 0;
                                       });
-
                                       detailsProvider.selectVariation(
                                           key, value, widget.myProduct.finalProducts!);
                                     }
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.only(
-                                        right:
-                                        8.0 * SizeConfig.horizontalBlock),
+                                    margin: EdgeInsets.only(right: 8.0 * SizeConfig.horizontalBlock),
                                     padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                      12 * SizeConfig.horizontalBlock,
+                                      horizontal: 12 * SizeConfig.horizontalBlock,
                                       vertical: 6 * SizeConfig.verticalBlock,
                                     ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(
-                                            10 * SizeConfig.textRatio),
+                                        Radius.circular(10 * SizeConfig.textRatio),
                                       ),
                                       color: Color(0X50E9E9E9),
                                       border: Border.all(
-                                        width: detailsProvider
-                                            .selectedVariations[key] ==
-                                            value
-                                            ? 4
-                                            : 1,
+                                        width: detailsProvider.selectedVariations[key] == value ? 4 : 1,
                                         color: SizeConfig.iconColor,
                                       ),
                                     ),
                                     child: Center(
-                                      child: Text(
+                                      child: key.toLowerCase() == "color"
+                                          ? Container(
+                                        width: 25 * SizeConfig.horizontalBlock,
+                                        height: 25 * SizeConfig.verticalBlock,
+                                        decoration: BoxDecoration(
+                                          color: _parseColor(value),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.black26),
+                                        ),
+                                      )
+                                          : Text(
                                         value,
                                         style: GoogleFonts.rubik(
                                           fontSize: 20 * SizeConfig.textRatio,

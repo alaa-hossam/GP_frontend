@@ -41,6 +41,9 @@ class _productDetailsState extends State<productDetails> {
     setState(() {}); // To refresh UI once values are loaded
   }
 
+
+
+
   void toggleFavourite(String productId) async {
     bool exists = await wishListObj.doesIdExist(productId, email);
     if (exists) {

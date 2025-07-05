@@ -9,6 +9,14 @@ class ProductOrderDetails extends StatelessWidget {
 
   ProductOrderDetails({super.key, required this.product});
 
+  Color _parseColor(String colorValue) {
+    try {
+      return Color(int.parse('0xFF$colorValue'));
+    } catch (_) {
+      return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print(product.variations);
@@ -109,7 +117,17 @@ class ProductOrderDetails extends StatelessWidget {
                                           fontSize: 16 * SizeConfig.textRatio,
                                           color: Color(0x50000000),
                                         ),
-                                      ),Text(
+                                      ),
+                                      variation['variationType'] == "Color" ?
+                                        Container(
+                                          width: 25 * SizeConfig.horizontalBlock,
+                                          height: 25 * SizeConfig.verticalBlock,
+                                          decoration: BoxDecoration(
+                                            color: _parseColor(variation['variationValue']),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.black26),
+                                          ),
+                                        ): Text(
                                         variation['variationValue'],
                                         style: GoogleFonts.roboto(
                                           fontSize: 16 * SizeConfig.textRatio,
