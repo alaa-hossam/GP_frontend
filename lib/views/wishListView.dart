@@ -40,142 +40,94 @@ class _wishListViewState extends State<wishListView> {
     print("before provider");
     print(wishProvider.wishListProducts);
   }
+  Future<void> shareWishlistAsPdf() async {
+    final pdf = pw.Document();
+    final wishlist = wishProvider.wishListProducts;
 
-  // Future<void> shareWishlistAsPdf() async {
-  //   final pdf = pw.Document();
-  //
-  //   final wishlist = wishProvider.wishListProducts;
-  //
-  //   for (var product in wishlist) {
-  //     final imageUrl = product['imageUrl'];
-  //     final response = await http.get(Uri.parse(imageUrl));
-  //     final image = pw.MemoryImage(response.bodyBytes);
-  //
-  //     pdf.addPage(
-  //       pw.Page(
-  //         build: (pw.Context context) {
-  //           return pw.Container(
-  //             padding: const pw.EdgeInsets.all(10),
-  //             child: pw.Row(
-  //               crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //               children: [
-  //                 pw.Container(
-  //                   width: 100,
-  //                   height: 100,
-  //                   child: pw.Image(image, fit: pw.BoxFit.cover),
-  //                 ),
-  //                 pw.SizedBox(width: 10),
-  //                 pw.Expanded(
-  //                   child: pw.Column(
-  //                     crossAxisAlignment: pw.CrossAxisAlignment.start,
-  //                     children: [
-  //                       pw.Text(product['name'],
-  //                           style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-  //                       pw.Text('Category: ${product['category']['name']}'),
-  //                       pw.Text('Price: ${product['lowestCustomPrice']} EGP'),
-  //                       pw.Text('Rating: ${product['averageRating']}'),
-  //                     ],
-  //                   ),
-  //                 )
-  //               ],
-  //             ),
-  //           );
-  //         },
-  //       ),
-  //     );
-  //   }
-  //
-  //   // Save the PDF file
-  //   final output = await getTemporaryDirectory();
-  //   final file = File('${output.path}/wishlist.pdf');
-  //   await file.writeAsBytes(await pdf.save());
-  //
-  //   // Share the PDF
-  //   await Share.shareXFiles([XFile(file.path)], text: 'My Wishlist (PDF)');
-  // }
+    final baseColor = PdfColors.deepPurple;
+    final headerStyle = pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColors.blue400);
+    final labelStyle = pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey800);
+    final valueStyle = pw.TextStyle(fontSize: 12, color: PdfColors.black);
 
+    // 🔧 First build the list of widgets asynchronously
+    List<pw.Widget> wishlistWidgets = [
+      pw.Center(child: pw.Text('My Wishlist', style: headerStyle)),
+      pw.SizedBox(height: 15),
+    ];
 
+    for (var product in wishlist) {
+      final imageUrl = product['imageUrl'];
+      final response = await http.get(Uri.parse(imageUrl));
+      final image = pw.MemoryImage(response.bodyBytes);
 
-  Future<String> createDynamicLink(String binId) async {
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://san3a.page.link ',
-      link: Uri.parse('https://san3a.page.link/wishlist/ $binId'), // ✅ Same domain
-      androidParameters: AndroidParameters(
-        packageName: 'com.gpfrontend.app',
-        minimumVersion: 0,
-      ),
-      iosParameters: IOSParameters(
-        bundleId: 'com.gpfrontend.app',
-        minimumVersion: '1.0.0',
-      ),
-    );
-    final ShortDynamicLink shortLink =
-    await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-    return shortLink.shortUrl.toString(); // Example: https://san3a.page.link/6Hbz
-  }
+      wishlistWidgets.add(
+        pw.Container(
+          margin: const pw.EdgeInsets.only(bottom: 20),
+          padding: const pw.EdgeInsets.all(10),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.blue400, width: 1.5),
+            borderRadius: pw.BorderRadius.circular(10),
+            color: PdfColors.grey100,
 
-
-
-  Future<void> uploadAndShareWishlist(String email) async {
-    try {
-      final ids = await wishList().getProductIdsByEmail(email);
-      final products = wishProvider.wishListProducts
-          .where((prod) => ids.contains(prod['id']))
-          .toList();
-
-      // Step 1: Upload the wishlist JSON to JSONBin
-      final url = Uri.parse('https://api.jsonbin.io/v3/b');
-      final apiKey = r'$2a$10$mA/MU1ktlqt4VqFHJNlwtOcnOoOq21QmXQJFRnMr0jTjbTEwzgp.S';
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': apiKey,
-        },
-        body: jsonEncode({
-          'email': email,
-          'wishlist': products,
-        }),
-      );
-print(response.statusCode);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        final binId = data['metadata']['id'];
-print(Uri.parse('https://san3a.page.link/wishlist/$binId'));
-        // Step 2: Create a Firebase Dynamic Link to the wishlist
-        final DynamicLinkParameters parameters = DynamicLinkParameters(
-          uriPrefix: 'https://san3a.page.link',
-          link: Uri.parse('https://san3a.page.link/wishlist/$binId'), // ✅ Now both match and are valid
-          androidParameters: AndroidParameters(
-            packageName: 'com.gpfrontend.app', // ✅ your actual app ID
-            minimumVersion: 0,
           ),
-          iosParameters: IOSParameters(
-            bundleId: 'com.gpfrontend.app',
-            minimumVersion: '1.0.0',
+          child: pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.ClipRRect(
+                horizontalRadius: 8,
+                verticalRadius: 8,
+                child: pw.Image(image, width: 100, height: 100, fit: pw.BoxFit.cover),
+              ),
+              pw.SizedBox(width: 12),
+              pw.Expanded(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(product['name'], style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                    pw.SizedBox(height: 5),
+                    _buildInfoRow('Category:', product['category']['name'], labelStyle, valueStyle),
+                    _buildInfoRow('Price:', '${product['lowestCustomPrice']} EGP', labelStyle, valueStyle),
+                    _buildInfoRow('Rating:', product['averageRating'].toString(), labelStyle, valueStyle),
+                  ],
+                ),
+              ),
+            ],
           ),
-        );
-
-        final ShortDynamicLink shortLink =
-        await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-        final Uri shortUrl = shortLink.shortUrl;
-
-        // Step 3: Share the link
-        await Share.share('Check out my wishlist! $shortUrl');
-      } else {
-        print('Upload failed: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to upload wishlist")),
-        );
-      }
-    } catch (e) {
-      print("Upload error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        ),
       );
     }
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageTheme: pw.PageTheme(
+          margin: const pw.EdgeInsets.all(30),
+        ),
+        build: (context) => wishlistWidgets,
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File('${output.path}/wishlist.pdf');
+    await file.writeAsBytes(await pdf.save());
+
+    await Share.shareXFiles([XFile(file.path)], text: 'My Wishlist (PDF)');
   }
+
+  pw.Widget _buildInfoRow(String label, String value, pw.TextStyle labelStyle, pw.TextStyle valueStyle) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 3),
+      child: pw.RichText(
+        text: pw.TextSpan(
+          children: [
+            pw.TextSpan(text: label + ' ', style: labelStyle),
+            pw.TextSpan(text: value, style: valueStyle),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
 
   @override
@@ -200,9 +152,7 @@ print(Uri.parse('https://san3a.page.link/wishlist/$binId'));
           IconButton(
             icon: Icon(Icons.share, color: Colors.white),
             onPressed:()async{
-              Token token = Token();
-              String email = await token.getEmail() ?? "";
-              uploadAndShareWishlist(email);},
+              shareWishlistAsPdf();},
           ),
         ],
       ),

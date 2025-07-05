@@ -10,19 +10,19 @@ class compareColumn extends StatelessWidget {
   String id, imageUrl, name;
   double price, rate;
   String? category, description;
-  double? stock;
 
   compareColumn(
-      this.id, this.imageUrl, this.name, this.price, this.rate , {this.category , this.description, this.stock});
+      this.id, this.imageUrl, this.name, this.price, this.rate , {this.category , this.description});
 
   @override
   Widget build(BuildContext context) {
     productModel product =
-        productModel(id, imageUrl, name,category:  category, price, rate , description: this.description , stock: this.stock);
+        productModel(id, imageUrl, name,category:  category, price, rate , description: this.description );
 
     return Stack(
       children: [
         Column(
+
           children: [
             Container(
               height: 165 * SizeConfig.verticalBlock,
@@ -78,57 +78,41 @@ class compareColumn extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: 10 * SizeConfig.verticalBlock,
-            ),
-            Container(
-              // width: 149 * SizeConfig.horizontalBlock,
-              // height: 26 * SizeConfig.verticalBlock,
-              decoration: BoxDecoration(
-                  color: Color(0x50E9E9E9),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text("Description: ",
-                        style: GoogleFonts.roboto(
-                            fontSize: 16 * SizeConfig.textRatio,
-                            color: Color(0x503C3C3C))),
-                    Text("${product.description}",
-                        style:
-                            GoogleFonts.roboto(fontSize: 16 * SizeConfig.textRatio))
-                  ],
+            product.description != null?
+            Column(
+              children: [
+                SizedBox(
+                  height: 10 * SizeConfig.verticalBlock,
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 10 * SizeConfig.verticalBlock,
-            ),
-            Container(
-              // width: 149 * SizeConfig.horizontalBlock,
-              // height: 26 * SizeConfig.verticalBlock,
-              decoration: BoxDecoration(
-                  color: Color(0x50E9E9E9),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text("Number of pieces: ",
-                        style: GoogleFonts.roboto(
-                            fontSize: 16 * SizeConfig.textRatio,
-                            color: Color(0x503C3C3C))),
-                    Text("${product.stock}",
-                        style:
-                            GoogleFonts.roboto(fontSize: 16 * SizeConfig.textRatio))
-                  ],
+                Container(
+
+                  decoration: BoxDecoration(
+                      color: Color(0x50E9E9E9),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text("Description: ",
+                            style: GoogleFonts.roboto(
+                                fontSize: 16 * SizeConfig.textRatio,
+                                color: Color(0x503C3C3C))),
+                        Text("${product.description}",
+                            style:
+                                GoogleFonts.roboto(fontSize: 16 * SizeConfig.textRatio))
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 10 * SizeConfig.verticalBlock,
-            ),
+                SizedBox(
+                  height: 10 * SizeConfig.verticalBlock,
+                ),
+
+              ],
+
+            ):Container(),
+
+
             Container(
               // width: 149 * SizeConfig.horizontalBlock,
               // height: 26 * SizeConfig.verticalBlock,
@@ -186,7 +170,7 @@ class compareColumn extends StatelessWidget {
           left: 17 * SizeConfig.horizontalBlock,
           child: GestureDetector(
             child: Container(
-              width: 174 * SizeConfig.verticalBlock,
+              width: 140 * SizeConfig.verticalBlock,
               height: 50 * SizeConfig.horizontalBlock,
               decoration: BoxDecoration(
                 color: SizeConfig.iconColor,

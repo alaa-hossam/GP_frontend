@@ -301,9 +301,7 @@ class productService {
                 name
             }
             description
-            finalProducts {
-                stockQuantity
-            }
+            
         }
     }
 }
@@ -352,7 +350,6 @@ class productService {
             (product['lowestCustomPrice'] ?? 0).toDouble(),
             (product['averageRating'] ?? 0).toDouble(),
             description: product['description'],
-            stock: product['stockQuantity'],
           ));
         }
 

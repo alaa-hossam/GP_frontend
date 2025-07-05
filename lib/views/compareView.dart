@@ -74,9 +74,9 @@ class _compareScreenState extends State<compareScreen> {
             print(product.name);
             // Access each item in the list
             return Padding(
-              padding:  EdgeInsets.all(8.0 * SizeConfig.verticalBlock),
+              padding:  EdgeInsets.symmetric(vertical: 8.0 * SizeConfig.verticalBlock, horizontal: 10 * SizeConfig.horizontalBlock),
               child: compareColumn(product.id, product.imageURL,product.name,
-                  category:product.category,product.price,product.rate,description: product.description,stock: product.stock ),
+                  category:product.category,product.price,product.rate,description: product.description ),
             );
           },
         )
