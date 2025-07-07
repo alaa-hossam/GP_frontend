@@ -169,37 +169,42 @@ class _ProfileState extends State<Profile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  padding: EdgeInsets.only(right: 5 * SizeConfig.horizontalBlock),
-                  width: SizeConfig.horizontalBlock * 85,
-                  height: SizeConfig.verticalBlock * 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.emoji_events_outlined,
-                          color: Color(0xFF0B44ED),
-                          size: 15 * SizeConfig.textRatio),
-                      SizedBox(width: 6 * SizeConfig.horizontalBlock),
-                      Text(
-                        _customer.points.toString(),
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 19 * SizeConfig.textRatio,
+                IntrinsicWidth(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8 * SizeConfig.horizontalBlock,
+                      vertical: 8 * SizeConfig.verticalBlock,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.emoji_events_outlined,
+                          color: const Color(0xFF0B44ED),
+                          size: 15 * SizeConfig.textRatio,
                         ),
-                      ),
-                      SizedBox(width: 4 * SizeConfig.horizontalBlock),
-                      Text(
-                        'points',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10 * SizeConfig.textRatio,
+                        SizedBox(width: 6 * SizeConfig.horizontalBlock),
+                        Text(
+                          _customer.points.toString(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 19 * SizeConfig.textRatio,
+                          ),
                         ),
-                      )
-                    ],
+                        SizedBox(width: 4 * SizeConfig.horizontalBlock),
+                        Text(
+                          'points',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10 * SizeConfig.textRatio,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -366,13 +371,6 @@ class _ProfileState extends State<Profile> {
         iconColor: SizeConfig.iconColor,
         onClickButton: () =>
             Navigator.pushNamed(context, chooseAddress.id),
-      ),
-      SizedBox(height: SizeConfig.verticalBlock * 10),
-      customizeNavigatorProfile(
-        buttonName: 'Setting',
-        buttonIcon: Icons.settings_outlined,
-        iconColor: SizeConfig.iconColor,
-        onClickButton: () {},
       ),
       SizedBox(height: SizeConfig.verticalBlock * 10),
       customizeNavigatorProfile(

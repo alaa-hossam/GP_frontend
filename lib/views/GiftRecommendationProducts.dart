@@ -69,40 +69,6 @@ class _GiftRecommendationProductsState extends State<GiftRecommendationProducts>
       ),
       body: ListView(
         children: [
-          Consumer<CategoryProvider>(
-            builder: (context, categoryProvider, child) {
-              if (categoryProvider.categories.isEmpty) {
-                return Center(child: CircularProgressIndicator());
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: SizeConfig.horizontalBlock,
-                  height: 43 * SizeConfig.verticalBlock,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categoryProvider.categories.length,
-                    itemBuilder: (context, index) {
-                      bool isSelected = index == selectedIndex;
-                      var category = categoryProvider.categories[index];
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Customizecategory("${category.name}", isSelected),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
           Consumer<productProvider>(
             builder: (context, productProvider, child) {
               if (productProvider.giftRecommendProducts.isEmpty) {

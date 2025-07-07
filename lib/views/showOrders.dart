@@ -83,7 +83,7 @@ class _showOrdersState extends State<showOrders> {
                 itemCount: filteredOrders.length,
                 itemBuilder: (context, index) {
                   final order = filteredOrders[index];
-                  return OrderContainer(order: order);
+                  return OrderContainer(order: order,isCrafter: false,);
                 },
               ),
             );

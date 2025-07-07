@@ -302,7 +302,6 @@ class _RecommendGiftState extends State<RecommendGift> {
                         setState(() {
                           _isLoading = true;
                         });
-                        if (_additionalInfoController.text.isNotEmpty || _selectedAnswer != null) {
                           // Save the final answer
                           answers[questions.keys.toList()[_currentQuestionIndex]] =
                               _additionalInfoController.text;
@@ -316,15 +315,9 @@ class _RecommendGiftState extends State<RecommendGift> {
                           });
                           // Navigate to a new screen to display the recommendations
                           Navigator.pushReplacementNamed(context, GiftRecommendationProducts.id);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Please provide additional information."),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
                         }
-                      },                  ),
+
+                    ),
                 ],
               ),
             ],

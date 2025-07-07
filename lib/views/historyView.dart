@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gp_frontend/widgets/Dimensions.dart';
 import 'package:provider/provider.dart';
-import '../Providers/CategoryProvider.dart';
 import '../Providers/ProductProvider.dart';
 import '../widgets/customProduct.dart';
 import '../widgets/customizeCategory.dart';
 
 class HistoryProducts extends StatefulWidget {
-  static String id = "GiftRecommendationProductsScreen";
+  static String id = "HistoryScreen";
   const HistoryProducts({super.key});
 
   @override

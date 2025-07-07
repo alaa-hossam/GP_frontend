@@ -13,22 +13,22 @@ class HomeBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.transparent,
       actions: [
-        IconButton(
-          onPressed: () async {
-            // await Cart().deleteDatabaseFile();
-            // String id = await getId();
-            // Widget screen = ChatScreen(
-            //   currentUserId: id,
-            //   otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
-            // );
-            //
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => screen),
-            // );
-          },
-          icon: Icon(Icons.notifications_none, size: 24),
-        ),
+        // IconButton(
+        //   onPressed: () async {
+        //     // await Cart().deleteDatabaseFile();
+        //     // String id = await getId();
+        //     // Widget screen = ChatScreen(
+        //     //   currentUserId: id,
+        //     //   otherUserId: "bf6c1277-7f7f-41c2-993b-d5a4c3a48d1a",
+        //     // );
+        //     //
+        //     // Navigator.push(
+        //     //   context,
+        //     //   MaterialPageRoute(builder: (context) => screen),
+        //     // );
+        //   },
+        //   icon: Icon(Icons.notifications_none, size: 24),
+        // ),
         IconButton(
           onPressed: () => Navigator.pushNamed(context, cartScreen.id),
           icon: Icon(Icons.shopping_cart_outlined, size: 24),
