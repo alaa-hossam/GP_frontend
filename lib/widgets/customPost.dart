@@ -11,8 +11,8 @@ import '../SqfliteCodes/Token.dart';
 
 class customPost extends StatefulWidget {
   final postModel post;
-
-  const customPost(this.post, {Key? key}) : super(key: key);
+  final bool? isOrder;
+  const customPost(this.post, {Key? key,this.isOrder}) : super(key: key);
 
   @override
   State<customPost> createState() => _CustomPostState();
@@ -73,7 +73,6 @@ class _CustomPostState extends State<customPost> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Info + Time
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -100,6 +99,7 @@ class _CustomPostState extends State<customPost> {
                           Text(timeAgo, style: GoogleFonts.roboto(fontSize: 8 * SizeConfig.textRatio, color: const Color(0x503C3C3C))),
                         ],
                       ),
+
                     ],
                   ),
                   if (!loading && match)
@@ -187,21 +187,61 @@ class _CustomPostState extends State<customPost> {
                     errorBuilder: (_, __, ___) => const Center(child: Text("Image failed to load")),
                   ),
                 ),
-            ],
-          ),
-          Positioned(
-            bottom: 0,
-            right: 10 * SizeConfig.horizontalBlock,
-            child: Row(
-              children: [
-                offers(postId: post.id ?? "", clientId: post.clientId ?? ""),
-                Text(
-                  "${post.offersIds?.length ?? 0}",
-                  style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+              if(widget.isOrder!) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock,vertical: 10 * SizeConfig.verticalBlock),
+                  child: Container(
+                    height: 97 * SizeConfig.verticalBlock,
+                    width: 350 * SizeConfig.horizontalBlock,
+                    padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock,vertical: 10 * SizeConfig.verticalBlock),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5 * SizeConfig.textRatio),
+                      color: Color(0xFFE9E9E9).withOpacity(0.5),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("${post.aprovedOffer!.description!}", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 15 * SizeConfig.verticalBlock),
+                          Row(
+                            children: [
+                              Text("Price:", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0x503C3C3C))),
+                              SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                              Text("${post.aprovedOffer!.price} LE", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          SizedBox(height: 5 * SizeConfig.verticalBlock),
+                          Row(
+                            children: [
+                              Text("Duration:", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0x503C3C3C))),
+                              SizedBox(width: 5 * SizeConfig.horizontalBlock),
+                              Text("${post.aprovedOffer!.duration}", style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
+            ],
+          ),
+          if(widget.isOrder! == false)
+            Positioned(
+              bottom: 0,
+              right: 10 * SizeConfig.horizontalBlock,
+              child: Row(
+                children: [
+                  offers(postId: post.id ?? "", clientId: post.clientId ?? ""),
+                  Text(
+                    "${post.offersIds?.length ?? 0}",
+                    style: GoogleFonts.roboto(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
+              ),
             ),
-          )
         ],
       ),
     );

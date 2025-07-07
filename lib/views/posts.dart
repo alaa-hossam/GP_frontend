@@ -187,7 +187,7 @@ class _postsState extends State<posts> {
                               left:10.0 * SizeConfig.horizontalBlock,
                               right: 10.0 * SizeConfig.horizontalBlock,
                               bottom: 50.0 * SizeConfig.horizontalBlock),
-                              child: customPost(posts[index]),
+                              child: customPost(posts[index],isOrder: false,),
                             );
                           },
                         ),

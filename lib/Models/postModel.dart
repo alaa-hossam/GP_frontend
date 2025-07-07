@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:gp_frontend/Models/offerModel.dart';
 import 'package:http/http.dart' as http;
 import '../SqfliteCodes/Token.dart';
 
@@ -17,6 +18,7 @@ class postModel {
   int? quantity, duration;
   double? price;
   List<String>? offersIds;
+  offerModel? aprovedOffer;
 
   postModel(
       {this.clientId,
@@ -32,7 +34,8 @@ class postModel {
       this.createdAt,
       this.offersIds,
       this.specialName,
-      this.specialId});
+      this.specialId,
+      this.aprovedOffer});
 }
 
 class postService {

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:gp_frontend/Models/ProductModel.dart';
+import 'package:gp_frontend/Models/postModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite/sqflite.dart';
 
 import '../SqfliteCodes/Token.dart';
+import 'offerModel.dart';
 
 class orderModel {
   String? addressId, offerId, userId, transactionId;
@@ -342,30 +344,24 @@ class orderService {
           } else if (order['orderType'] == "PostCustomized") {
             int quantity = order['postCustomizedDetails']['quantity'];
 
-
             productModel product = productModel(
-              "",
-              order['postCustomizedDetails']['approvedOffer']['post'] != null &&
-                      order['postCustomizedDetails']['approvedOffer']['post']
-                              ['gallery'] !=
-                          null
-                  ? order['postCustomizedDetails']['approvedOffer']['post']
-                      ['gallery'][0]['fileURL']
-                  : "",
-              order['postCustomizedDetails']['approvedOffer']['post'] != null
-                  ? order['postCustomizedDetails']['approvedOffer']['post']
-                      ['title']
-                  : "",
-              order['postCustomizedDetails']['onePrice'].toDouble(),
-              0,
-              handcrafterName: order['postCustomizedDetails']['approvedOffer']
-                      ['handicrafter']['handicrafterProfile']['name'] ??
-                  "",
-              handcrafterImage: order['postCustomizedDetails']['approvedOffer']
-                      ['handicrafter']['handicrafterProfile']['imageUrl'] ??
-                  "",
-              Quantity: order['postCustomizedDetails']['quantity']
-            );
+                "",
+                order['postCustomizedDetails']['approvedOffer']['post'] != null &&
+                        order['postCustomizedDetails']['approvedOffer']['post']
+                                ['gallery'] !=
+                            null
+                    ? order['postCustomizedDetails']['approvedOffer']['post']
+                        ['gallery'][0]['fileURL']
+                    : "",
+                order['postCustomizedDetails']['approvedOffer']['post'] != null
+                    ? order['postCustomizedDetails']['approvedOffer']['post']
+                        ['title']
+                    : "",
+                order['postCustomizedDetails']['onePrice'].toDouble(),
+                0,
+                handcrafterName: order['postCustomizedDetails']['approvedOffer']['handicrafter']['handicrafterProfile']['name'] ?? "",
+                handcrafterImage: order['postCustomizedDetails']['approvedOffer']['handicrafter']['handicrafterProfile']['imageUrl'] ?? "",
+                Quantity: order['postCustomizedDetails']['quantity']);
 
             orders.add({
               'id': order['id'],
@@ -400,15 +396,14 @@ class orderService {
                         ['product']['handicrafter']['handicrafterProfile']
                     ['imageUrl'],
                 // variations: variations
-              Quantity: 1
-            );
+                Quantity: 1);
             orders.add({
               'id': order['id'],
               'orderPrice': price,
               'date': order['createdAt'],
               'quantity': quantity,
               'products': product,
-              'status':order['status'],
+              'status': order['status'],
               'type': order['orderType']
             });
           }
@@ -425,7 +420,6 @@ class orderService {
     }
   }
 
-
   Future<List<Map<String, dynamic>>> getCrafterOrders() async {
     print("getCrafterOrders in model");
     List<Map<String, dynamic>> orders = [];
@@ -433,172 +427,91 @@ class orderService {
     String id = await token.getUUID() ?? "";
 
     const query = r'''
-    query GetHandicrafterOrders($handicrafterId: String!) {
-      getHandicrafterOrders(handicrafterId: $handicrafterId) {
-        id
-        status
-        orderType
-        createdAt
+        query GetHandicrafterOrders($handicrafterId: String!) {
+          getHandicrafterOrders(handicrafterId: $handicrafterId) {
+            id
+            status
+            orderType
+            createdAt
 
-        customMadeDetails {
-          quantity
-          priceAtPurchase
-          finalProduct {
-            imageUrl
-            product {
-              id
-              name
-              category { name }
-              handicrafter {
-                handicrafterProfile {
-                  name
-                  imageUrl
-                }
-              }
-            }
-            finalProductVariation {
-              productVariation {
-                variationType
-                variationValue
-              }
-            }
-          }
-        }
-
-        postCustomizedDetails {
-          quantity
-          onePrice
-          approvedOffer {
-            handicrafter {
-              handicrafterProfile {
-                name
+            customMadeDetails {
+              quantity
+              priceAtPurchase
+              finalProduct {
                 imageUrl
-              }
-            }
-            post {
-              title
-              gallery { fileURL }
-            }
-          }
-        }
-
-        readyMadeDetails {
-          quantity
-          priceAtPurchase
-          finalProduct {
-            imageUrl
-            product {
-              id
-              name
-              category { name }
-              handicrafter {
-                handicrafterProfile {
+                product {
+                  id
                   name
-                  imageUrl
+                  category { name }
+                  handicrafter {
+                    handicrafterProfile {
+                      name
+                      imageUrl
+                    }
+                  }
+                }
+                finalProductVariation {
+                  productVariation {
+                    variationType
+                    variationValue
+                  }
                 }
               }
             }
-            finalProductVariation {
-              productVariation {
-                variationType
-                variationValue
+            postCustomizedDetails {
+                approvedOffer {
+                    post {
+                        gallery {
+                            fileURL
+                        }
+                        createdAt
+                        customer {
+                            id
+                            username
+                            clientProfile {
+                                imageUrl
+                            }
+                        }
+                        description
+                        suggestedOneDuration
+                        suggestedOnePrice
+                        suggestedQuantity
+                        title
+                    }
+                    description
+                    id
+                    suggestedOneDuration
+                    suggestedOnePrice
+                }
+            }
+
+            readyMadeDetails {
+              quantity
+              priceAtPurchase
+              finalProduct {
+                imageUrl
+                product {
+                  id
+                  name
+                  category { name }
+                  handicrafter {
+                    handicrafterProfile {
+                      name
+                      imageUrl
+                    }
+                  }
+                }
+                finalProductVariation {
+                  productVariation {
+                    variationType
+                    variationValue
+                  }
+                }
               }
             }
           }
         }
-      }
-    }
-  ''';
-
-    //    const query = r'''
-    //     query GetHandicrafterOrders($handicrafterId: String!) {
-    //       getHandicrafterOrders(handicrafterId: $handicrafterId) {
-    //         id
-    //         status
-    //         orderType
-    //         createdAt
-    //
-    //         customMadeDetails {
-    //           quantity
-    //           priceAtPurchase
-    //           finalProduct {
-    //             imageUrl
-    //             product {
-    //               id
-    //               name
-    //               category { name }
-    //               handicrafter {
-    //                 handicrafterProfile {
-    //                   name
-    //                   imageUrl
-    //                 }
-    //               }
-    //             }
-    //             finalProductVariation {
-    //               productVariation {
-    //                 variationType
-    //                 variationValue
-    //               }
-    //             }
-    //           }
-    //         }
-    //         postCustomizedDetails {
-    //             approvedOffer {
-    //                 post {
-    //                     gallery {
-    //                         fileURL
-    //                     }
-    //                     createdAt
-    //                     customer {
-    //                         id
-    //                         username
-    //                         clientProfile {
-    //                             imageUrl
-    //                         }
-    //                     }
-    //                     description
-    //                     specialization {
-    //                         id
-    //                         name
-    //                     }
-    //                     suggestedOneDuration
-    //                     suggestedOnePrice
-    //                     suggestedQuantity
-    //                 }
-    //                 description
-    //                 id
-    //                 suggestedOneDuration
-    //                 suggestedOnePrice
-    //             }
-    //         }
-    //
-    //         readyMadeDetails {
-    //           quantity
-    //           priceAtPurchase
-    //           finalProduct {
-    //             imageUrl
-    //             product {
-    //               id
-    //               name
-    //               category { name }
-    //               handicrafter {
-    //                 handicrafterProfile {
-    //                   name
-    //                   imageUrl
-    //                 }
-    //               }
-    //             }
-    //             finalProductVariation {
-    //               productVariation {
-    //                 variationType
-    //                 variationValue
-    //               }
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   ''';
+      ''';
 
     final request = {
       'query': query,
@@ -635,12 +548,14 @@ class orderService {
             for (var item in order['readyMadeDetails']) {
               final productData = item['finalProduct']['product'];
               final variations = item['finalProduct']['finalProductVariation']
-                  ?.map((v) => {
-                'variationType': v['productVariation']['variationType'],
-                'variationValue': v['productVariation']['variationValue'],
-              })
-                  ?.toList()
-                  ?? [];
+                      ?.map((v) => {
+                            'variationType': v['productVariation']
+                                ['variationType'],
+                            'variationValue': v['productVariation']
+                                ['variationValue'],
+                          })
+                      ?.toList() ??
+                  [];
 
               readyProducts.add(productModel(
                 productData['id'],
@@ -650,51 +565,66 @@ class orderService {
                 0,
                 Quantity: item['quantity'],
                 variations: List<Map<String, dynamic>>.from(variations),
-                handcrafterName:
-                productData['handicrafter']['handicrafterProfile']['name'],
-                handcrafterImage:
-                productData['handicrafter']['handicrafterProfile']['imageUrl'],
+                handcrafterName: productData['handicrafter']
+                    ['handicrafterProfile']['name'],
+                handcrafterImage: productData['handicrafter']
+                    ['handicrafterProfile']['imageUrl'],
               ));
 
-              orderPrice += (item['priceAtPurchase'] as num).toDouble() * (item['quantity'] as num).toInt();
+              orderPrice += (item['priceAtPurchase'] as num).toDouble() *
+                  (item['quantity'] as num).toInt();
               quantity += (item['quantity'] as num).toInt();
             }
 
             products = readyProducts;
-          }
+          }else if (type == "PostCustomized") {
+        var postData = order['postCustomizedDetails'];
+        var approved = postData['approvedOffer'];
+        var post = approved['post'];
 
-          else if (type == "PostCustomized") {
-            var postData = order['postCustomizedDetails'];
-            quantity = postData['quantity'];
-            orderPrice = (postData['onePrice'] * quantity).toDouble();
+        quantity = post['suggestedQuantity'];
+        orderPrice = (approved['suggestedOnePrice'] as num).toDouble() * quantity;
 
-            products = productModel(
-              "",
-              postData['approvedOffer']['post']['gallery']?[0]['fileURL'] ?? "",
-              postData['approvedOffer']['post']['title'] ?? "",
-              postData['onePrice'].toDouble(),
-              0,
-              Quantity: quantity,
-              handcrafterName: postData['approvedOffer']['handicrafter']
-              ['handicrafterProfile']['name'],
-              handcrafterImage: postData['approvedOffer']['handicrafter']
-              ['handicrafterProfile']['imageUrl'],
-            );
-          }
+        offerModel approvedOffer = offerModel(
+          id: approved['id'],
+          description: approved['description'],
+          duration: approved['suggestedOneDuration'],
+          price: (approved['suggestedOnePrice'] as num).toDouble(),
+        );
 
-          else if (type == "CustomMade") {
+        postModel postDataModel = postModel(
+          id: post['id'],
+          title: post['title'],
+          description: post['description'],
+          quantity: quantity,
+          price: (approved['suggestedOnePrice'] as num).toDouble(),
+          duration: approved['suggestedOneDuration'],
+          postImage: post['gallery']?.isNotEmpty == true ? post['gallery'][0]['fileURL'] : "",
+          createdAt: post['createdAt'],
+          userName: post['customer']?['username'],
+          clientImage: post['customer']?['clientProfile']?['imageUrl'],
+          clientId: post['customer']?['id'],
+          specialId: post['specialization']?['id'],
+          specialName: post['specialization']?['name'],
+          aprovedOffer: approvedOffer,
+        );
+
+        products = postDataModel;
+    } else if (type == "CustomMade") {
             var custom = order['customMadeDetails'];
             quantity = custom['quantity'];
             orderPrice = custom['priceAtPurchase'].toDouble();
 
             final productData = custom['finalProduct']['product'];
             final variations = custom['finalProduct']['finalProductVariation']
-                ?.map((v) => {
-              'variationType': v['productVariation']['variationType'],
-              'variationValue': v['productVariation']['variationValue'],
-            })
-                ?.toList()
-                ?? [];
+                    ?.map((v) => {
+                          'variationType': v['productVariation']
+                              ['variationType'],
+                          'variationValue': v['productVariation']
+                              ['variationValue'],
+                        })
+                    ?.toList() ??
+                [];
 
             products = productModel(
               productData['id'],
@@ -704,10 +634,10 @@ class orderService {
               0,
               Quantity: quantity,
               variations: List<Map<String, dynamic>>.from(variations),
-              handcrafterName:
-              productData['handicrafter']['handicrafterProfile']['name'],
-              handcrafterImage:
-              productData['handicrafter']['handicrafterProfile']['imageUrl'],
+              handcrafterName: productData['handicrafter']
+                  ['handicrafterProfile']['name'],
+              handcrafterImage: productData['handicrafter']
+                  ['handicrafterProfile']['imageUrl'],
             );
           }
 

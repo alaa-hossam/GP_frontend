@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../Providers/orderProvider.dart';
 import '../widgets/crafterOrdersAppBar.dart';
+import '../widgets/customPost.dart';
 import '../widgets/orderContainer.dart';
 
 class ShowCrafterOrders extends StatefulWidget {
@@ -77,17 +78,18 @@ class _ShowCrafterOrdersState extends State<ShowCrafterOrders> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (selectedIndex == 1) ...
-              [
-                SizedBox(height: 40 * SizeConfig.verticalBlock),
-                Divider(
-                  height: 2,
-                  indent: 40 * SizeConfig.horizontalBlock,
-                  endIndent: 40 * SizeConfig.horizontalBlock,
-
+            if (selectedIndex == 1) ...[
+              SizedBox(height: 40 * SizeConfig.verticalBlock),
+              Divider(
+                height: 2,
+                indent: 40 * SizeConfig.horizontalBlock,
+                endIndent: 40 * SizeConfig.horizontalBlock,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16 * SizeConfig.horizontalBlock,
+                  vertical: 16 * SizeConfig.verticalBlock,
                 ),
-                Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16 * SizeConfig.horizontalBlock,vertical: 16 * SizeConfig.verticalBlock),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -97,16 +99,35 @@ class _ShowCrafterOrdersState extends State<ShowCrafterOrders> {
                   ],
                 ),
               ),
-              ],
+            ],
             SizedBox(height: 10),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10 * SizeConfig.horizontalBlock),
-                child: ListView.builder(
+                child: subFilterIndex == 1 && selectedIndex == 1
+                    ? ListView.builder(
+                  itemCount: filteredOrders.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: index != filteredOrders.length - 1
+                          ? EdgeInsets.only(
+                        left: 10.0 * SizeConfig.horizontalBlock,
+                        right: 10.0 * SizeConfig.horizontalBlock,
+                      )
+                          : EdgeInsets.only(
+                        left: 10.0 * SizeConfig.horizontalBlock,
+                        right: 10.0 * SizeConfig.horizontalBlock,
+                        bottom: 50.0 * SizeConfig.horizontalBlock,
+                      ),
+                      child: customPost(filteredOrders[index]['products'],isOrder: true ,), // assuming products is of type postModel
+                    );
+                  },
+                )
+                    : ListView.builder(
                   itemCount: filteredOrders.length,
                   itemBuilder: (context, index) {
                     final order = filteredOrders[index];
-                    return OrderContainer(order: order,isCrafter: true,);
+                    return OrderContainer(order: order, isCrafter: true);
                   },
                 ),
               ),

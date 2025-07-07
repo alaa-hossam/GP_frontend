@@ -77,7 +77,7 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        toolbarHeight: 320 * SizeConfig.verticalBlock,
+        toolbarHeight: 350 * SizeConfig.verticalBlock,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -100,7 +100,7 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10 * SizeConfig.verticalBlock,
+            spacing: 5 * SizeConfig.verticalBlock,
             children: [
               Row(
                 children: [
@@ -173,7 +173,7 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                         fontWeight: FontWeight.bold
                     ),
                   ),
-                  SizedBox(width: 10 * SizeConfig.horizontalBlock),
+                  SizedBox(width: 5 * SizeConfig.horizontalBlock),
                   ...List.generate(5, (index) {
                     if (index < _handcrafter!.rate!) {
                       return Icon(
@@ -213,7 +213,16 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                   ),
                 ],
               ),
-
+              Center(
+                child: Text(
+                  "${_handcrafter?.sellOrders!} Orders",
+                  style: TextStyle(
+                    fontFamily: "Roboto",
+                    fontSize: 16 * SizeConfig.textRatio,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -260,15 +269,6 @@ class _HandcrafterProfileClientViewState extends State<HandcrafterProfileClientV
                                   ReelsView(handcrafter: _handcrafter!)
                           ),);
                       },
-                    ),
-                    SizedBox(width: 10 * SizeConfig.horizontalBlock),
-                    customizeButton(
-                      buttonName: "${_handcrafter?.sellOrders!} Orders",
-                      buttonColor: Color(0xFFE9E9E9).withOpacity(0.5),
-                      fontColor: SizeConfig.iconColor,
-                      textSize: 14 * SizeConfig.textRatio,
-                      width: _calculateButtonWidth("Orders", context),
-                      height: 40 * SizeConfig.verticalBlock,
                     ),
                     SizedBox(width: 10 * SizeConfig.horizontalBlock),
                   ],
