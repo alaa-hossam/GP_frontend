@@ -1259,7 +1259,10 @@ class productService {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        List<dynamic> prods = data['data']['recommendProductsForUser'];
+        List<dynamic> prods = data['data'];
+        print("Recommended");
+        print(prods);
+
         for (var pro in prods) {
           products.add(
             productModel(
@@ -1282,7 +1285,7 @@ class productService {
         throw Exception('Failed to load products: ${response.body}');
       }
     } catch (e) {
-      print("Error fetching products: $e");
+      print("Error fetching Recommended products: $e");
       return products;
     }
   }

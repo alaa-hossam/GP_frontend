@@ -1,7 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:gp_frontend/Providers/orderProvider.dart';
 import 'package:gp_frontend/views/OrderDetails.dart';
 import 'package:gp_frontend/views/analysisView.dart';
@@ -9,6 +8,10 @@ import 'package:gp_frontend/views/chatBot.dart';
 import 'package:gp_frontend/views/showCrafterOrders.dart';
 import 'package:provider/provider.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+import 'SqfliteCodes/Token.dart';
 import 'firebase_options.dart';
 import 'views/signUpView.dart';
 import 'views/logInView.dart';
@@ -63,20 +66,38 @@ import 'Providers/voucherProvider.dart';
 import 'Providers/SearchProvider.dart';
 import 'ViewModels/messageViewModel.dart';
 
-import 'SqfliteCodes/cart.dart';
-import 'SqfliteCodes/wishList.dart';
+
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final initialRoute = await getInitialRoute();
+  runApp(MyApp(initialRoute: initialRoute));
+}
 
-  runApp(MyApp());
+Future<String> getInitialRoute() async {
+  final tokenManager = Token();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('TOKEN');
+  final expired = prefs.getString('EXPIRED');
+
+  if (token == null || expired == null) {
+    return logIn.id;
+  }
+
+  final expiryDate = DateTime.tryParse(expired);
+  if (expiryDate == null || DateTime.now().isAfter(expiryDate)) {
+    return logIn.id;
+  }
+
+  return Home.id;
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +130,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
           useMaterial3: true,
         ),
-        initialRoute: logIn.id,
+        initialRoute: initialRoute,
         routes: {
           SignUp.id: (_) => SignUp(),
           logIn.id: (_) => logIn(),
@@ -149,9 +170,9 @@ class MyApp extends StatelessWidget {
           ChatDetails.id: (_) => ChatDetails(),
           UpdatePost.id: (_) => UpdatePost(),
           giftCard.id: (_) => giftCard(),
-          AnalysisView.id : (_) => AnalysisView(),
-          OrderDetailsScreen.id : (_) => OrderDetailsScreen(),
-          ShowCrafterOrders.id : (_) => ShowCrafterOrders(),
+          AnalysisView.id: (_) => AnalysisView(),
+          OrderDetailsScreen.id: (_) => OrderDetailsScreen(),
+          ShowCrafterOrders.id: (_) => ShowCrafterOrders(),
         },
       ),
     );

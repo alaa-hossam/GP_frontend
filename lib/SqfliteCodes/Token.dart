@@ -51,4 +51,18 @@ class Token {
     final prefs = await SharedPreferences.getInstance();
     return !prefs.containsKey(_tokenKey);
   }
+
+  Future<bool> isTokenValid() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_tokenKey);
+    final expired = prefs.getString(_expiredKey);
+
+    if (token == null || expired == null) return false;
+
+    final expiryDate = DateTime.tryParse(expired);
+    if (expiryDate == null) return false;
+
+    return DateTime.now().isBefore(expiryDate);
+  }
+
 }
